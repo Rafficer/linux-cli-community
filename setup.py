@@ -7,7 +7,7 @@ from setuptools import setup
 
 version = re.search(
     r'(VERSION = "(\d.\d.\d)")',
-    open("pvpn_cli/constants.py").read(),
+    open("protonvpn_cli/constants.py").read(),
     re.M
     ).group(2)
 
@@ -17,13 +17,13 @@ with open("README.md", "rb") as f:
 
 
 setup(
-    name="pvpn_cli",
-    packages=["pvpn_cli"],
+    name="protonvpn_cli",
+    packages=["protonvpn_cli"],
     entry_points={
-        "console_scripts": ["protonvpn-cli = pvpn_cli.cli:main"]
+        "console_scripts": ["protonvpn = protonvpn_cli.cli:main"]
         },
     version=version,
-    data_files=[("pvpn_cli", ["pvpn_cli/country_codes.json"])],
+    data_files=[("protonvpn_cli", ["protonvpn_cli/country_codes.json"])],
     description="Linux command-line client for ProtonVPN",
     long_description=long_descr,
     author="Proton Technologies AG",

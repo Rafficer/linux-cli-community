@@ -55,17 +55,17 @@ On Arch/Manjaro:
 
 ## How to use
 
-You can see a full set of commands and examples by running `protonvpn-cli --help`.
+You can see a full set of commands and examples by running `protonvpn --help`.
 
 **Most of the commands need to be run as root, so use sudo with the commands in this guide!**
 
 Before using any other commands, you need to initialize your profile:
 
-`protonvpn-cli init`
+`protonvpn init`
 
 To connect to a server you always need the `connect` option (or just `c`):
 
-`protonvpn-cli connect`
+`protonvpn connect`
 
 Running it just like that will give you a menu that let's you select the country, server and protocol interactively:
 
@@ -75,75 +75,75 @@ Running it just like that will give you a menu that let's you select the country
 
 If you specify a servername after connect, you can directly connect to a server of your choice:
 
-`protonvpn-cli connect US-NY#6`
+`protonvpn connect US-NY#6`
 
 The servername can be written in a few different formats. `usny6`, `us-ny-6`, `usny-06` all work.
 
 To connect to the fastest server, you can use the `--fastest` or `-f` flag:
 
-`protonvpn-cli c --fastest`
+`protonvpn c --fastest`
 
-`protonvpn-cli c -f`
+`protonvpn c -f`
 
 There's also a flag to connect to a completely random server, `--random` or `-r`:
 
-`protonvpn-cli c -r`
+`protonvpn c -r`
 
 There are a few methods of fastest connect. You can connect to the fastest server of a country, the fastest Secure-Core server, the fastest P2P server or the fastest Tor server.
 
 Fastest server in a country (replace UK with the code of the desired country, e.g. `US` for USA, `JP` for Japan, `AU` for Australia, etc.):
 
-`protonvpn-cli c --cc UK`
+`protonvpn c --cc UK`
 
 Fastest Secure-Core server:
 
-`protonvpn-cli c --sc`
+`protonvpn c --sc`
 
 Fastest P2P/torrent server:
 
-`protonvpn-cli c --p2p`
+`protonvpn c --p2p`
 
 Fastest Tor server:
 
-`protonvpn-cli c --tor`
+`protonvpn c --tor`
 
 All connection methods (except the interactive menu) can be used with the `-p` flag to choose a protocol. Possible values are either `TCP` or `UDP` If that flag is not used it will use the default protcol specified in the initialization:
 
 Connect to the fastest server with TCP:
 
-`protonvpn-cli c -f -p TCP`
+`protonvpn c -f -p TCP`
 
 Connect to a random server with UDP:
 
-`protonvpn-cli c -rp UDP`
+`protonvpn c -rp UDP`
 
 To disconnect the VPN, you need to use the `disconnect` or `d` option:
 
-`protonvpn-cli disconnect`
+`protonvpn disconnect`
 
-`protonvpn-cli d`
+`protonvpn d`
 
 If you're having trouble with your connection, e.g. because you switched networks or your device woke up from sleeping, you can easily reconnect to the last server with the `reconnect` or `r` option:
 
-`protonvpn-cli reconnect`
+`protonvpn reconnect`
 
-`protonvpn-cli r`
+`protonvpn r`
 
 If you want to see the status and information of your current connection, you can use the `status` or `s` option, which doesn't require root:
 
-`protonvpn-cli status`
+`protonvpn status`
 
-`protonvpn-cli s`
+`protonvpn s`
 
 ![status-example](https://i.imgur.com/RBUG2C3.png)
 
 If you want to change different values that you've set during initialization, you can do this with the `configure` option, just follow the prompts to change your username/password, default protocol and so on:
 
-`protonvpn-cli configure`
+`protonvpn configure`
 
-Finally, to uninstall protonvpn-cli, use the `uninstall` option. It will entirely remove the program and configuration from your device 😔:
+Finally, to uninstall protonvpn, use the `uninstall` option. It will entirely remove the program and configuration from your device 😔:
 
-`protonvpn-cli uninstall`
+`protonvpn uninstall`
 
 
 ## Getting started (dev)
