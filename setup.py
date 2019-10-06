@@ -12,8 +12,15 @@ version = re.search(
     ).group(2)
 
 
-with open("README.md", "rb") as f:
-    long_descr = f.read().decode("utf-8")
+long_descr = """
+ProtonVPN-CLI
+
+A Linux CLI for ProtonVPN.
+
+For further information and a usage guide, please view the project page:
+
+https://github.com/ProtonVPN/protonvpn-cli-ng
+"""
 
 
 setup(
