@@ -91,10 +91,12 @@ from . import connection
 from .logger import logger
 from .utils import (
     check_root, change_file_owner, pull_server_data, make_ovpn_template,
-    check_init, set_config_value, get_config_value
+    check_init, set_config_value, get_config_value, is_valid_ip
 )
 # Constants
-from .constants import CONFIG_DIR, CONFIG_FILE, PASSFILE, USER, VERSION
+from .constants import (
+    CONFIG_DIR, CONFIG_FILE, PASSFILE, USER, VERSION, SPLIT_TUNNEL_FILE
+)
 
 
 def main():
@@ -242,13 +244,6 @@ def init_cli():
     # Enable or disable DNS Leak Protection
     dns_leak_protection, custom_dns = set_dns_protection(write=False)
 
-    # Enable or disable VPN Killswitch
-    print(
-        "The Killswitch will block all network traffic\n"
-        "if the VPN connection drops unexpectedly."
-    )
-    killswitch = set_killswitch(write=False)
-
     protonvpn_plans = {1: "Free", 2: "Basic", 3: "Plus", 4: "Visionary"}
 
     print()
@@ -260,7 +255,6 @@ def init_cli():
         "Default protocol: {0}\n".format(user_protocol.upper()),
         "DNS Leak Protection: {0}\n"
         .format('On' if dns_leak_protection else 'Off'),
-        "Killswitch: {0}".format('On' if killswitch else 'Off'),
     )
     if custom_dns:
         print("Custom DNS: {0}\n".format(custom_dns))
@@ -288,7 +282,7 @@ def init_cli():
         set_config_value("USER", "default_protocol", user_protocol)
         set_config_value("USER", "dns_leak_protection", dns_leak_protection)
         set_config_value("USER", "custom_dns", custom_dns)
-        set_config_value("USER", "killswitch", killswitch)
+        set_config_value("USER", "killswitch", 0)
 
         with open(PASSFILE, "w") as f:
             f.write("{0}\n{1}".format(ovpn_username, ovpn_password))
@@ -318,6 +312,7 @@ def configure_cli():
             "3) Default Protocol\n"
             "4) DNS Management\n"
             "5) Killswitch\n"
+            "6) Split Tunneling\n"
         )
 
         user_choice = input(
@@ -339,6 +334,9 @@ def configure_cli():
             break
         elif user_choice == "5":
             set_killswitch(write=True)
+            break
+        elif user_choice == "6":
+            set_split_tunnel()
             break
         elif user_choice == "":
             print("Quitting configuration.")
@@ -521,6 +519,10 @@ def set_dns_protection(write=False):
 def set_killswitch(write=False):
     """Enable or disable the Killswitch."""
 
+    print(
+        "The Killswitch will block all network traffic\n"
+        "if the VPN connection drops unexpectedly."
+    )
     print()
     user_choice = input("Enable VPN Killswitch? [y/N]: ")
 
@@ -534,4 +536,44 @@ def set_killswitch(write=False):
         print()
         print("Killswitch configuration updated.")
 
-    return killswitch
+
+def set_split_tunnel():
+    """Enable or disable split tunneling"""
+
+    print()
+    user_choice = input("Enable split tunneling? [y/N]: ")
+
+    if user_choice.strip().lower() == "y":
+        set_config_value("USER", "split_tunnel", 1)
+
+        while True:
+            ip = input(
+                "Please enter an IP or CIDR to exclude from VPN.\n"
+                "Or leave empty to stop: "
+            ).strip()
+
+            if ip == "":
+                break
+
+            if not is_valid_ip(ip):
+                print("[!] Invalid IP")
+                print()
+                continue
+
+            with open(SPLIT_TUNNEL_FILE, "a") as f:
+                f.write("\n{0}".format(ip))
+
+        change_file_owner(SPLIT_TUNNEL_FILE)
+
+    else:
+        set_config_value("USER", "split_tunnel", 0)
+
+        if os.path.isfile(SPLIT_TUNNEL_FILE):
+            clear_config = input("Remove split tunnel configuration? [y/N]: ")
+
+            if clear_config.strip().lower() == "y":
+                os.remove(SPLIT_TUNNEL_FILE)
+
+    print()
+    print("Split tunneling configuration updated.")
+    make_ovpn_template()

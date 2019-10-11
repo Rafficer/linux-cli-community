@@ -14,7 +14,7 @@ import requests
 from .logger import logger
 # Constants
 from .constants import (
-    USER, CONFIG_FILE, SERVER_INFO_FILE, TEMPLATE_FILE
+    USER, CONFIG_FILE, SERVER_INFO_FILE, TEMPLATE_FILE, SPLIT_TUNNEL_FILE
 )
 
 
@@ -185,6 +185,47 @@ def is_connected():
     return True if ovpn_processes != [] else False
 
 
+def cidr_to_netmask(cidr):
+    netmask = "0"
+    cidr_netmask = {
+        1: "128.0.0.0",
+        2: "192.0.0.0",
+        3: "224.0.0.0",
+        4: "240.0.0.0",
+        5: "248.0.0.0",
+        6: "252.0.0.0",
+        7: "254.0.0.0",
+        8: "255.0.0.0",
+        9: "255.128.0.0",
+        10: "255.192.0.0",
+        11: "255.224.0.0",
+        12: "255.240.0.0",
+        13: "255.248.0.0",
+        14: "255.252.0.0",
+        15: "255.254.0.0",
+        16: "255.255.0.0",
+        17: "255.255.128.0",
+        18: "255.255.192.0",
+        19: "255.255.224.0",
+        20: "255.255.240.0",
+        21: "255.255.248.0",
+        22: "255.255.252.0",
+        23: "255.255.254.0",
+        24: "255.255.255.0",
+        25: "255.255.255.128",
+        26: "255.255.255.192",
+        27: "255.255.255.224",
+        28: "255.255.255.240",
+        29: "255.255.255.248",
+        30: "255.255.255.252",
+        31: "255.255.255.254",
+        32: "255.255.255.255",
+    }
+
+    netmask = cidr_netmask[cidr]
+    return netmask
+
+
 def make_ovpn_template():
     """Create OpenVPN template file."""
     pull_server_data()
@@ -204,6 +245,51 @@ def make_ovpn_template():
         for chunk in config_file_response.iter_content(100000):
             f.write(chunk)
             logger.debug("OpenVPN config file downloaded")
+
+    # Write split tunneling config to OpenVPN Template
+    try:
+        if get_config_value("USER", "split_tunnel") == "1":
+            split = True
+        else:
+            split = False
+    except KeyError:
+        split = False
+    if split:
+        logger.debug("Writing Split Tunnel config")
+        with open(SPLIT_TUNNEL_FILE, "r") as f:
+            content = f.readlines()
+
+        with open(TEMPLATE_FILE, "a") as f:
+            for line in content:
+                line = line.rstrip("\n")
+                netmask = None
+
+                if not is_valid_ip(line):
+                    logger.debug(
+                        "[!] '{0}' is invalid. Skipped.".format(line)
+                    )
+                    continue
+
+                if "/" in line:
+                    ip, cidr = line.split("/")
+                    netmask = cidr_to_netmask(int(cidr))
+                else:
+                    ip = line
+
+                if netmask is None:
+                    netmask = "255.255.255.255"
+
+                if is_valid_ip(ip):
+                    f.write(
+                        "\nroute {0} {1} net_gateway".format(ip, netmask)
+                    )
+
+                else:
+                    logger.debug(
+                        "[!] '{0}' is invalid. Skipped.".format(line)
+                    )
+
+        logger.debug("Split Tunneling Written")
 
     # Remove all remote, proto, up, down and script-security lines
     # from template file
@@ -296,3 +382,19 @@ def check_init(check_props=True):
         )
         logger.debug("Initialized Profile not found")
         sys.exit(1)
+
+
+def is_valid_ip(ipaddr):
+    valid_ip_re = re.compile(
+        r'^(25[0-5]|2[0-4][0-9]|[0-1]?[0-9][0-9]?)\.'
+        r'(25[0-5]|2[0-4][0-9]|[0-1]?[0-9][0-9]?)\.'
+        r'(25[0-5]|2[0-4][0-9]|[0-1]?[0-9][0-9]?)\.'
+        r'(25[0-5]|2[0-4][0-9]|[0-1]?[0-9][0-9]?)'
+        r'(/(3[0-2]|[12][0-9]|[1-9]))?$'  # Matches CIDR
+    )
+
+    if valid_ip_re.match(ipaddr):
+        return True
+
+    else:
+        return False
