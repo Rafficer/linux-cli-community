@@ -140,16 +140,10 @@ def get_ip_info():
 def get_country_name(code):
     """Return the full name of a country from code"""
 
-    # Very abstract to make it work with pyinstaller and python
-    cc_file = os.path.join(os.path.split(
-        os.path.abspath(__file__))[0], "country_codes.json"
-    )
-
-    with open(cc_file, "r") as f:
-        cc_to_name = json.load(f)["cc_to_name"]
+    from .country_codes import country_codes
 
     try:
-        return cc_to_name[code]
+        return country_codes["cc_to_name"][code]
     except KeyError:
         return code
 

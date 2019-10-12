@@ -30,7 +30,6 @@ setup(
         "console_scripts": ["protonvpn = protonvpn_cli.cli:main"]
         },
     version=version,
-    data_files=[("protonvpn_cli", ["protonvpn_cli/country_codes.json"])],
     description="Linux command-line client for ProtonVPN",
     long_description=long_descr,
     author="Proton Technologies AG",
