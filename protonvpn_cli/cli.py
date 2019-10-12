@@ -15,7 +15,6 @@ Usage:
     protonvpn (s | status)
     protonvpn configure
     protonvpn refresh
-    protonvpn uninstall
     protonvpn (-h | --help)
     protonvpn (-v | --version)
 
@@ -38,7 +37,6 @@ Commands:
     s, status           Show connection status.
     configure           Change ProtonVPN-CLI configuration.
     refresh             Refresh OpenVPN configuration and server data.
-    uninstall           Uninstall the CLI.
 
 Arguments:
     <servername>        Servername (CH#4, CH-US-1, HK5-Tor).
@@ -167,9 +165,6 @@ def cli():
     elif args.get("refresh"):
         pull_server_data(force=True)
         make_ovpn_template()
-    elif args.get("uninstall"):
-        check_root()
-        uninstall()
 
 
 def init_cli():
@@ -313,6 +308,7 @@ def configure_cli():
             "4) DNS Management\n"
             "5) Killswitch\n"
             "6) Split Tunneling\n"
+            "7) Purge Configuration\n"
         )
 
         user_choice = input(
@@ -338,6 +334,10 @@ def configure_cli():
         elif user_choice == "6":
             set_split_tunnel()
             break
+        # Make sure this is always the last option
+        elif user_choice == "7":
+            purge_configuration()
+            break
         elif user_choice == "":
             print("Quitting configuration.")
             sys.exit(0)
@@ -348,20 +348,23 @@ def configure_cli():
             time.sleep(0.5)
 
 
-def uninstall():
-    """Uninstall the CLI"""
+def purge_configuration():
+    """Purges CLI configuration"""
 
-    # Function may be removed as other package managers will handle this
-    # Further discussion needed
+    user_choice = input(
+        "Are you sure you want to purge the configuration? [y/N]: "
+    ).lower().strip()
 
-    connection.disconnect()
+    if not user_choice == "y":
+        return
+
+    print("Okay :(")
+    time.sleep(0.5)
+
+    connection.disconnect(passed=True)
     if os.path.isdir(CONFIG_DIR):
         shutil.rmtree(CONFIG_DIR)
-    if os.path.isdir("/usr/local/pvpn-cli"):
-        shutil.rmtree("/usr/local/pvpn-cli")
-    if os.path.islink("/usr/local/bin/pvpn-cli"):
-        os.unlink("/usr/local/bin/pvpn-cli")
-    print("ProtonVPN-CLI and Configuration uninstalled.")
+    print("Configuration purged.")
 
 
 def set_username_password(write=False):

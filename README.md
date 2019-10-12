@@ -135,15 +135,23 @@ If you want to see the status and information of your current connection, you ca
 
 `protonvpn s`
 
-![status-example](https://i.imgur.com/RBUG2C3.png)
+![status-example](https://i.imgur.com/8YRp2oS.png)
 
 If you want to change different values that you've set during initialization, you can do this with the `configure` option, just follow the prompts to change your username/password, default protocol and so on:
 
 `protonvpn configure`
 
-Finally, to uninstall protonvpn, use the `uninstall` option. It will entirely remove the program and configuration from your device 😔:
+![configuration-example](https://i.imgur.com/JjdoPm7.png)
 
-`protonvpn uninstall`
+## Uninstallation
+
+If you want to uninstall ProtonVPN-CLI, run `configure` first and purge the configuration. Then uninstall through the package manager you used for installation.
+
+For PIP this would be
+
+`sudo pip uninstall protonvpn-cli`
+
+Bye Bye 😔
 
 
 ## Getting started (dev)
