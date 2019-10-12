@@ -414,16 +414,16 @@ def status():
     # Print Status Output
     logger.debug("Printing status")
     print(
-        "Status:       Connected\n",
-        "Time:         {0}\n".format(connection_time),
-        "IP:           {0}\n".format(ip),
-        "Server:       {0}\n".format(connected_server),
-        "Features:     {0}\n".format(all_features[feature]),
-        "Protocol:     {0}\n".format(connected_protocol.upper()),
-        "Killswitch:   {0}\n".format(killswitch_status),
-        "Country:      {0}\n".format(country),
-        "City:         {0}\n".format(city),
-        "Load:         {0}%".format(load),
+        "Status:       Connected\n" +
+        "Time:         {0}\n".format(connection_time) +
+        "IP:           {0}\n".format(ip) +
+        "Server:       {0}\n".format(connected_server) +
+        "Features:     {0}\n".format(all_features[feature]) +
+        "Protocol:     {0}\n".format(connected_protocol.upper()) +
+        "Killswitch:   {0}\n".format(killswitch_status) +
+        "Country:      {0}\n".format(country) +
+        "City:         {0}\n".format(city) +
+        "Load:         {0}%".format(load)
     )
 
 
