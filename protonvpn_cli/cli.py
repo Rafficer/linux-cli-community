@@ -1,23 +1,23 @@
-"""pvpn-cli 0.1.0
+"""
 A community maintened CLI for ProtonVPN.
 
 Usage:
-    pvpn-cli init
-    pvpn-cli (c | connect) [<servername>] [-p <protocol>]
-    pvpn-cli (c | connect) [-f | --fastest] [-p <protocol>]
-    pvpn-cli (c | connect) [--cc <code>] [-p <protocol>]
-    pvpn-cli (c | connect) [--sc] [-p <protocol>]
-    pvpn-cli (c | connect) [--p2p] [-p <protocol>]
-    pvpn-cli (c | connect) [--tor] [-p <protocol>]
-    pvpn-cli (c | connect) [-r | --random] [-p <protocol>]
-    pvpn-cli (r | reconnect)
-    pvpn-cli (d | disconnect)
-    pvpn-cli (s | status)
-    pvpn-cli configure
-    pvpn-cli refresh
-    pvpn-cli uninstall
-    pvpn-cli (-h | --help)
-    pvpn-cli (-v | --version)
+    protonvpn init
+    protonvpn (c | connect) [<servername>] [-p <protocol>]
+    protonvpn (c | connect) [-f | --fastest] [-p <protocol>]
+    protonvpn (c | connect) [--cc <code>] [-p <protocol>]
+    protonvpn (c | connect) [--sc] [-p <protocol>]
+    protonvpn (c | connect) [--p2p] [-p <protocol>]
+    protonvpn (c | connect) [--tor] [-p <protocol>]
+    protonvpn (c | connect) [-r | --random] [-p <protocol>]
+    protonvpn (r | reconnect)
+    protonvpn (d | disconnect)
+    protonvpn (s | status)
+    protonvpn configure
+    protonvpn refresh
+    protonvpn uninstall
+    protonvpn (-h | --help)
+    protonvpn (-v | --version)
 
 Options:
     -f, --fastest       Select the fastest ProtonVPN server.
@@ -36,7 +36,7 @@ Commands:
     r, reconnect        Reconnect to the last server.
     d, disconnect       Disconnect the current session.
     s, status           Show connection status.
-    configure           Change pvpn-cli configuration.
+    configure           Change ProtonVPN-CLI configuration.
     refresh             Refresh OpenVPN configuration and server data.
     uninstall           Uninstall the CLI.
 
@@ -44,36 +44,36 @@ Arguments:
     <servername>        Servername (CH#4, CH-US-1, HK5-Tor).
 
 Examples:
-    pvpn-cli connect
+    protonvpn connect
                         Display a menu and select server interactively.
-    pvpn-cli c BE-5
+    protonvpn c BE-5
                         Connect to BE#5 with the default protocol.
 
-    pvpn-cli connect NO#3 -p tcp
+    protonvpn connect NO#3 -p tcp
                         Connect to NO#3 with TCP.
 
-    pvpn-cli c --fastest
+    protonvpn c --fastest
                         Connect to the fastest VPN Server.
 
-    pvpn-cli connect --cc AU
+    protonvpn connect --cc AU
                         Connect to the fastest Australian server
                         with the default protocol.
 
-    pvpn-cli c --p2p -p tcp
+    protonvpn c --p2p -p tcp
                         Connect to the fastest torrent server with TCP.
 
-    pvpn-cli c --sc
+    protonvpn c --sc
                         Connect to the fastest Secure-Core server with
                         the default protocol.
 
-    pvpn-cli reconnect
+    protonvpn reconnect
                         Reconnect the currently active session or connect
                         to the last connected server.
 
-    pvpn-cli disconnect
+    protonvpn disconnect
                         Disconnect the current session.
 
-    pvpn-cli s
+    protonvpn s
                         Print information about the current session.
 """
 # Standard Libraries
@@ -86,7 +86,7 @@ import shutil
 import time
 # External Libraries
 from docopt import docopt
-# pvpn-cli Functions
+# protonvpn-cli Functions
 from . import connection
 from .logger import logger
 from .utils import (
@@ -218,7 +218,7 @@ def init_cli():
         pass
 
     term_width = shutil.get_terminal_size()[0]
-    print("[ -- PVPN-CLI INIT -- ]\n".center(term_width))
+    print("[ -- PROTONVPN-CLI INIT -- ]\n".center(term_width))
 
     init_msg = (
         "ProtonVPN uses two different sets of credentials, one for the "
@@ -361,7 +361,7 @@ def uninstall():
         shutil.rmtree("/usr/local/pvpn-cli")
     if os.path.islink("/usr/local/bin/pvpn-cli"):
         os.unlink("/usr/local/bin/pvpn-cli")
-    print("PVPN-CLI and Configuration uninstalled.")
+    print("ProtonVPN-CLI and Configuration uninstalled.")
 
 
 def set_username_password(write=False):

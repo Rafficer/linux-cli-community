@@ -350,7 +350,7 @@ def check_init(check_props=True):
         if not int(get_config_value("USER", "initialized")):
             print(
                 "[!] There has been no profile initialized yet. "
-                "Please run 'pvpn-cli init'."
+                "Please run 'protonvpn init'."
             )
             logger.debug("Initialized Profile not found")
             sys.exit(1)
@@ -358,7 +358,7 @@ def check_init(check_props=True):
             # Check if required properties are set.
             # This is to ensure smooth updates so the user can be warned
             # when a property is missing and can be ordered
-            # to run `pvpn-cli configure` or something else.
+            # to run `protonvpn configure` or something else.
 
             required_props = ["username", "tier", "default_protocol",
                               "dns_leak_protection", "custom_dns"]
@@ -369,7 +369,7 @@ def check_init(check_props=True):
                 except KeyError:
                     print(
                         "[!] {0} is missing from configuration.\n".format(prop), # noqa
-                        "[!] Please run 'pvpn-cli configure' to set it."
+                        "[!] Please run 'protonvpn configure' to set it."
                     )
                     logger.debug(
                         "{0} is missing from configuration".format(prop)
@@ -378,7 +378,7 @@ def check_init(check_props=True):
     except KeyError:
         print(
             "[!] There has been no profile initialized yet. "
-            "Please run 'pvpn-cli init'."
+            "Please run 'protonvpn init'."
         )
         logger.debug("Initialized Profile not found")
         sys.exit(1)

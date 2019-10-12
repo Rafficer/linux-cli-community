@@ -13,7 +13,7 @@ import zlib
 # External Libraries
 from dialog import Dialog
 from .logger import logger
-# pvpn-cli Functions
+# protonvpn-cli Functions
 from .utils import (
     check_init, pull_server_data, is_connected,
     get_servers, get_server_value, get_config_value,
@@ -34,7 +34,7 @@ def dialog():
 
         logger.debug("Showing Dialog: {0}".format(headline))
 
-        code, tag = d.menu(headline, title="PVPN-CLI", choices=choices)
+        code, tag = d.menu(headline, title="ProtonVPN-CLI", choices=choices)
         if code == "ok":
             return tag
         else:
@@ -364,7 +364,7 @@ def status():
         dns_server = get_config_value("metadata", "dns_server")
     except KeyError:
         print("It looks like there never was a connection.\n"
-              "Please connect with 'pvpn-cli c' first.")
+              "Please connect with 'protonvpn connect' first.")
         sys.exit(1)
 
     # Check if the VPN Server is reachable
@@ -374,7 +374,7 @@ def status():
     if ping.returncode != 0:
         logger.debug("Could not reach VPN server")
         print("[!] Could not reach the VPN Server")
-        print("[!] You may want to reconnect with 'pvpn-cli reconnect'")
+        print("[!] You may want to reconnect with 'protonvpn reconnect'")
         return
 
     servers = get_servers()
@@ -577,7 +577,7 @@ def manage_dns(mode, dns_server=False):
 
         # Add ProtonVPN DNS Server to resolv.conf
         with open("/etc/resolv.conf", "a") as f:
-            f.write("# ProtonVPN DNS Servers. Managed by pvpn-cli.\n")
+            f.write("# ProtonVPN DNS Servers. Managed by ProtonVPN-CLI.\n")
             f.write("nameserver {0}\n".format(dns_server))
             logger.debug("Added ProtonVPN or custom DNS")
 
