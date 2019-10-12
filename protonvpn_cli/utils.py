@@ -341,6 +341,7 @@ def check_root():
                 logger.debug("{0} not found".format(program))
                 print("'{0}' not found. \n".format(program),
                       "Please install {0}.".format(program))
+                sys.exit(1)
 
 
 def check_init(check_props=True):
