@@ -180,7 +180,7 @@ def init_cli():
             "initialized": "0",
             "dns_leak_protection": "1",
             "custom_dns": "None",
-            "check_update_interval": "7",
+            "check_update_interval": "3",
         }
         config["metadata"] = {
             "last_api_pull": "0",

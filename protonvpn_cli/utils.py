@@ -14,7 +14,8 @@ import requests
 from .logger import logger
 # Constants
 from .constants import (
-    USER, CONFIG_FILE, SERVER_INFO_FILE, TEMPLATE_FILE, SPLIT_TUNNEL_FILE
+    USER, CONFIG_FILE, SERVER_INFO_FILE, TEMPLATE_FILE, SPLIT_TUNNEL_FILE,
+    VERSION
 )
 
 
@@ -336,6 +337,79 @@ def check_root():
                 print("'{0}' not found. \n".format(program),
                       "Please install {0}.".format(program))
                 sys.exit(1)
+
+
+def check_update():
+    """Return the download URL if an Update is available, False if otherwise"""
+
+    def get_latest_version():
+        """Return the latest version from pypi"""
+        logger.debug("Calling pypi API")
+        try:
+            r = requests.get("https://test.pypi.org/pypi/protonvpn-cli/json")
+        except (requests.exceptions.ConnectionError,
+                requests.exceptions.ConnectTimeout):
+            logger.debug("Couldn't connect to pypi API")
+            return False
+        try:
+            r.raise_for_status()
+        except requests.exceptions.HTTPError:
+            logger.debug(
+                "HTTP Error with pypi API: {0}".format(r.status_code)
+            )
+            return False
+
+        release = r.json()["info"]["version"]
+
+        return release
+
+    # Determine if an update check should be run
+    check_interval = int(get_config_value("USER", "check_update_interval"))
+    check_interval = check_interval * 24 * 3600
+    last_check = int(get_config_value("metadata", "last_update_check"))
+
+    if (last_check + check_interval) >= time.time():
+        # Don't check for update
+        return
+
+    logger.debug("Checking for new update")
+    current_version = list(VERSION.split("."))
+    current_version = [int(i) for i in current_version]
+    logger.debug("Current: {0}".format(current_version))
+
+    latest_version = get_latest_version()
+    if not latest_version:
+        # Skip if get_latest_version() ran into errors
+        return
+    latest_version = latest_version.split(".")
+    latest_version = [int(i) for i in latest_version]
+    logger.debug("Latest: {0}".format(latest_version))
+
+    for idx, i in enumerate(latest_version):
+        if i > current_version[idx]:
+            logger.debug("Update found")
+            update_available = True
+            break
+        elif i < current_version[idx]:
+            logger.debug("No update")
+            update_available = False
+            break
+    else:
+        logger.debug("No update")
+        update_available = False
+
+    set_config_value("metadata", "last_update_check", int(time.time()))
+
+    if update_available:
+        print()
+        print(
+            "A new Update for ProtonVPN-CLI (v{0}) ".format('.'.join(
+                [str(x) for x in latest_version])
+                ) +
+            "is available.\n" +
+            "Follow the Update instructions on " +
+            "https://github.com/ProtonVPN/protonvpn-cli-ng"
+        )
 
 
 def check_init(check_props=True):

@@ -18,7 +18,7 @@ from .utils import (
     check_init, pull_server_data, is_connected,
     get_servers, get_server_value, get_config_value,
     set_config_value, get_ip_info, get_country_name,
-    get_fastest_server
+    get_fastest_server, check_update
 )
 # Constants
 from .constants import (
@@ -531,6 +531,8 @@ def openvpn_connect(servername, protocol):
 
     with open(CONFIG_FILE, "w+") as f:
         config.write(f)
+
+    check_update()
 
 
 def manage_dns(mode, dns_server=False):
