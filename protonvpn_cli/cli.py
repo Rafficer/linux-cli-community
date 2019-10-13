@@ -504,12 +504,25 @@ def set_dns_protection(write=False):
         dns_leak_protection = 0
         print()
         user_choice = input(
-            "Would you like to use a custom DNS server? [y/N]: "
+            "Would you like to use custom DNS servers? [y/N]: "
         )
         user_choice = user_choice.strip().lower()
         if user_choice == "y":
-            custom_dns = input("Please enter your custom DNS server: ")
-            custom_dns = custom_dns.strip()
+            custom_dns = input(
+                "Please enter your custom DNS servers (space separated): "
+            )
+            custom_dns = custom_dns.strip().split()
+
+            # Check DNS Servers for validity
+            if len(custom_dns) > 3:
+                print("[!] Don't enter more than 3 DNS Servers")
+                return
+
+            for dns in custom_dns:
+                if not is_valid_ip(dns):
+                    print("[!] {0} is invalid. Please try again.".format(dns))
+                    return
+            custom_dns = " ".join(dns for dns in custom_dns)
 
     if write:
         set_config_value("USER", "dns_leak_protection", dns_leak_protection)

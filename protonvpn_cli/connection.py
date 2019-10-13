@@ -577,10 +577,12 @@ def manage_dns(mode, dns_server=False):
                 print(line, end="")
         logger.debug("Removed existing DNS Servers")
 
-        # Add ProtonVPN DNS Server to resolv.conf
+        # Add ProtonVPN managed DNS Server to resolv.conf
+        dns_server = dns_server.split()
         with open("/etc/resolv.conf", "a") as f:
             f.write("# ProtonVPN DNS Servers. Managed by ProtonVPN-CLI.\n")
-            f.write("nameserver {0}\n".format(dns_server))
+            for dns in dns_server[:3]:
+                f.write("nameserver {0}\n".format(dns))
             logger.debug("Added ProtonVPN or custom DNS")
 
         # Write the hash of the edited file in the configuration
