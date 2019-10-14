@@ -13,9 +13,7 @@ version = re.search(
 
 
 long_descr = """
-ProtonVPN-CLI
-
-A Linux CLI for ProtonVPN.
+The official Linux CLI for ProtonVPN.
 
 For further information and a usage guide, please view the project page:
 
