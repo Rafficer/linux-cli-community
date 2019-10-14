@@ -2,21 +2,15 @@
 
 ![protonvpn-cli](https://i.imgur.com/tDrwkX5l.png)
 
-## *Disclaimer*
-
-**!! This is a work in progress and not considered production ready at this stage. Use at your own risk. !!**
-
 ### A Linux CLI for ProtonVPN. Written in Python.
 
 ProtonVPN-CLI is a full rewrite of the [bash protonvpn-cli](https://github.com/ProtonVPN/protonvpn-cli/blob/master/protonvpn-cli.sh) in Python to improve readability, speed and reliability as well as add more functionality and features.
 
 ## Installation and Updating
 
-*WIP - Likely via PIP*
+### Installation
 
-### Dependencies
-
-Required system packages:
+**Dependencies:**
 
 * openvpn
 * dialog (optional, needed for interactive selection)
@@ -27,15 +21,29 @@ On Fedora/CentOS/RHEL:
 
 `sudo dnf install -y openvpn dialog python3-pip`
 
+`sudo pip3 install protonvpn-cli`
+
 On Debian/Ubuntu/Linux Mint and derivatives:
 
 `sudo apt install -y openvpn dialog python3-pip`
+
+`sudo pip3 install protonvpn-cli`
 
 On Arch/Manjaro:
 
 `sudo pacman -S openvpn dialog`
 
-### CLI Installation
+`sudo pip3 install protonvpn-cli`
+
+Make sure to run pip as sudo so it installs globally and also recognizes the command with sudo.
+
+### Updating
+
+Updating works via PIP as well
+
+`sudo pip3 install protonvpn-cli --update`
+
+### Manual Installation from source
 
 1. Clone this repository or download the zip file
 
@@ -51,9 +59,33 @@ On Arch/Manjaro:
 
 3. Install (make sure to use sudo to install globally)
 
-    `sudo setup.py install`
+    `sudo pip3 install .`
 
 ## How to use
+
+### Brief list of commands
+
+| **Command**                       | **Description**                                       |
+|:----------------------------------|:------------------------------------------------------|
+|`protonvpn init`                   | Initialize ProtonVPN profile.                         |
+|`protonvpn connect, c`             | Select a ProtonVPN server and connect to it.          |
+|`protonvpn c [servername]`         | Connect to a specified server.                        |
+|`protonvpn c -r`                   | Connect to a random server.                           |
+|`protonvpn c -f`                   | Connect to the fastest server.                        |
+|`protonvpn c --p2p`                | Connect to the fastest P2P server.                    |
+|`protonvpn c --cc [countrycode]`   | Connect to the fastest server in a specified country. |
+|`protonvpn c --sc`                 | Connect to the fastest Secure-Core server.            |
+|`protonvpn reconnect, r`           | Reconnect or connect to the last used server.         |
+|`protonvpn disconnect, d`          | Disconnect the current session.                       |
+|`protonvpn status, s`              | Print connection status.                              |
+|`protonvpn configure`              | Change CLI configuration.                             |
+|`protonvpn refresh`                | Refresh OpenVPN configuration and server data.        |
+|`protonvpn examples`               | Print example commands.                               |
+|`protonvpn --version`              | Display version.                                      |
+|`protonvpn --help`                 | Show help message.                                    |
+
+All connect options can be used with the `-p` flag to explicitly specify the Protocol (either `udp` or `tcp`).
+### Extensive explanation
 
 You can see a full set of commands and examples by running `protonvpn --help`.
 
@@ -69,9 +101,9 @@ To connect to a server you always need the `connect` option (or just `c`):
 
 Running it just like that will give you a menu that let's you select the country, server and protocol interactively:
 
-![country-selection](https://i.imgur.com/7WGmwbN.png)
+![country-selection](https://i.imgur.com/lRwx67E.png)
 
-![server-selection](https://i.imgur.com/jbXP43z.png)
+![server-selection](https://i.imgur.com/lRwx67E.png)
 
 If you specify a servername after connect, you can directly connect to a server of your choice:
 
@@ -152,51 +184,3 @@ For PIP this would be
 `sudo pip uninstall protonvpn-cli`
 
 Bye Bye 😔
-
-
-## Getting started (dev)
-
-These instructions will help you to get a copy of the project up and running on your local environment for development, testing and verification purposes.
-
-### Prerequisites
-
-System packages:
-
-* Python 3.5+
-* pip
-* openvpn
-* dialog
-
-Python Packages:
-
-* docopt
-* requests
-* pythondialog
-
-### Installation
-
-1. Clone this project:
-
-    `git clone https://github.com/protonvpn/protonvpn-cli-ng`
-
-2. Install the virtualenv package
-
-    `pip3 install virtualenv`
-
-3. Create a virtual environment
-
-    `cd protonvpn-cli-ng`
-    
-    `virtualenv .venv`
-
-4. Enter the virtualenv
-
-    `source .venv/bin/activate`
-
-5. Install the necessary python packages
-
-    `pip install --user -r requirements.txt`
-
-6. You can the use it by running
-    
-    `sudo .venv/bin/python -m pvpn_cli <options>`
