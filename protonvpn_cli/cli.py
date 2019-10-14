@@ -1,5 +1,5 @@
 """
-A community maintened CLI for ProtonVPN.
+A CLI for ProtonVPN.
 
 Usage:
     protonvpn init
@@ -15,6 +15,7 @@ Usage:
     protonvpn (s | status)
     protonvpn configure
     protonvpn refresh
+    protonvpn examples
     protonvpn (-h | --help)
     protonvpn (-v | --version)
 
@@ -37,42 +38,10 @@ Commands:
     s, status           Show connection status.
     configure           Change ProtonVPN-CLI configuration.
     refresh             Refresh OpenVPN configuration and server data.
+    examples            Print some example commands.
 
 Arguments:
     <servername>        Servername (CH#4, CH-US-1, HK5-Tor).
-
-Examples:
-    protonvpn connect
-                        Display a menu and select server interactively.
-    protonvpn c BE-5
-                        Connect to BE#5 with the default protocol.
-
-    protonvpn connect NO#3 -p tcp
-                        Connect to NO#3 with TCP.
-
-    protonvpn c --fastest
-                        Connect to the fastest VPN Server.
-
-    protonvpn connect --cc AU
-                        Connect to the fastest Australian server
-                        with the default protocol.
-
-    protonvpn c --p2p -p tcp
-                        Connect to the fastest torrent server with TCP.
-
-    protonvpn c --sc
-                        Connect to the fastest Secure-Core server with
-                        the default protocol.
-
-    protonvpn reconnect
-                        Reconnect the currently active session or connect
-                        to the last connected server.
-
-    protonvpn disconnect
-                        Disconnect the current session.
-
-    protonvpn s
-                        Print information about the current session.
 """
 # Standard Libraries
 import sys
@@ -165,6 +134,8 @@ def cli():
     elif args.get("refresh"):
         pull_server_data(force=True)
         make_ovpn_template()
+    elif args.get("examples"):
+        print_examples()
 
 
 def init_cli():
@@ -293,6 +264,38 @@ def init_cli():
         print()
         print("Please restart the initialization process.")
         sys.exit(1)
+
+
+def print_examples():
+    """Print some examples on how to use this program"""
+
+    examples = (
+        "protonvpn connect\n"
+        "               Display a menu and select server interactively.\n\n"
+        "protonvpn c BE-5\n"
+        "               Connect to BE#5 with the default protocol.\n\n"
+        "protonvpn connect NO#3 -p tcp\n"
+        "               Connect to NO#3 with TCP.\n\n"
+        "protonvpn c --fastest\n"
+        "               Connect to the fastest VPN Server.\n\n"
+        "protonvpn connect --cc AU\n"
+        "               Connect to the fastest Australian server\n"
+        "               with the default protocol.\n\n"
+        "protonvpn c --p2p -p tcp\n"
+        "               Connect to the fastest torrent server with TCP.\n\n"
+        "protonvpn c --sc\n"
+        "               Connect to the fastest Secure-Core server with\n"
+        "               the default protocol.\n\n"
+        "protonvpn reconnect\n"
+        "               Reconnect the currently active session or connect\n"
+        "               to the last connected server.\n\n"
+        "protonvpn disconnect\n"
+        "               Disconnect the current session.\n\n"
+        "protonvpn s\n"
+        "               Print information about the current session."
+    )
+
+    print(examples)
 
 
 def configure_cli():
