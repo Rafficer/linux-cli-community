@@ -4,7 +4,7 @@
 
 ### A Linux CLI for ProtonVPN. Written in Python.
 
-ProtonVPN-CLI is a full rewrite of the [bash protonvpn-cli](https://github.com/ProtonVPN/protonvpn-cli/blob/master/protonvpn-cli.sh) in Python to improve readability, speed and reliability as well as add more functionality and features.
+ProtonVPN-CLI is a full rewrite of the [bash protonvpn-cli](https://github.com/ProtonVPN/protonvpn-cli/blob/master/protonvpn-cli.sh) in Python, which adds more features and functionality with the purpose of improving readability, speed and reliability.
 
 ## Installation and Updating
 
@@ -35,7 +35,7 @@ On Arch/Manjaro:
 
 `sudo pip3 install protonvpn-cli`
 
-Make sure to run pip as sudo so it installs globally and also recognizes the command with sudo.
+Make sure to run pip as sudo, so it installs globally and recognizes the command with sudo.
 
 ### Updating
 
@@ -87,7 +87,7 @@ Updating works via PIP as well
 All connect options can be used with the `-p` flag to explicitly specify the Protocol (either `udp` or `tcp`).
 ### Extensive explanation
 
-You can see a full set of commands and examples by running `protonvpn --help`.
+You can see the full list of commands by running `protonvpn --help` and a list of examples by running `protonvpn examples`.
 
 **Most of the commands need to be run as root, so use sudo with the commands in this guide!**
 
@@ -105,11 +105,11 @@ Running it just like that will give you a menu that let's you select the country
 
 ![server-selection](https://i.imgur.com/lRwx67E.png)
 
-If you specify a servername after connect, you can directly connect to a server of your choice:
+If you specify a server name after connect, you can directly connect to a server of your choice:
 
 `protonvpn connect US-NY#6`
 
-The servername can be written in a few different formats. `usny6`, `us-ny-6`, `usny-06` all work.
+The server name can be written in a few different ways. For example, `usny6`, `us-ny-6` or `usny-06` are all valid formats.
 
 To connect to the fastest server, you can use the `--fastest` or `-f` flag:
 
@@ -117,7 +117,7 @@ To connect to the fastest server, you can use the `--fastest` or `-f` flag:
 
 `protonvpn c -f`
 
-There's also a flag to connect to a completely random server, `--random` or `-r`:
+You can use the `--random` or `-r` flag to connect to a random server:
 
 `protonvpn c -r`
 
@@ -181,6 +181,6 @@ If you want to uninstall ProtonVPN-CLI, run `configure` first and purge the conf
 
 For PIP this would be
 
-`sudo pip uninstall protonvpn-cli`
+`sudo pip3 uninstall protonvpn-cli`
 
 Bye Bye 😔
