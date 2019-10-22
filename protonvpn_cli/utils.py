@@ -321,7 +321,7 @@ def check_root():
     if getpass.getuser() != "root":
         print(
             "[!] The program was not executed as root.\n"
-            "[!] Plase run as root"
+            "[!] Please run as root"
         )
         logger.debug("Program was executed as root")
         sys.exit(1)
