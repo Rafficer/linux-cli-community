@@ -274,6 +274,11 @@ def reconnect():
 
     logger.debug("Starting reconnect")
 
+    # Prevent killswitch from blocking access to the Proton API, 
+    # in case the VPN session drops. See #1 on Github.
+    manage_killswitch("restore")
+    manage_dns("restore")
+    
     try:
         servername = get_config_value("metadata", "connected_server")
         protocol = get_config_value("metadata", "connected_proto")
