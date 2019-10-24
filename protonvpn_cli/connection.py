@@ -451,8 +451,7 @@ def openvpn_connect(servername, protocol):
         logger.debug("IPs: {0}".format(ip_list))
         logger.debug("connect.ovpn written")
 
-    if is_connected():
-        disconnect(passed=True)
+    disconnect(passed=True)
 
     old_ip, _ = get_ip_info()
 
