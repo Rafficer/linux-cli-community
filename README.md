@@ -29,9 +29,15 @@ On Debian/Ubuntu/Linux Mint and derivatives:
 
 `sudo pip3 install protonvpn-cli`
 
+On SUSE:
+
+`sudo zypper in -y openvpn dialog python3-pip`
+
+`sudo pip3 install protonvpn-cli`
+
 On Arch/Manjaro:
 
-`sudo pacman -S openvpn dialog`
+`sudo pacman -S openvpn dialog python-pip`
 
 `sudo pip3 install protonvpn-cli`
 
