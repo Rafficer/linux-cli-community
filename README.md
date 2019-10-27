@@ -47,7 +47,7 @@ Make sure to run pip as sudo, so it installs globally and recognizes the command
 
 Updating works via PIP as well
 
-`sudo pip3 install protonvpn-cli --update`
+`sudo pip3 install protonvpn-cli --upgrade`
 
 ### Manual Installation from source
 
