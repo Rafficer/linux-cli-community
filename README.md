@@ -109,7 +109,7 @@ Running it just like that will give you a menu that let's you select the country
 
 ![country-selection](https://i.imgur.com/lRwx67E.png)
 
-![server-selection](https://i.imgur.com/lRwx67E.png)
+![server-selection](https://i.imgur.com/M41cc74.png)
 
 If you specify a server name after connect, you can directly connect to a server of your choice:
 
