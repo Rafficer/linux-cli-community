@@ -364,7 +364,7 @@ def status():
         print("ISP:        {0}".format(isp))
 
         if os.path.isfile(os.path.join(CONFIG_DIR, "iptables.backup")):
-            print("[!] Killswitch is active. Run pvpn_cli disconnect.")
+            print("[!] Killswitch is active. Run protonvpn disconnect.")
             logger.debug("Killswitch active while VPN disconnected")
         return
 
