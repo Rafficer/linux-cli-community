@@ -107,9 +107,9 @@ To connect to a server you always need the `connect` option (or just `c`):
 
 Running it just like that will give you a menu that let's you select the country, server and protocol interactively:
 
-![country-selection](https://i.imgur.com/lRwx67E.png)
+![country-selection](https://i.imgur.com/jjJh09J.png)
 
-![server-selection](https://i.imgur.com/M41cc74.png)
+![server-selection](https://i.imgur.com/uXfcHMI.png)
 
 If you specify a server name after connect, you can directly connect to a server of your choice:
 
