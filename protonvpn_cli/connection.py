@@ -802,6 +802,8 @@ def manage_killswitch(mode, proto=None, port=None):
             "iptables -P INPUT DROP",
             "iptables -P OUTPUT DROP",
             "iptables -P FORWARD DROP",
+            "iptables -A OUTPUT -o lo -j ACCEPT",
+            "iptables -A INPUT -i lo -j ACCEPT",
             "iptables -A OUTPUT -o {0} -j ACCEPT".format(device),
             "iptables -A INPUT -i {0} -j ACCEPT".format(device),
             "iptables -A OUTPUT -o {0} -m state --state ESTABLISHED,RELATED -j ACCEPT".format(device), # noqa
