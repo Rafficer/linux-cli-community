@@ -309,7 +309,7 @@ def configure_cli():
             "2) ProtonVPN Plan\n"
             "3) Default Protocol\n"
             "4) DNS Management\n"
-            "5) Killswitch\n"
+            "5) Kill Switch\n"
             "6) Split Tunneling\n"
             "7) Purge Configuration\n"
         )
@@ -536,14 +536,14 @@ def set_dns_protection(write=False):
 
 
 def set_killswitch(write=False):
-    """Enable or disable the Killswitch."""
+    """Enable or disable the Kill Switch."""
 
     print(
-        "The Killswitch will block all network traffic\n"
+        "The Kill Switch will block all network traffic\n"
         "if the VPN connection drops unexpectedly."
     )
     print()
-    user_choice = input("Enable VPN Killswitch? [y/N]: ")
+    user_choice = input("Enable VPN Kill Switch? [y/N]: ")
 
     if user_choice.strip().lower() == "y":
         killswitch = 1
@@ -553,7 +553,7 @@ def set_killswitch(write=False):
     if write:
         set_config_value("USER", "killswitch", killswitch)
         print()
-        print("Killswitch configuration updated.")
+        print("Kill Switch configuration updated.")
 
 
 def set_split_tunnel():
