@@ -184,13 +184,13 @@ If you want to see the status and information of your current connection, you ca
 
 `protonvpn s`
 
-![status-example](https://i.imgur.com/8YRp2oS.png)
+![status-example](https://i.imgur.com/5tm5nOJ.png)
 
 If you want to change different values that you've set during initialization, you can do this with the `configure` option, just follow the prompts to change your username/password, default protocol and so on:
 
 `protonvpn configure`
 
-![configuration-example](https://i.imgur.com/JjdoPm7.png)
+![configuration-example](https://i.imgur.com/tHSkBxk.png)
 
 ## Uninstallation
 

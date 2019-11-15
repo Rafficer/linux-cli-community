@@ -364,8 +364,8 @@ def status():
         print("ISP:        {0}".format(isp))
 
         if os.path.isfile(os.path.join(CONFIG_DIR, "iptables.backup")):
-            print("[!] Killswitch is active. Run protonvpn disconnect.")
-            logger.debug("Killswitch active while VPN disconnected")
+            print("[!] Kill Switch is active. Run protonvpn disconnect.")
+            logger.debug("Kill Switch active while VPN disconnected")
         return
 
     try:
@@ -430,7 +430,7 @@ def status():
         "Server:       {0}\n".format(connected_server) +
         "Features:     {0}\n".format(all_features[feature]) +
         "Protocol:     {0}\n".format(connected_protocol.upper()) +
-        "Killswitch:   {0}\n".format(killswitch_status) +
+        "Kill Switch:  {0}\n".format(killswitch_status) +
         "Country:      {0}\n".format(country) +
         "City:         {0}\n".format(city) +
         "Load:         {0}%".format(load)
@@ -748,9 +748,9 @@ def manage_ipv6(mode):
 
 def manage_killswitch(mode, proto=None, port=None):
     """
-    Disable and enable the VPN Killswitch.
+    Disable and enable the VPN Kill Switch.
 
-    The Killswitch creates IPTables rules that only allow connections to go
+    The Kill Switch creates IPTables rules that only allow connections to go
     through the OpenVPN device. If the OpenVPN process stops for some unkown
     reason this will completely block access to the internet.
     """
@@ -770,23 +770,23 @@ def manage_killswitch(mode, proto=None, port=None):
             logger.debug("No Backupfile found")
         return
 
-    # Stop if killswitch is disabled
+    # Stop if Kill Switch is disabled
     if not int(get_config_value("USER", "killswitch")):
         return
 
     if mode == "enable":
         if os.path.isfile(backupfile):
-            logger.debug("Killswitch backup exists")
+            logger.debug("Kill Switch backup exists")
             manage_killswitch("restore")
 
         with open(os.path.join(CONFIG_DIR, "ovpn.log"), "r") as f:
             content = f.read()
             device = re.search(r"(TUN\/TAP device) (.+) opened", content)
             if not device:
-                print("[!] Killswitch activation failed."
+                print("[!] Kill Switch activation failed."
                       "Device couldn't be determined.")
                 logger.debug(
-                    "Killswitch activation failed. No device in logfile"
+                    "Kill Switch activation failed. No device in logfile"
                 )
             device = device.group(2)
 
@@ -806,7 +806,7 @@ def manage_killswitch(mode, proto=None, port=None):
                 f.write(":OUTPUT ACCEPT\n")
                 f.write("COMMIT\n")
 
-        # Creating Killswitch rules
+        # Creating Kill Switch rules
         iptables_commands = [
             "iptables -F",
             "iptables -P INPUT DROP",
@@ -825,4 +825,4 @@ def manage_killswitch(mode, proto=None, port=None):
         for command in iptables_commands:
             command = command.split()
             subprocess.run(command)
-        logger.debug("Killswitch enabled")
+        logger.debug("Kill Switch enabled")
