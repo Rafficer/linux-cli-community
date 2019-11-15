@@ -191,7 +191,7 @@ def init_cli():
         "website and official apps where the username is most likely your "
         "e-mail, and one for connecting to the VPN servers.\n\n"
         "You can find the OpenVPN credentials at "
-        "https://account.protonvpn.com/settings.\n\n"
+        "https://account.protonvpn.com/account.\n\n"
         "--- Please make sure to use the OpenVPN credentials ---\n"
     ).splitlines()
 
