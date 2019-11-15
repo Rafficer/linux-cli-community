@@ -1,8 +1,19 @@
-# ProtonVPN-CLI
+<h1 align="center">ProtonVPN-CLI</h1>
+<p align="center">
+  <img src="https://i.imgur.com/tDrwkX5l.png" alt="Logo"></img>
+</p>
 
-![protonvpn-cli](https://i.imgur.com/tDrwkX5l.png)
+<p align="center">
+    <a href="https://pepy.tech/project/protonvpn-cli"><img alt="Downloads" src="https://pepy.tech/badge/protonvpn-cli"></a>
+    <img alt="GitHub" src="https://img.shields.io/github/license/ProtonVPN/protonvpn-cli-ng">
+    <a href="https://pepy.tech/project/protonvpn-cli/week"><img alt="Downloads per Week" src="https://pepy.tech/badge/protonvpn-cli/week"></a>
+    <br>
+    <a href="https://twitter.com/ProtonVPN"><img alt="Twitter Follow" src="https://img.shields.io/twitter/follow/ProtonVPN?style=social"></a>
+    <a href="https://www.reddit.com/r/ProtonVPN"><img alt="Subreddit subscribers" src="https://img.shields.io/reddit/subreddit-subscribers/ProtonVPN?label=Join%20r%2FProtonVPN&style=social"></a>
+</p>
 
-### A Linux CLI for ProtonVPN. Written in Python.
+<h3 align="center">A Linux CLI for ProtonVPN. Written in Python.</h3>
+
 
 ProtonVPN-CLI is a full rewrite of the [bash protonvpn-cli](https://github.com/ProtonVPN/protonvpn-cli/blob/master/protonvpn-cli.sh) in Python, which adds more features and functionality with the purpose of improving readability, speed and reliability.
 
