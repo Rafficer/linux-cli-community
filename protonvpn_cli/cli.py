@@ -207,9 +207,6 @@ def init_cli():
     # Set default Protocol
     user_protocol = set_default_protocol(write=False)
 
-    # Enable or disable DNS Leak Protection
-    dns_leak_protection, custom_dns = set_dns_protection(write=False)
-
     protonvpn_plans = {1: "Free", 2: "Basic", 3: "Plus", 4: "Visionary"}
 
     print()
@@ -219,13 +216,8 @@ def init_cli():
         "Password: {0}\n".format("*" * len(ovpn_password)),
         "Tier: {0}\n".format(protonvpn_plans[user_tier]),
         "Default protocol: {0}\n".format(user_protocol.upper()),
-        "DNS Leak Protection: {0}\n"
-        .format('On' if dns_leak_protection else 'Off'),
     )
-    if custom_dns:
-        print("Custom DNS: {0}\n".format(custom_dns))
-    else:
-        print()
+    print()
 
     user_confirmation = input(
         "Is this information correct? [Y/n]: "
@@ -246,8 +238,8 @@ def init_cli():
         set_config_value("USER", "username", ovpn_username)
         set_config_value("USER", "tier", user_tier)
         set_config_value("USER", "default_protocol", user_protocol)
-        set_config_value("USER", "dns_leak_protection", dns_leak_protection)
-        set_config_value("USER", "custom_dns", custom_dns)
+        set_config_value("USER", "dns_leak_protection", 1)
+        set_config_value("USER", "custom_dns", None)
         set_config_value("USER", "killswitch", 0)
 
         with open(PASSFILE, "w") as f:
@@ -329,7 +321,7 @@ def configure_cli():
             set_default_protocol(write=True)
             break
         elif user_choice == "4":
-            set_dns_protection(write=True)
+            set_dns_protection()
             break
         elif user_choice == "5":
             set_killswitch(write=True)
@@ -485,32 +477,31 @@ def set_default_protocol(write=False):
     return user_protocol
 
 
-def set_dns_protection(write=False):
+def set_dns_protection():
     """Enable or disable DNS Leak Protection and custom DNS"""
 
-    # DNS Leak protection and Custom DNS Server
-    print()
-    print(
-        "DNS Leak Protection makes sure that you always use "
-        "ProtonVPN's DNS servers.\n"
-        "For security reasons this option is recommended."
-    )
-    print()
-    user_choice = input("Enable DNS Leak Protection? [Y/n]: ")
-    user_choice = user_choice.strip().lower()
-
-    custom_dns = None
-
-    if user_choice == "y" or user_choice == "":
-        dns_leak_protection = 1
-    else:
-        dns_leak_protection = 0
+    while True:
+        print()
+        print(
+            "DNS Leak Protection makes sure that you always use "
+            "ProtonVPN's DNS servers.\n"
+            "For security reasons this option is recommended.\n"
+            "\n"
+            "1) Enable DNS Leak Protection (recommended)\n"
+            "2) Configure Custom DNS Servers\n"
+            "3) Disable DNS Management"
+        )
         print()
         user_choice = input(
-            "Would you like to use custom DNS servers? [y/N]: "
+                "Please enter your choice or leave empty to quit: "
         )
-        user_choice = user_choice.strip().lower()
-        if user_choice == "y":
+        user_choice = user_choice.lower().strip()
+        if user_choice == "1":
+            dns_leak_protection = 1
+            custom_dns = None
+            break
+        elif user_choice == "2":
+            dns_leak_protection = 0
             custom_dns = input(
                 "Please enter your custom DNS servers (space separated): "
             )
@@ -526,13 +517,23 @@ def set_dns_protection(write=False):
                     print("[!] {0} is invalid. Please try again.".format(dns))
                     return
             custom_dns = " ".join(dns for dns in custom_dns)
+            break
+        elif user_choice == "3":
+            dns_leak_protection = 0
+            custom_dns = None
+            break
+        elif user_choice == "":
+            print("Quitting configuration.")
+            sys.exit(0)
+        else:
+            print(
+                "[!] Invalid choice. Please enter the number of your choice.\n"
+            )
+            time.sleep(0.5)
 
-    if write:
-        set_config_value("USER", "dns_leak_protection", dns_leak_protection)
-        set_config_value("USER", "custom_dns", custom_dns)
-        print("DNS Management updated.")
-
-    return dns_leak_protection, custom_dns
+    set_config_value("USER", "dns_leak_protection", dns_leak_protection)
+    set_config_value("USER", "custom_dns", custom_dns)
+    print("DNS Management updated.")
 
 
 def set_killswitch(write=False):
