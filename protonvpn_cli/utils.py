@@ -408,7 +408,7 @@ def check_update():
                 ) +
             "is available.\n" +
             "Follow the Update instructions on " +
-            "https://github.com/ProtonVPN/protonvpn-cli-ng"
+            "https://github.com/ProtonVPN/protonvpn-cli-ng/blob/master/USAGE.md#updating-protonvpn-cli" # noqa
         )
 
 
