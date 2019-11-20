@@ -80,7 +80,7 @@ Bye Bye 😔
 
 1. Installing dependencies
 
-   To install ProtonVPN-CLI's dependencies, open a terminal and type `sudo apt install -y dialog openvpn python3-pip` and confirm with Enter. Wait for the installation to finish
+   To install ProtonVPN-CLI's dependencies, open a terminal and type `sudo apt install -y dialog openvpn python3-pip python3-setuptools` and confirm with Enter. Wait for the installation to finish
 
 2. Installing ProtonVPN-CLI
 
