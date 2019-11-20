@@ -10,6 +10,7 @@ Usage:
     protonvpn (c | connect) [--p2p] [-p <protocol>]
     protonvpn (c | connect) [--tor] [-p <protocol>]
     protonvpn (c | connect) [-r | --random] [-p <protocol>]
+    protonvpn (c | connect) [-r | --random] [<rcc>...] [-p <protocol>]
     protonvpn (r | reconnect)
     protonvpn (d | disconnect)
     protonvpn (s | status)
@@ -101,7 +102,10 @@ def cli():
             protocol = protocol.lower().strip()
 
         if args.get("--random"):
-            connection.random_c(protocol)
+            if len(args.get("<rcc>")) >= 2:  # random predefined random codes
+                connection.connect_random_predefined_c(args.get("<rcc>")[1:])
+            else:
+                connection.random_c(protocol)
         elif args.get("--fastest"):
             connection.fastest(protocol)
         elif args.get("<servername>"):

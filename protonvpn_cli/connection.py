@@ -279,6 +279,23 @@ def direct(user_input, protocol=None):
     openvpn_connect(servername, protocol)
 
 
+def connect_random_predefined_c(predefined_countries, protocol=None):
+    """Make an attemp to connect to a country from a given list of countries."""
+
+    fails = 0
+    for country in predefined_countries:
+        try:
+            country_f(country, protocol)
+        except SystemExit:
+            fails += 1
+            print("Failed to connect with {}".format(country))
+            continue
+
+    if fails == len(predefined_countries):
+        print("None of the given countries {} succeed to establish a connection".format(predefined_countries))
+        sys.exit(1)
+
+
 def reconnect():
     """Reconnect to the last VPN Server."""
 
