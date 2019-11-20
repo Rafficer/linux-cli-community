@@ -30,25 +30,25 @@ ProtonVPN-CLI is a full rewrite of the [bash protonvpn-cli](https://github.com/P
 
 On Fedora/CentOS/RHEL:
 
-`sudo dnf install -y openvpn dialog python3-pip`
+`sudo dnf install -y openvpn dialog python3-pip python3-setuptools`
 
 `sudo pip3 install protonvpn-cli`
 
 On Debian/Ubuntu/Linux Mint and derivatives:
 
-`sudo apt install -y openvpn dialog python3-pip`
+`sudo apt install -y openvpn dialog python3-pip python3-setuptools`
 
 `sudo pip3 install protonvpn-cli`
 
 On SUSE:
 
-`sudo zypper in -y openvpn dialog python3-pip`
+`sudo zypper in -y openvpn dialog python3-pip python3-setuptools`
 
 `sudo pip3 install protonvpn-cli`
 
 On Arch/Manjaro:
 
-`sudo pacman -S openvpn dialog python-pip`
+`sudo pacman -S openvpn dialog python-pip python-setuptools`
 
 `sudo pip3 install protonvpn-cli`
 
