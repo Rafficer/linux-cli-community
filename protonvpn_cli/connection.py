@@ -352,21 +352,22 @@ def status():
     current IP, server name, country, server load
     """
     check_init()
-    pull_server_data()
     logger.debug("Getting VPN Status")
 
     # Quit if not connected
     if not is_connected():
         logger.debug("Disconnected")
-        ip, isp = get_ip_info()
         print("Status:     Disconnected")
-        print("IP:         {0}".format(ip))
-        print("ISP:        {0}".format(isp))
-
         if os.path.isfile(os.path.join(CONFIG_DIR, "iptables.backup")):
-            print("[!] Kill Switch is active. Run protonvpn disconnect.")
+            print("[!] Kill Switch is currently active.")
             logger.debug("Kill Switch active while VPN disconnected")
+        else:
+            ip, isp = get_ip_info()
+            print("IP:         {0}".format(ip))
+            print("ISP:        {0}".format(isp))
         return
+
+    pull_server_data()
 
     try:
         connected_server = get_config_value("metadata", "connected_server")
