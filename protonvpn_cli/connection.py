@@ -246,7 +246,6 @@ def direct(user_input, protocol=None):
         tor = user_server.group(5)
         servername = "{0}#{1}".format(country_code, number) +\
                      "{0}".format('-' + tor if tor is not None else '')
-        print(servername)
     elif re_long.search(user_input):
         user_server = re_long.search(user_input)
         country_code = user_server.group(3)
@@ -256,7 +255,6 @@ def direct(user_input, protocol=None):
         servername = "{0}-{1}#{2}".format(country_code,
                                           country_code2, number) + \
                      "{0}".format('-' + tor if tor is not None else '')
-        servername = (servername)
     else:
         print(
             "[!] '{0}' is not a valid servername\n".format(user_input),
