@@ -11,8 +11,12 @@ This document provides an extensive guide on how to install and use ProtonVPN-CL
     - [Installing ProtonVPN-CLI](#installing-protonvpn-cli)
     - [Updating ProtonVPN-CLI](#updating-protonvpn-cli)
     - [Initialization](#initialization)
-    - [Uninstallation](#uninstallation)
+    - [Uninstall](#uninstall)
     - [Example Installation on Ubuntu 18.04](#example-installation-on-ubuntu-1804)
+    - [Installing in a virtual environment](#installing-in-a-virtual-environment)
+      - [Install](#install)
+      - [Update](#update)
+      - [Uninstall](#uninstall-1)
   - [Commands](#commands)
     - [List of all Commands](#list-of-all-commands)
     - [Command Explanations](#command-explanations)
@@ -120,6 +124,70 @@ Bye Bye 😔
    You are now ready to connect to ProtonVPN. For example, you can let ProtonVPN-CLI find the fastest server for you. Just type `sudo protonvpn connect -f` and a connection will be established.
 
    ![ubuntu-connected](https://i.imgur.com/VJVacKe.png)
+
+### Installing in a virtual environment
+
+If you're having trouble with the normal installation or don't want to install ProtonVPN-CLI as root, follow this guide to install it in a Python virtual environment.
+
+#### Install
+
+1. Install the virtualenv Python package
+
+    `pip3 install virtualenv --user`
+
+2. Create a virtual environment and activate it
+
+    `virtualenv ~/ProtonVPN-CLI`
+
+    `source ~/ProtonVPN-CLI/bin/activate`
+
+3. Now that you're in the virtual environment, install ProtonVPN-CLI
+
+    `pip install protonvpn-cli`
+
+    As you're in the virtualenv, `pip` should be the same as `pip3`.
+
+4. You should now have the executable `~/ProtonVPN-CLI/bin/protonvpn`.
+
+    `which protonvpn`
+
+5. If that works, deactivate the virtual environment again
+
+    `deactivate`
+
+6. Link the executable from above (output of the `which` command) to a PATH folder so you can access it from anywhere
+
+    `sudo ln -sf ~/ProtonVPN-CLI/bin/protonvpn /usr/local/bin/protonvpn`
+
+Now you should be able to use the protonvpn command from anywhere in the system without issues.
+
+#### Update
+
+1. Activate the virtual environment again
+
+    `source ~/ProtonVPN-CLI/bin/activate`
+
+2. Update ProtonVPN-CLI
+
+    `pip install protonvpn-cli --upgrade`
+
+3. Deactivate the virtual environment
+
+    `deactivate`
+
+#### Uninstall
+
+1. Purge configuration
+
+    `sudo protonvpn configure` -> `7` -> `y`
+
+2. Delete the ProtonVPN-CLI folder
+
+    `rm -rf ~/ProtonVPN-CLI`
+
+3. Delete the symlink
+
+    `sudo unlink /usr/local/bin/protonvpn`
 
 ## Commands
 
