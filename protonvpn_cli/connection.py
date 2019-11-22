@@ -12,8 +12,8 @@ import datetime
 import zlib
 # External Libraries
 from dialog import Dialog
-from .logger import logger
 # protonvpn-cli Functions
+from .logger import logger
 from .utils import (
     check_init, pull_server_data, is_connected,
     get_servers, get_server_value, get_config_value,
