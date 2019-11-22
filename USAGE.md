@@ -40,6 +40,7 @@ This document provides an extensive guide on how to install and use ProtonVPN-CL
 - dialog (optional, needed for interactive selection)
 - pip for python3 (pip3)
 - python3.5+
+- setuptools for python3 (python3-setuptools)
 
 Depending on your distribution, run the appropriate following command to install the necessary dependencies
 
