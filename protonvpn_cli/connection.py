@@ -269,9 +269,9 @@ def direct(user_input, protocol=None):
 
     if servername not in [server["Name"] for server in servers]:
         print(
-            "[!] {servername} doesn't exist or inaccessible with your plan.\n"
-            .format(servername),
-            "[!] Please enter a valid servername."
+            "[!] {0} doesn't exist, ".format(servername) +
+            "is under maintenance, or inaccessible with your plan.\n"
+            "[!] Please enter a different, valid servername."
         )
         logger.debug("{0} doesn't exist".format(servername))
         sys.exit(1)
