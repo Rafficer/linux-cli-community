@@ -11,6 +11,7 @@ import getpass
 import random
 # External Libraries
 import requests
+# ProtonVPN-CLI functions
 from .logger import logger
 # Constants
 from .constants import (

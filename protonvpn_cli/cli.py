@@ -77,7 +77,6 @@ def main():
 
 def cli():
     """Run user's input command."""
-    args = docopt(__doc__, version=VERSION)
 
     # Initial log values
     change_file_owner(os.path.join(CONFIG_DIR, "pvpn-cli.log"))
@@ -85,9 +84,11 @@ def cli():
     logger.debug("### NEW PROCESS STARTED ###")
     logger.debug("###########################")
     logger.debug(sys.argv)
-    logger.debug("Arguments\n{0}".format(args))
     logger.debug("USER: {0}".format(USER))
     logger.debug("CONFIG_DIR: {0}".format(CONFIG_DIR))
+
+    args = docopt(__doc__, version="ProtonVPN-CLI v{0}".format(VERSION))
+    logger.debug("Arguments\n{0}".format(str(args).replace("\n", "")))
 
     # Parse arguments
     if args.get("init"):
