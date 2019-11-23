@@ -553,6 +553,7 @@ def manage_dns(mode, dns_server=False):
     """
 
     backupfile = os.path.join(CONFIG_DIR, "resolv.conf.backup")
+    resolvconf_path = os.path.realpath("/etc/resolv.conf")
 
     if mode == "leak_protection":
         logger.debug("Leak Protection initiated")
@@ -574,20 +575,20 @@ def manage_dns(mode, dns_server=False):
         if not dns_server:
             raise Exception("No DNS Server has been provided.")
 
-        shutil.copy2("/etc/resolv.conf", backupfile)
-        logger.debug("resolv.conf backed up")
+        shutil.copy2(resolvconf_path, backupfile)
+        logger.debug("{0} (resolv.conf) backed up".format(resolvconf_path))
 
         # Remove previous nameservers
         dns_regex = re.compile(r"^nameserver .*$")
 
-        for line in fileinput.input("/etc/resolv.conf", inplace=True):
+        for line in fileinput.input(resolvconf_path, inplace=True):
             if not dns_regex.search(line) and not dns_regex.search(line):
                 print(line, end="")
         logger.debug("Removed existing DNS Servers")
 
         # Add ProtonVPN managed DNS Server to resolv.conf
         dns_server = dns_server.split()
-        with open("/etc/resolv.conf", "a") as f:
+        with open(resolvconf_path, "a") as f:
             f.write("# ProtonVPN DNS Servers. Managed by ProtonVPN-CLI.\n")
             for dns in dns_server[:3]:
                 f.write("nameserver {0}\n".format(dns))
@@ -599,7 +600,7 @@ def manage_dns(mode, dns_server=False):
         # if the configuration changes during a VPN session
         # (e.g. by switching networks)
 
-        with open("/etc/resolv.conf", "rb") as f:
+        with open(resolvconf_path, "rb") as f:
             filehash = zlib.crc32(f.read())
         set_config_value("metadata", "resolvconf_hash", filehash)
 
@@ -609,11 +610,11 @@ def manage_dns(mode, dns_server=False):
 
             # Check if the file changed since connection
             oldhash = get_config_value("metadata", "resolvconf_hash")
-            with open("/etc/resolv.conf", "rb") as f:
+            with open(resolvconf_path, "rb") as f:
                 filehash = zlib.crc32(f.read())
 
             if filehash == int(oldhash):
-                shutil.copy2(backupfile, "/etc/resolv.conf")
+                shutil.copy2(backupfile, resolvconf_path)
                 logger.debug("resolv.conf restored from backup")
             else:
                 logger.debug("resolv.conf changed. Not restoring.")
