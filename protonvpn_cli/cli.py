@@ -337,7 +337,7 @@ def configure_cli():
             set_dns_protection()
             break
         elif user_choice == "5":
-            set_killswitch(write=True)
+            set_killswitch()
             break
         elif user_choice == "6":
             set_split_tunnel()
@@ -549,25 +549,47 @@ def set_dns_protection():
     print("DNS Management updated.")
 
 
-def set_killswitch(write=False):
+def set_killswitch():
     """Enable or disable the Kill Switch."""
 
-    print(
-        "The Kill Switch will block all network traffic\n"
-        "if the VPN connection drops unexpectedly."
-    )
-    print()
-    user_choice = input("Enable VPN Kill Switch? [y/N]: ")
-
-    if user_choice.strip().lower() == "y":
-        killswitch = 1
-    else:
-        killswitch = 0
-
-    if write:
-        set_config_value("USER", "killswitch", killswitch)
+    while True:
         print()
-        print("Kill Switch configuration updated.")
+        print(
+            "The Kill Switch will block all network traffic\n"
+            "if the VPN connection drops unexpectedly.\n"
+            "\n"
+            "Please note that the Kill Switch assumes only one network interface being active.\n" # noqa
+            "\n"
+            "1) Enable Kill Switch (Block access to/from LAN)\n"
+            "2) Enable Kill Switch (Allow access to/from LAN)\n"
+            "3) Disable Kill Switch"
+        )
+        print()
+        user_choice = input(
+                "Please enter your choice or leave empty to quit: "
+        )
+        user_choice = user_choice.lower().strip()
+        if user_choice == "1":
+            killswitch = 1
+            break
+        elif user_choice == "2":
+            killswitch = 2
+            break
+        elif user_choice == "3":
+            killswitch = 0
+            break
+        elif user_choice == "":
+            print("Quitting configuration.")
+            sys.exit(0)
+        else:
+            print(
+                "[!] Invalid choice. Please enter the number of your choice.\n"
+            )
+            time.sleep(0.5)
+
+    set_config_value("USER", "killswitch", killswitch)
+    print()
+    print("Kill Switch configuration updated.")
 
 
 def set_split_tunnel():
