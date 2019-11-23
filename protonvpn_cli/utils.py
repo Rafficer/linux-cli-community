@@ -19,7 +19,7 @@ from .constants import (
 )
 
 
-def call_api(endpoint, json_format=True):
+def call_api(endpoint, json_format=True, handle_errors=True):
     """Call to the ProtonVPN API."""
 
     api_domain = "https://api.protonmail.ch"
@@ -32,6 +32,11 @@ def call_api(endpoint, json_format=True):
     }
 
     logger.debug("Initiating API Call: {0}".format(url))
+
+    # For manual error handling, such as in wait_for_network()
+    if not handle_errors:
+        response = requests.get(url, headers=headers)
+        return response
 
     try:
         response = requests.get(url, headers=headers)
@@ -182,6 +187,29 @@ def is_connected():
         .format(len(ovpn_processes))
         )
     return True if ovpn_processes != [] else False
+
+
+def wait_for_network(wait_time):
+    """Check if internet access is working"""
+
+    print("Waiting for connection...")
+    start = time.time()
+
+    while True:
+        if time.time() - start > wait_time:
+            logger.debug("Max waiting time reached.")
+            print("Max waiting time reached.")
+            sys.exit(1)
+        logger.debug("Waiting for {0}s for connection...".format(wait_time))
+        try:
+            call_api("/test/ping", handle_errors=False)
+            time.sleep(2)
+            print("Connection working!")
+            logger.debug("Connection working!")
+            break
+        except (requests.exceptions.ConnectionError,
+                requests.exceptions.ConnectTimeout):
+            time.sleep(2)
 
 
 def cidr_to_netmask(cidr):
