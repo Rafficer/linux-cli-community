@@ -363,15 +363,19 @@ Systemd is the current init system of most major Linux distributions. This guide
    [Service]
    Type=forking
    ExecStart=/usr/local/bin/protonvpn connect -f
+   Environment=PVPN_WAIT=300
+   Environment=PVPN_DEBUG=1
    Environment=SUDO_USER=user
 
    [Install]
    WantedBy=multi-user.target
    ```
 
-   Make sure to replace the username in the `Environment=` line with your own username that has ProtonVPN-CLI configured.
+   Make sure to replace the username in the `Environment=SUDO_USER` line with your own username that has ProtonVPN-CLI configured.
 
-   Also replace the path to the `protonvpn` executable in the `ExecStart` line with the output of Step 1.
+   `PVPN_WAIT=300` means that ProtonVPN-CLI will check for 300 Seconds if the internet connection is working before timing out. Adjust this value as you prefer.
+
+   Also replace the path to the `protonvpn` executable in the `ExecStart=` line with the output of Step 1.
 
    If you want another connect command than fastest as used in this example, just replace `-f` with what you personally prefer.
 
