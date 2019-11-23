@@ -18,7 +18,7 @@ from .utils import (
     check_init, pull_server_data, is_connected,
     get_servers, get_server_value, get_config_value,
     set_config_value, get_ip_info, get_country_name,
-    get_fastest_server, check_update
+    get_fastest_server, check_update, get_default_nic
 )
 # Constants
 from .constants import (
@@ -646,14 +646,8 @@ def manage_ipv6(mode):
         if os.path.isfile(ipv6_backupfile):
             manage_ipv6("restore")
 
-        default_route = subprocess.run(
-            "ip route show | grep default",
-            stdout=subprocess.PIPE, shell=True
-        )
-
         # Get the default nic from ip route show output
-        default_nic = default_route.stdout.decode().strip().split()[4]
-
+        default_nic = get_default_nic()
         ipv6_info = subprocess.run(
             "ip addr show dev {0} | grep '\<inet6.*global\>'".format(default_nic), # noqa
             stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True,
@@ -822,6 +816,23 @@ def manage_killswitch(mode, proto=None, port=None):
             "iptables -A OUTPUT -p {0} -m {1} --dport {2} -j ACCEPT".format(proto.lower(), proto.lower(), port), # noqa
             "iptables -A INPUT -p {0} -m {1} --sport {2} -j ACCEPT".format(proto.lower(), proto.lower(), port), # noqa
         ]
+
+        if int(get_config_value("USER", "killswitch")) == 2:
+            # Getting local network information
+            default_nic = get_default_nic()
+            local_network = subprocess.run(
+                "ip addr show {0} | grep inet".format(default_nic),
+                stdout=subprocess.PIPE, shell=True
+            )
+            local_network = local_network.stdout.decode().strip().split()[1]
+
+            exclude_lan_commands = [
+                "iptables -A OUTPUT -o {0} -d {1} -j ACCEPT".format(default_nic, local_network), # noqa
+                "iptables -A INPUT -i {0} -s {1} -j ACCEPT".format(default_nic, local_network), # noqa
+            ]
+
+            for lan_command in exclude_lan_commands:
+                iptables_commands.append(lan_command)
 
         for command in iptables_commands:
             command = command.split()

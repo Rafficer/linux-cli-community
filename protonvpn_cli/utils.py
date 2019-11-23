@@ -167,6 +167,18 @@ def get_fastest_server(server_pool):
     return fastest_server
 
 
+def get_default_nic():
+    """Find and return the default network interface"""
+    default_route = subprocess.run(
+        "ip route show | grep default",
+        stdout=subprocess.PIPE, shell=True
+    )
+
+    # Get the default nic from ip route show output
+    default_nic = default_route.stdout.decode().strip().split()[4]
+    return default_nic
+
+
 def is_connected():
     """Check if a VPN connection already exists."""
     ovpn_processes = subprocess.run(["pgrep", "openvpn"],
