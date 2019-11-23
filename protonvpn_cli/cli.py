@@ -58,7 +58,8 @@ from . import connection
 from .logger import logger
 from .utils import (
     check_root, change_file_owner, pull_server_data, make_ovpn_template,
-    check_init, set_config_value, get_config_value, is_valid_ip
+    check_init, set_config_value, get_config_value, is_valid_ip,
+    wait_for_network
 )
 # Constants
 from .constants import (
@@ -96,6 +97,14 @@ def cli():
     elif args.get("c") or args.get("connect"):
         check_root()
         check_init()
+
+        # Wait until a connection to the ProtonVPN API can be made
+        # As this is mainly for automatically connecting on boot, it only
+        # activates when the environment variable PVPN_WAIT is 1
+        # Otherwise it wouldn't connect when a VPN process without
+        # internet access exists or the Kill Switch is active
+        if int(os.environ.get("PVPN_WAIT", 0)) > 0:
+            wait_for_network(int(os.environ["PVPN_WAIT"]))
 
         protocol = args.get("-p")
         if protocol is not None and protocol.lower().strip() in ["tcp", "udp"]:
