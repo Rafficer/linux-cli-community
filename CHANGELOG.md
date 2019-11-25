@@ -4,10 +4,22 @@
 
 - [ProtonVPN-CLI Changelog](#protonvpn-cli-changelog)
   - [Table of Contents](#table-of-contents)
+  - [v2.1.2](#v212)
   - [v2.1.1](#v211)
   - [v2.1.0](#v210)
   - [v2.0.0](#v200)
   - [v0.1.0](#v010)
+
+## v2.1.2
+
+- Enhancement: Clearer logging of command line arguments
+- Enhancement: Improved version printout (`protonvpn -v`)
+- Bug fix: Not following `/etc/resolv.conf` symlinks
+- Bug fix: Crash when using `protonvpn connect <servername>` with an invalid servername
+- Bug fix: Wrong status printout when Kill Switch is active
+- Documentation: Remove duplicate information from USAGE.md in README.md and shorten it
+- Documentation: Add installation guide for Python virtual environments
+- Documentation: Add setuptools dependency
 
 ## v2.1.1
 
