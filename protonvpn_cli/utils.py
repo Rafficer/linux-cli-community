@@ -347,7 +347,7 @@ def check_update():
         """Return the latest version from pypi"""
         logger.debug("Calling pypi API")
         try:
-            r = requests.get("https://test.pypi.org/pypi/protonvpn-cli/json")
+            r = requests.get("https://pypi.org/pypi/protonvpn-cli/json")
         except (requests.exceptions.ConnectionError,
                 requests.exceptions.ConnectTimeout):
             logger.debug("Couldn't connect to pypi API")
@@ -408,7 +408,7 @@ def check_update():
                 [str(x) for x in latest_version])
                 ) +
             "is available.\n" +
-            "Follow the Update instructions on " +
+            "Follow the Update instructions on\n" +
             "https://github.com/ProtonVPN/protonvpn-cli-ng/blob/master/USAGE.md#updating-protonvpn-cli" # noqa
         )
 
