@@ -285,7 +285,13 @@ It works by replacing your existing iptables rules with custom rules that only a
 
 **Enabling Kill Switch**
 
-To enable Kill Switch, open the configuration menu with `protonvpn configure`, then select `5` for Kill Switch and confirm the activation with `y`. On the next connection Kill Switch will be enabled.
+To enable Kill Switch, open the configuration menu with `protonvpn configure`, then select `5` for Kill Switch and confirm the activation with either `1` or `2`, depending on your preference.
+
+`1` will block access from your directly connected network (e.g. public WiFi) and is recommended for laptops that may connect to untrusted networks.
+
+`2` will allow access from your directly connected network and is for computers that don't leave a secure and trusted LAN, like your home network.
+
+On the next connection Kill Switch will be enabled.
 
 *Note: Kill Switch only activates on unexpected connection drops. It will not persist through reboots and not activate when calling `protonvpn disconnect`. To simulate the Kill Switch, kill the OpenVPN process while connected with `sudo pkill openvpn`.*
 
