@@ -18,7 +18,7 @@ from .utils import (
     check_init, pull_server_data, is_connected,
     get_servers, get_server_value, get_config_value,
     set_config_value, get_ip_info, get_country_name,
-    get_fastest_server, check_update
+    get_fastest_server, check_update, get_default_nic
 )
 # Constants
 from .constants import (
@@ -639,55 +639,68 @@ def manage_ipv6(mode):
     """
 
     ipv6_backupfile = os.path.join(CONFIG_DIR, "ipv6.backup")
+    ip6tables_backupfile = os.path.join(CONFIG_DIR, "ip6tables.backup")
 
     if mode == "disable":
 
         logger.debug("Disabling IPv6")
+        # Needs to be removed eventually. I'll leave it in for now
+        # so it still properly restores the IPv6 address the old way
         if os.path.isfile(ipv6_backupfile):
+            manage_ipv6("legacy_restore")
+
+        if os.path.isfile(ip6tables_backupfile):
+            logger.debug("IPv6 backup exists")
             manage_ipv6("restore")
 
-        default_route = subprocess.run(
-            "ip route show | grep default",
-            stdout=subprocess.PIPE, shell=True
-        )
+        # Backing up ip6ables rules
+        logger.debug("Backing up ip6tables rules")
+        ip6tables_rules = subprocess.run(["ip6tables-save"],
+                                         stdout=subprocess.PIPE)
+
+        if "COMMIT" in ip6tables_rules.stdout.decode():
+            with open(ip6tables_backupfile, "wb") as f:
+                f.write(ip6tables_rules.stdout)
+        else:
+            with open(ip6tables_backupfile, "w") as f:
+                f.write("*filter\n")
+                f.write(":INPUT ACCEPT\n")
+                f.write(":FORWARD ACCEPT\n")
+                f.write(":OUTPUT ACCEPT\n")
+                f.write("COMMIT\n")
 
         # Get the default nic from ip route show output
-        default_nic = default_route.stdout.decode().strip().split()[4]
+        default_nic = get_default_nic()
 
-        ipv6_info = subprocess.run(
-            "ip addr show dev {0} | grep '\<inet6.*global\>'".format(default_nic), # noqa
-            stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True,
-        )
-
-        has_ipv6 = True if ipv6_info.returncode == 0 else False
-
-        # Stop configuration if not IPv6 address is present
-        if not has_ipv6:
-            logger.debug("No IPv6 present")
-            return
-
-        # Get the actual IPv6 address
-        ipv6_addr = ipv6_info.stdout.decode().strip().split()[1]
-
-        logger.debug("Writing backup file")
-        with open(ipv6_backupfile, "w") as f:
-            f.write("{0}\n".format(default_nic))
-            f.write(ipv6_addr)
-
-        ipv6_disable = subprocess.run(
-            "sysctl -w net.ipv6.conf.{0}.disable_ipv6=1".format(default_nic),
-            shell=True, stderr=subprocess.PIPE, stdout=subprocess.PIPE
-        )
-
-        if not ipv6_disable.returncode == 0:
-            print("[!] There was an error with disabling IPv6")
-            logger.debug("Error with disabling IPv6")
-            logger.debug("stdout: {0}".format(ipv6_disable.stdout))
-            logger.debug("stderr: {0}".format(ipv6_disable.stderr))
-        else:
-            logger.debug("Successfully disabled IPv6")
+        ip6tables_commands = [
+            "ip6tables -A INPUT -i {0} -j DROP".format(default_nic),
+            "ip6tables -A OUTPUT -o {0} -j DROP".format(default_nic),
+        ]
+        for command in ip6tables_commands:
+            command = command.split()
+            subprocess.run(command)
+        logger.debug("IPv6 disabled successfully")
 
     elif mode == "restore":
+        logger.debug("Restoring ip6tables")
+        # Same as above, remove eventually
+        if os.path.isfile(ipv6_backupfile):
+            logger.debug("legacy ipv6 backup found")
+            manage_ipv6("legacy_restore")
+        if os.path.isfile(ip6tables_backupfile):
+            subprocess.run(
+                "ip6tables-restore < {0}".format(
+                                          ip6tables_backupfile
+                ), shell=True, stdout=subprocess.PIPE
+            )
+            logger.debug("ip6tables restored")
+            os.remove(ip6tables_backupfile)
+            logger.debug("ip6tables.backup removed")
+        else:
+            logger.debug("No Backupfile found")
+        return
+
+    elif mode == "legacy_restore":
         logger.debug("Restoring IPv6")
         if not os.path.isfile(ipv6_backupfile):
             logger.debug("No Backupfile found")
