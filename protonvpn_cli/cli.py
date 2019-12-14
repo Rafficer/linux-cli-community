@@ -190,6 +190,9 @@ def init_cli():
             if overwrite.strip().lower() != "y":
                 print("Quitting...")
                 sys.exit(1)
+            # Disconnect, so every setting (Kill Switch, IPv6, ...)
+            # will be reverted (See #62)
+            connection.disconnect(passed=True)
     except KeyError:
         pass
 
