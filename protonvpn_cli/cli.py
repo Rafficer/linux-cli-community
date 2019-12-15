@@ -481,7 +481,7 @@ def set_default_protocol(write=False):
             )
 
     if write:
-        set_config_value("USER", "default_protocl", user_protocol)
+        set_config_value("USER", "default_protocol", user_protocol)
         print("Default protocol has been updated.")
 
     return user_protocol
