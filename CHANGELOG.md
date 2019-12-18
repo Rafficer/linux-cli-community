@@ -4,11 +4,22 @@
 
 - [ProtonVPN-CLI Changelog](#protonvpn-cli-changelog)
   - [Table of Contents](#table-of-contents)
+  - [v2.2.0](#v220)
   - [v2.1.2](#v212)
   - [v2.1.1](#v211)
   - [v2.1.0](#v210)
   - [v2.0.0](#v200)
   - [v0.1.0](#v010)
+
+## v2.2.0
+
+  - Feature: Wait for connection when using auto-connect
+  - Enhancement: Option to allow access to LAN with Kill Switch
+  - Enhancement: Inform user about this document when displaying update notification
+  - Bug fix: Potential IPv6 leak when reconnecting the network interface with an active connection
+  - Bug fix: Error when trying to connect after reinitializing the profile with an active connection
+  - Bug fix: Configuration value spelling when changing default protocol
+  - Bug fix: Wrong API in update check
 
 ## v2.1.2
 
