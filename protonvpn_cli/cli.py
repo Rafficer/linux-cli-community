@@ -618,7 +618,13 @@ def set_split_tunnel():
             with open(SPLIT_TUNNEL_FILE, "a") as f:
                 f.write("\n{0}".format(ip))
 
-        change_file_owner(SPLIT_TUNNEL_FILE)
+        if os.path.isfile(SPLIT_TUNNEL_FILE):
+            change_file_owner(SPLIT_TUNNEL_FILE)
+        else:
+            # If no no config file exists,
+            # split tunneling should be disabled again
+            logger.debug("No split tunneling file existing.")
+            set_config_value("USER", "split_tunnel", 0)
 
     else:
         set_config_value("USER", "split_tunnel", 0)
