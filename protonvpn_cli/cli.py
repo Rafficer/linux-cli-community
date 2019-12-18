@@ -58,7 +58,8 @@ from . import connection
 from .logger import logger
 from .utils import (
     check_root, change_file_owner, pull_server_data, make_ovpn_template,
-    check_init, set_config_value, get_config_value, is_valid_ip
+    check_init, set_config_value, get_config_value, is_valid_ip,
+    wait_for_network
 )
 # Constants
 from .constants import (
@@ -77,7 +78,6 @@ def main():
 
 def cli():
     """Run user's input command."""
-    args = docopt(__doc__, version=VERSION)
 
     # Initial log values
     change_file_owner(os.path.join(CONFIG_DIR, "pvpn-cli.log"))
@@ -85,9 +85,11 @@ def cli():
     logger.debug("### NEW PROCESS STARTED ###")
     logger.debug("###########################")
     logger.debug(sys.argv)
-    logger.debug("Arguments\n{0}".format(args))
     logger.debug("USER: {0}".format(USER))
     logger.debug("CONFIG_DIR: {0}".format(CONFIG_DIR))
+
+    args = docopt(__doc__, version="ProtonVPN-CLI v{0}".format(VERSION))
+    logger.debug("Arguments\n{0}".format(str(args).replace("\n", "")))
 
     # Parse arguments
     if args.get("init"):
@@ -95,6 +97,14 @@ def cli():
     elif args.get("c") or args.get("connect"):
         check_root()
         check_init()
+
+        # Wait until a connection to the ProtonVPN API can be made
+        # As this is mainly for automatically connecting on boot, it only
+        # activates when the environment variable PVPN_WAIT is 1
+        # Otherwise it wouldn't connect when a VPN process without
+        # internet access exists or the Kill Switch is active
+        if int(os.environ.get("PVPN_WAIT", 0)) > 0:
+            wait_for_network(int(os.environ["PVPN_WAIT"]))
 
         protocol = args.get("-p")
         if protocol is not None and protocol.lower().strip() in ["tcp", "udp"]:
@@ -180,6 +190,9 @@ def init_cli():
             if overwrite.strip().lower() != "y":
                 print("Quitting...")
                 sys.exit(1)
+            # Disconnect, so every setting (Kill Switch, IPv6, ...)
+            # will be reverted (See #62)
+            connection.disconnect(passed=True)
     except KeyError:
         pass
 
@@ -324,7 +337,7 @@ def configure_cli():
             set_dns_protection()
             break
         elif user_choice == "5":
-            set_killswitch(write=True)
+            set_killswitch()
             break
         elif user_choice == "6":
             set_split_tunnel()
@@ -471,7 +484,7 @@ def set_default_protocol(write=False):
             )
 
     if write:
-        set_config_value("USER", "default_protocl", user_protocol)
+        set_config_value("USER", "default_protocol", user_protocol)
         print("Default protocol has been updated.")
 
     return user_protocol
@@ -536,25 +549,47 @@ def set_dns_protection():
     print("DNS Management updated.")
 
 
-def set_killswitch(write=False):
+def set_killswitch():
     """Enable or disable the Kill Switch."""
 
-    print(
-        "The Kill Switch will block all network traffic\n"
-        "if the VPN connection drops unexpectedly."
-    )
-    print()
-    user_choice = input("Enable VPN Kill Switch? [y/N]: ")
-
-    if user_choice.strip().lower() == "y":
-        killswitch = 1
-    else:
-        killswitch = 0
-
-    if write:
-        set_config_value("USER", "killswitch", killswitch)
+    while True:
         print()
-        print("Kill Switch configuration updated.")
+        print(
+            "The Kill Switch will block all network traffic\n"
+            "if the VPN connection drops unexpectedly.\n"
+            "\n"
+            "Please note that the Kill Switch assumes only one network interface being active.\n" # noqa
+            "\n"
+            "1) Enable Kill Switch (Block access to/from LAN)\n"
+            "2) Enable Kill Switch (Allow access to/from LAN)\n"
+            "3) Disable Kill Switch"
+        )
+        print()
+        user_choice = input(
+                "Please enter your choice or leave empty to quit: "
+        )
+        user_choice = user_choice.lower().strip()
+        if user_choice == "1":
+            killswitch = 1
+            break
+        elif user_choice == "2":
+            killswitch = 2
+            break
+        elif user_choice == "3":
+            killswitch = 0
+            break
+        elif user_choice == "":
+            print("Quitting configuration.")
+            sys.exit(0)
+        else:
+            print(
+                "[!] Invalid choice. Please enter the number of your choice.\n"
+            )
+            time.sleep(0.5)
+
+    set_config_value("USER", "killswitch", killswitch)
+    print()
+    print("Kill Switch configuration updated.")
 
 
 def set_split_tunnel():

@@ -12,8 +12,8 @@ import datetime
 import zlib
 # External Libraries
 from dialog import Dialog
-from .logger import logger
 # protonvpn-cli Functions
+from .logger import logger
 from .utils import (
     check_init, pull_server_data, is_connected,
     get_servers, get_server_value, get_config_value,
@@ -246,7 +246,6 @@ def direct(user_input, protocol=None):
         tor = user_server.group(5)
         servername = "{0}#{1}".format(country_code, number) +\
                      "{0}".format('-' + tor if tor is not None else '')
-        print(servername)
     elif re_long.search(user_input):
         user_server = re_long.search(user_input)
         country_code = user_server.group(3)
@@ -256,7 +255,6 @@ def direct(user_input, protocol=None):
         servername = "{0}-{1}#{2}".format(country_code,
                                           country_code2, number) + \
                      "{0}".format('-' + tor if tor is not None else '')
-        servername = (servername)
     else:
         print(
             "[!] '{0}' is not a valid servername\n".format(user_input),
@@ -555,6 +553,7 @@ def manage_dns(mode, dns_server=False):
     """
 
     backupfile = os.path.join(CONFIG_DIR, "resolv.conf.backup")
+    resolvconf_path = os.path.realpath("/etc/resolv.conf")
 
     if mode == "leak_protection":
         logger.debug("Leak Protection initiated")
@@ -576,20 +575,20 @@ def manage_dns(mode, dns_server=False):
         if not dns_server:
             raise Exception("No DNS Server has been provided.")
 
-        shutil.copy2("/etc/resolv.conf", backupfile)
-        logger.debug("resolv.conf backed up")
+        shutil.copy2(resolvconf_path, backupfile)
+        logger.debug("{0} (resolv.conf) backed up".format(resolvconf_path))
 
         # Remove previous nameservers
         dns_regex = re.compile(r"^nameserver .*$")
 
-        for line in fileinput.input("/etc/resolv.conf", inplace=True):
+        for line in fileinput.input(resolvconf_path, inplace=True):
             if not dns_regex.search(line) and not dns_regex.search(line):
                 print(line, end="")
         logger.debug("Removed existing DNS Servers")
 
         # Add ProtonVPN managed DNS Server to resolv.conf
         dns_server = dns_server.split()
-        with open("/etc/resolv.conf", "a") as f:
+        with open(resolvconf_path, "a") as f:
             f.write("# ProtonVPN DNS Servers. Managed by ProtonVPN-CLI.\n")
             for dns in dns_server[:3]:
                 f.write("nameserver {0}\n".format(dns))
@@ -601,7 +600,7 @@ def manage_dns(mode, dns_server=False):
         # if the configuration changes during a VPN session
         # (e.g. by switching networks)
 
-        with open("/etc/resolv.conf", "rb") as f:
+        with open(resolvconf_path, "rb") as f:
             filehash = zlib.crc32(f.read())
         set_config_value("metadata", "resolvconf_hash", filehash)
 
@@ -611,11 +610,11 @@ def manage_dns(mode, dns_server=False):
 
             # Check if the file changed since connection
             oldhash = get_config_value("metadata", "resolvconf_hash")
-            with open("/etc/resolv.conf", "rb") as f:
+            with open(resolvconf_path, "rb") as f:
                 filehash = zlib.crc32(f.read())
 
             if filehash == int(oldhash):
-                shutil.copy2(backupfile, "/etc/resolv.conf")
+                shutil.copy2(backupfile, resolvconf_path)
                 logger.debug("resolv.conf restored from backup")
             else:
                 logger.debug("resolv.conf changed. Not restoring.")
@@ -835,6 +834,23 @@ def manage_killswitch(mode, proto=None, port=None):
             "iptables -A OUTPUT -p {0} -m {1} --dport {2} -j ACCEPT".format(proto.lower(), proto.lower(), port), # noqa
             "iptables -A INPUT -p {0} -m {1} --sport {2} -j ACCEPT".format(proto.lower(), proto.lower(), port), # noqa
         ]
+
+        if int(get_config_value("USER", "killswitch")) == 2:
+            # Getting local network information
+            default_nic = get_default_nic()
+            local_network = subprocess.run(
+                "ip addr show {0} | grep inet".format(default_nic),
+                stdout=subprocess.PIPE, shell=True
+            )
+            local_network = local_network.stdout.decode().strip().split()[1]
+
+            exclude_lan_commands = [
+                "iptables -A OUTPUT -o {0} -d {1} -j ACCEPT".format(default_nic, local_network), # noqa
+                "iptables -A INPUT -i {0} -s {1} -j ACCEPT".format(default_nic, local_network), # noqa
+            ]
+
+            for lan_command in exclude_lan_commands:
+                iptables_commands.append(lan_command)
 
         for command in iptables_commands:
             command = command.split()

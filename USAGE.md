@@ -11,8 +11,12 @@ This document provides an extensive guide on how to install and use ProtonVPN-CL
     - [Installing ProtonVPN-CLI](#installing-protonvpn-cli)
     - [Updating ProtonVPN-CLI](#updating-protonvpn-cli)
     - [Initialization](#initialization)
-    - [Uninstallation](#uninstallation)
+    - [Uninstall](#uninstall)
     - [Example Installation on Ubuntu 18.04](#example-installation-on-ubuntu-1804)
+    - [Installing in a virtual environment](#installing-in-a-virtual-environment)
+      - [Install](#install)
+      - [Update](#update)
+      - [Uninstall](#uninstall-1)
   - [Commands](#commands)
     - [List of all Commands](#list-of-all-commands)
     - [Command Explanations](#command-explanations)
@@ -40,6 +44,7 @@ This document provides an extensive guide on how to install and use ProtonVPN-CL
 - dialog (optional, needed for interactive selection)
 - pip for python3 (pip3)
 - python3.5+
+- setuptools for python3 (python3-setuptools)
 
 Depending on your distribution, run the appropriate following command to install the necessary dependencies
 
@@ -119,6 +124,70 @@ Bye Bye 😔
    You are now ready to connect to ProtonVPN. For example, you can let ProtonVPN-CLI find the fastest server for you. Just type `sudo protonvpn connect -f` and a connection will be established.
 
    ![ubuntu-connected](https://i.imgur.com/VJVacKe.png)
+
+### Installing in a virtual environment
+
+If you're having trouble with the normal installation or don't want to install ProtonVPN-CLI as root, follow this guide to install it in a Python virtual environment.
+
+#### Install
+
+1. Install the virtualenv Python package
+
+    `pip3 install virtualenv --user`
+
+2. Create a virtual environment and activate it
+
+    `virtualenv ~/ProtonVPN-CLI`
+
+    `source ~/ProtonVPN-CLI/bin/activate`
+
+3. Now that you're in the virtual environment, install ProtonVPN-CLI
+
+    `pip install protonvpn-cli`
+
+    As you're in the virtualenv, `pip` should be the same as `pip3`.
+
+4. You should now have the executable `~/ProtonVPN-CLI/bin/protonvpn`.
+
+    `which protonvpn`
+
+5. If that works, deactivate the virtual environment again
+
+    `deactivate`
+
+6. Link the executable from above (output of the `which` command) to a PATH folder so you can access it from anywhere
+
+    `sudo ln -sf ~/ProtonVPN-CLI/bin/protonvpn /usr/local/bin/protonvpn`
+
+Now you should be able to use the protonvpn command from anywhere in the system without issues.
+
+#### Update
+
+1. Activate the virtual environment again
+
+    `source ~/ProtonVPN-CLI/bin/activate`
+
+2. Update ProtonVPN-CLI
+
+    `pip install protonvpn-cli --upgrade`
+
+3. Deactivate the virtual environment
+
+    `deactivate`
+
+#### Uninstall
+
+1. Purge configuration
+
+    `sudo protonvpn configure` -> `7` -> `y`
+
+2. Delete the ProtonVPN-CLI folder
+
+    `rm -rf ~/ProtonVPN-CLI`
+
+3. Delete the symlink
+
+    `sudo unlink /usr/local/bin/protonvpn`
 
 ## Commands
 
@@ -285,7 +354,13 @@ It works by replacing your existing iptables rules with custom rules that only a
 
 **Enabling Kill Switch**
 
-To enable Kill Switch, open the configuration menu with `protonvpn configure`, then select `5` for Kill Switch and confirm the activation with `y`. On the next connection Kill Switch will be enabled.
+To enable Kill Switch, open the configuration menu with `protonvpn configure`, then select `5` for Kill Switch and confirm the activation with either `1` or `2`, depending on your preference.
+
+`1` will block access from your directly connected network (e.g. public WiFi) and is recommended for laptops that may connect to untrusted networks.
+
+`2` will allow access from your directly connected network and is for computers that don't leave a secure and trusted LAN, like your home network.
+
+On the next connection Kill Switch will be enabled.
 
 *Note: Kill Switch only activates on unexpected connection drops. It will not persist through reboots and not activate when calling `protonvpn disconnect`. To simulate the Kill Switch, kill the OpenVPN process while connected with `sudo pkill openvpn`.*
 
@@ -363,15 +438,19 @@ Systemd is the current init system of most major Linux distributions. This guide
    [Service]
    Type=forking
    ExecStart=/usr/local/bin/protonvpn connect -f
+   Environment=PVPN_WAIT=300
+   Environment=PVPN_DEBUG=1
    Environment=SUDO_USER=user
 
    [Install]
    WantedBy=multi-user.target
    ```
 
-   Make sure to replace the username in the `Environment=` line with your own username that has ProtonVPN-CLI configured.
+   Make sure to replace the username in the `Environment=SUDO_USER` line with your own username that has ProtonVPN-CLI configured.
 
-   Also replace the path to the `protonvpn` executable in the `ExecStart` line with the output of Step 1.
+   `PVPN_WAIT=300` means that ProtonVPN-CLI will check for 300 Seconds if the internet connection is working before timing out. Adjust this value as you prefer.
+
+   Also replace the path to the `protonvpn` executable in the `ExecStart=` line with the output of Step 1.
 
    If you want another connect command than fastest as used in this example, just replace `-f` with what you personally prefer.
 

@@ -11,6 +11,7 @@ import getpass
 import random
 # External Libraries
 import requests
+# ProtonVPN-CLI functions
 from .logger import logger
 # Constants
 from .constants import (
@@ -19,8 +20,12 @@ from .constants import (
 )
 
 
-def call_api(url, json_format=True):
-    """Call to the ProtonMail API at https://api.protonmail.ch."""
+def call_api(endpoint, json_format=True, handle_errors=True):
+    """Call to the ProtonVPN API."""
+
+    api_domain = "https://api.protonmail.ch"
+    url = api_domain + endpoint
+
     headers = {
         "x-pm-appversion": "Other",
         "x-pm-apiversion": "3",
@@ -29,21 +34,26 @@ def call_api(url, json_format=True):
 
     logger.debug("Initiating API Call: {0}".format(url))
 
+    # For manual error handling, such as in wait_for_network()
+    if not handle_errors:
+        response = requests.get(url, headers=headers)
+        return response
+
     try:
         response = requests.get(url, headers=headers)
     except (requests.exceptions.ConnectionError,
             requests.exceptions.ConnectTimeout):
         print(
-            "[!] There was an error connecting to the ProtonMail API.\n"
+            "[!] There was an error connecting to the ProtonVPN API.\n"
             "[!] Please make sure your connection is working properly!"
         )
-        logger.debug("Error connecting to ProtonMail API")
+        logger.debug("Error connecting to ProtonVPN API")
         sys.exit(1)
     try:
         response.raise_for_status()
     except requests.exceptions.HTTPError:
         print(
-            "[!] There was an error with accessing the ProtonMail API.\n"
+            "[!] There was an error with accessing the ProtonVPN API.\n"
             "[!] Please make sure your connection is working properly!\n"
             "[!] HTTP Error Code: {0}".format(response.status_code)
         )
@@ -59,7 +69,7 @@ def call_api(url, json_format=True):
 
 
 def pull_server_data(force=False):
-    """Pull current server data from the ProtonMail API."""
+    """Pull current server data from the ProtonVPN API."""
     config = configparser.ConfigParser()
     config.read(CONFIG_FILE)
 
@@ -69,7 +79,7 @@ def pull_server_data(force=False):
             logger.debug("Last server pull within 15mins")
             return
 
-    data = call_api("https://api.protonmail.ch/vpn/logicals")
+    data = call_api("/vpn/logicals")
 
     with open(SERVER_INFO_FILE, "w") as f:
         json.dump(data, f)
@@ -130,7 +140,7 @@ def set_config_value(group, key, value):
 def get_ip_info():
     """Return the current public IP Address"""
     logger.debug("Getting IP Information")
-    ip_info = call_api("https://api.protonmail.ch/vpn/location")
+    ip_info = call_api("/vpn/location")
 
     ip = ip_info["IP"]
     isp = ip_info["ISP"]
@@ -167,6 +177,18 @@ def get_fastest_server(server_pool):
     return fastest_server
 
 
+def get_default_nic():
+    """Find and return the default network interface"""
+    default_route = subprocess.run(
+        "ip route show | grep default",
+        stdout=subprocess.PIPE, shell=True
+    )
+
+    # Get the default nic from ip route show output
+    default_nic = default_route.stdout.decode().strip().split()[4]
+    return default_nic
+
+
 def is_connected():
     """Check if a VPN connection already exists."""
     ovpn_processes = subprocess.run(["pgrep", "openvpn"],
@@ -178,6 +200,29 @@ def is_connected():
         .format(len(ovpn_processes))
         )
     return True if ovpn_processes != [] else False
+
+
+def wait_for_network(wait_time):
+    """Check if internet access is working"""
+
+    print("Waiting for connection...")
+    start = time.time()
+
+    while True:
+        if time.time() - start > wait_time:
+            logger.debug("Max waiting time reached.")
+            print("Max waiting time reached.")
+            sys.exit(1)
+        logger.debug("Waiting for {0}s for connection...".format(wait_time))
+        try:
+            call_api("/test/ping", handle_errors=False)
+            time.sleep(2)
+            print("Connection working!")
+            logger.debug("Connection working!")
+            break
+        except (requests.exceptions.ConnectionError,
+                requests.exceptions.ConnectTimeout):
+            time.sleep(2)
 
 
 def cidr_to_netmask(cidr):
@@ -232,7 +277,7 @@ def make_ovpn_template():
     server_id = server_data["LogicalServers"][0]["ID"]
 
     config_file_response = call_api(
-        "https://api.protonmail.ch/vpn/config?Platform=linux&LogicalID={0}&Protocol=tcp".format(server_id),  # noqa
+        "/vpn/config?Platform=linux&LogicalID={0}&Protocol=tcp".format(server_id),  # noqa
         json_format=False
     )
 
@@ -346,7 +391,7 @@ def check_update():
         """Return the latest version from pypi"""
         logger.debug("Calling pypi API")
         try:
-            r = requests.get("https://test.pypi.org/pypi/protonvpn-cli/json")
+            r = requests.get("https://pypi.org/pypi/protonvpn-cli/json")
         except (requests.exceptions.ConnectionError,
                 requests.exceptions.ConnectTimeout):
             logger.debug("Couldn't connect to pypi API")
@@ -407,7 +452,7 @@ def check_update():
                 [str(x) for x in latest_version])
                 ) +
             "is available.\n" +
-            "Follow the Update instructions on " +
+            "Follow the Update instructions on\n" +
             "https://github.com/ProtonVPN/protonvpn-cli-ng/blob/master/USAGE.md#updating-protonvpn-cli" # noqa
         )
 
