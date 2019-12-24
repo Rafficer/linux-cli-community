@@ -5,11 +5,14 @@ Usage:
     protonvpn init
     protonvpn (c | connect) [<servername>] [-p <protocol>]
     protonvpn (c | connect) [-f | --fastest] [-p <protocol>]
+        [--min_tier <min_tier>]
     protonvpn (c | connect) [--cc <code>] [-p <protocol>]
+        [--min_tier <min_tier>]
     protonvpn (c | connect) [--sc] [-p <protocol>]
-    protonvpn (c | connect) [--p2p] [-p <protocol>]
+    protonvpn (c | connect) [--p2p] [-p <protocol>] [--min_tier <min_tier>]
     protonvpn (c | connect) [--tor] [-p <protocol>]
     protonvpn (c | connect) [-r | --random] [-p <protocol>]
+        [--min_tier <min_tier>]
     protonvpn (r | reconnect)
     protonvpn (d | disconnect)
     protonvpn (s | status)
@@ -21,6 +24,8 @@ Usage:
 
 Options:
     -f, --fastest       Select the fastest ProtonVPN server.
+    --min_tier TIER     Minimum tier of the ProtonVPN server, 1-4.
+                        Must be compatible with your plan.
     -r, --random        Select a random ProtonVPN server.
     --cc CODE           Determine the country for fastest connect.
     --sc                Connect to the fastest Secure-Core server.
@@ -110,17 +115,22 @@ def cli():
         if protocol is not None and protocol.lower().strip() in ["tcp", "udp"]:
             protocol = protocol.lower().strip()
 
+        min_tier = args.get("--min_tier")
+        if min_tier is not None:
+            # Accept 1-based UI tier as input and set 0-based API tier
+            min_tier = int(min_tier) - 1
+
         if args.get("--random"):
-            connection.random_c(protocol)
+            connection.random_c(protocol, min_tier)
         elif args.get("--fastest"):
-            connection.fastest(protocol)
+            connection.fastest(protocol, min_tier)
         elif args.get("<servername>"):
             connection.direct(args.get("<servername>"), protocol)
         elif args.get("--cc") is not None:
-            connection.country_f(args.get("--cc"), protocol)
+            connection.country_f(args.get("--cc"), protocol, min_tier)
         # Features: 1: Secure-Core, 2: Tor, 4: P2P
         elif args.get("--p2p"):
-            connection.feature_f(4, protocol)
+            connection.feature_f(4, protocol, min_tier)
         elif args.get("--sc"):
             connection.feature_f(1, protocol)
         elif args.get("--tor"):

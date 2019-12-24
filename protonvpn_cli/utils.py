@@ -94,7 +94,7 @@ def pull_server_data(force=False):
         logger.debug("last_api_call updated")
 
 
-def get_servers():
+def get_servers(min_tier=None):
     """Return a list of all servers for the users Tier."""
 
     with open(SERVER_INFO_FILE, "r") as f:
@@ -104,9 +104,14 @@ def get_servers():
     servers = server_data["LogicalServers"]
 
     user_tier = int(get_config_value("USER", "tier"))
+    logger.debug("User tier: {0}, minimum tier: {1}".format(
+        user_tier, min_tier))  # log 0-based API tiers
 
-    # Sort server IDs by Tier
-    return [server for server in servers if server["Tier"] <= user_tier and server["Status"] == 1] # noqa
+    # Filter for acceptable tiers and status.
+    return [server for server in servers
+        if (server["Tier"] <= user_tier and # noqa
+            (min_tier is None or server["Tier"] >= min_tier)) and # noqa
+            server["Status"] == 1]
 
 
 def get_server_value(servername, key, servers):

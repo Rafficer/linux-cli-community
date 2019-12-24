@@ -123,7 +123,7 @@ def dialog():
     openvpn_connect(server_result, protocol_result)
 
 
-def random_c(protocol=None):
+def random_c(protocol=None, min_tier=None):
     """Connect to a random ProtonVPN Server."""
 
     logger.debug("Starting random connect")
@@ -131,14 +131,14 @@ def random_c(protocol=None):
     if not protocol:
         protocol = get_config_value("USER", "default_protocol")
 
-    servers = get_servers()
+    servers = get_servers(min_tier)
 
     servername = random.choice(servers)["Name"]
 
     openvpn_connect(servername, protocol)
 
 
-def fastest(protocol=None):
+def fastest(protocol=None, min_tier=None):
     """Connect to the fastest server available."""
 
     logger.debug("Starting fastest connect")
@@ -149,7 +149,7 @@ def fastest(protocol=None):
     disconnect(passed=True)
     pull_server_data(force=True)
 
-    servers = get_servers()
+    servers = get_servers(min_tier)
 
     # ProtonVPN Features: 1: SECURE-CORE, 2: TOR, 4: P2P
     excluded_features = [1, 2]
@@ -164,7 +164,7 @@ def fastest(protocol=None):
     openvpn_connect(fastest_server, protocol)
 
 
-def country_f(country_code, protocol=None):
+def country_f(country_code, protocol=None, min_tier=None):
     """Connect to the fastest server in a specific country."""
     logger.debug("Starting fastest country connect")
 
@@ -176,7 +176,7 @@ def country_f(country_code, protocol=None):
     disconnect(passed=True)
     pull_server_data(force=True)
 
-    servers = get_servers()
+    servers = get_servers(min_tier)
 
     # ProtonVPN Features: 1: SECURE-CORE, 2: TOR, 4: P2P
     excluded_features = [1, 2]
@@ -199,7 +199,7 @@ def country_f(country_code, protocol=None):
     openvpn_connect(fastest_server, protocol)
 
 
-def feature_f(feature, protocol=None):
+def feature_f(feature, protocol=None, min_tier=None):
     """Connect to the fastest server in a specific country."""
     logger.debug(
         "Starting fastest feature connect with feature {0}".format(feature)
@@ -211,7 +211,7 @@ def feature_f(feature, protocol=None):
     disconnect(passed=True)
     pull_server_data(force=True)
 
-    servers = get_servers()
+    servers = get_servers(min_tier)
 
     server_pool = [s for s in servers if s["Features"] == feature]
 
@@ -402,6 +402,7 @@ def status():
     country = get_country_name(country_code)
     city = get_server_value(connected_server, "City", servers)
     load = get_server_value(connected_server, "Load", servers)
+    tier = int(get_server_value(connected_server, "Tier", servers))
     feature = get_server_value(connected_server, "Features", servers)
     last_connection = get_config_value("metadata", "connected_time")
     connection_time = time.time() - int(last_connection)
@@ -424,6 +425,7 @@ def status():
         + "Time:         {0}\n".format(connection_time)
         + "IP:           {0}\n".format(ip)
         + "Server:       {0}\n".format(connected_server)
+        + "Tier:         {0}\n".format(tier + 1)  # 1-based UI tier
         + "Features:     {0}\n".format(all_features[feature])
         + "Protocol:     {0}\n".format(connected_protocol.upper())
         + "Kill Switch:  {0}\n".format(killswitch_status)
