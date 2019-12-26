@@ -226,9 +226,12 @@ def wait_for_network(wait_time):
 
 
 def cidr_to_netmask(cidr):
+    # a 4-byte integer that represents the netmask
     inetmask = 0xFFFFFFFF
-    inetmask <<= 32 - cidr
+    inetmask <<= 32 - cidr # cidr to netmask
 
+    # transforms the 4-byte integer to string IPv4 format
+    # byte0.byte1.byte2.byte3
     netmask = "%d.%d.%d.%d" % (
         inetmask >> 24 & 0xFF,
         (inetmask >> 16) & 0xFF,
