@@ -152,11 +152,7 @@ def get_country_name(code):
     """Return the full name of a country from code"""
 
     from .country_codes import country_codes
-
-    try:
-        return country_codes["cc_to_name"][code]
-    except KeyError:
-        return code
+    return country_codes.get(code, code)
 
 
 def get_fastest_server(server_pool):
