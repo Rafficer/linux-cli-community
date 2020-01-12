@@ -587,6 +587,15 @@ def set_killswitch():
             )
             time.sleep(0.5)
 
+    if killswitch and int(get_config_value("USER", "split_tunnel")):
+        set_config_value("USER", "split_tunnel", 0)
+        print()
+        print(
+            "[!] Kill Switch can't be used with Split Tunneling.\n" +
+            "[!] Split Tunneling has been disabled."
+        )
+        time.sleep(1)
+
     set_config_value("USER", "killswitch", killswitch)
     print()
     print("Kill Switch configuration updated.")
@@ -599,6 +608,15 @@ def set_split_tunnel():
     user_choice = input("Enable split tunneling? [y/N]: ")
 
     if user_choice.strip().lower() == "y":
+        if int(get_config_value("USER", "killswitch")):
+            set_config_value("USER", "killswitch", 0)
+            print()
+            print(
+                "[!] Split Tunneling can't be used with Kill Switch.\n" +
+                "[!] Kill Switch has been disabled.\n"
+            )
+            time.sleep(1)
+
         set_config_value("USER", "split_tunnel", 1)
 
         while True:
