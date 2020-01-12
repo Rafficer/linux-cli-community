@@ -388,16 +388,7 @@ def status():
 
     servers = get_servers()
 
-    subs = [s["Servers"] for s in servers if s["Name"] == connected_server][0]
-    server_ips = [subserver["ExitIP"] for subserver in subs]
-
     ip, isp = get_ip_info()
-
-    if ip not in server_ips:
-        logger.debug("IP not found in connected_server IPs")
-        print("[!] Your IP was not found in last Servers IPs\n"
-              "[!] Maybe you're not connected to a ProtonVPN Server")
-        sys.exit(1)
 
     # Collect Information
     all_features = {0: "Normal", 1: "Secure-Core", 2: "Tor", 4: "P2P"}
