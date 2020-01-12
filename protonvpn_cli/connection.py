@@ -216,6 +216,11 @@ def feature_f(feature, protocol=None):
 
     server_pool = [s for s in servers if s["Features"] == feature]
 
+    if len(server_pool) == 0:
+        logger.debug("No servers found with users selection. Exiting.")
+        print("[!] No servers found with your selection.")
+        sys.exit(1)
+
     fastest_server = get_fastest_server(server_pool)
     openvpn_connect(fastest_server, protocol)
 
