@@ -9,6 +9,7 @@ import re
 import fileinput
 import getpass
 import random
+import ipaddress
 # External Libraries
 import requests
 # ProtonVPN-CLI functions
@@ -226,20 +227,8 @@ def wait_for_network(wait_time):
 
 
 def cidr_to_netmask(cidr):
-    # a 4-byte integer that represents the netmask
-    inetmask = 0xFFFFFFFF
-    inetmask <<= 32 - cidr  # cidr to netmask
-
-    # transforms the 4-byte integer to string IPv4 format
-    # byte0.byte1.byte2.byte3
-    netmask = "%d.%d.%d.%d" % (
-        inetmask >> 24 & 0xFF,    # first byte only
-        (inetmask >> 16) & 0xFF,  # second byte only
-        (inetmask >> 8) & 0xFF,   # third byte only
-        inetmask & 0xFF           # fourth byte only
-    )
-
-    return netmask
+    subnet = ipaddress.IPv4Network("0.0.0.0/%d" % cidr)
+    return str(subnet.netmask)
 
 
 def make_ovpn_template():
