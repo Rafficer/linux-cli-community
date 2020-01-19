@@ -227,7 +227,7 @@ def wait_for_network(wait_time):
 
 
 def cidr_to_netmask(cidr):
-    subnet = ipaddress.IPv4Network("0.0.0.0/%d" % cidr)
+    subnet = ipaddress.IPv4Network("0.0.0.0/{0}".format(cidr))
     return str(subnet.netmask)
 
 
