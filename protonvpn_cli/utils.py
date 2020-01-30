@@ -7,7 +7,6 @@ import json
 import subprocess
 import re
 import fileinput
-import getpass
 import random
 import ipaddress
 # External Libraries
@@ -324,7 +323,7 @@ def change_file_owner(path):
 
 def check_root():
     """Check if the program was executed as root and prompt the user."""
-    if getpass.getuser() != "root":
+    if os.geteuid() != 0:
         print(
             "[!] The program was not executed as root.\n"
             "[!] Please run as root."
