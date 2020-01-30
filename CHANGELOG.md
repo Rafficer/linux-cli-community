@@ -2,24 +2,35 @@
 
 ## Table of Contents
 
-- [ProtonVPN-CLI Changelog](#protonvpn-cli-changelog)
-  - [Table of Contents](#table-of-contents)
-  - [v2.2.0](#v220)
-  - [v2.1.2](#v212)
-  - [v2.1.1](#v211)
-  - [v2.1.0](#v210)
-  - [v2.0.0](#v200)
-  - [v0.1.0](#v010)
+- [v2.2.1](#v221)
+- [v2.2.0](#v220)
+- [v2.1.2](#v212)
+- [v2.1.1](#v211)
+- [v2.1.0](#v210)
+- [v2.0.0](#v200)
+- [v0.1.0](#v010)
+
+## v2.2.1
+
+- Enhancement: Switch API endpoint to api.protonvpn.ch
+- Enhancement: Disallow usage of Kill Switch and Split Tunneling simultaneously
+- Bug fix: Wrong indentation in multiple print statements
+- Bug fix: Failed to detect that it was executed by root on certain Distros
+- Bug fix: Error when try to use `protonvpn status` and connected to a Tor server
+- Bug fix: Error when an invalid server selection was made
+- Bug fix: Error on Split Tunneling activation when no IPs were entered
+- Bug fix: False positives in OpenVPN process detection
+- Documentation: Added Contribution Guide
 
 ## v2.2.0
 
-  - Feature: Wait for connection when using auto-connect
-  - Enhancement: Option to allow access to LAN with Kill Switch
-  - Enhancement: Inform user about this document when displaying update notification
-  - Bug fix: Potential IPv6 leak when reconnecting the network interface with an active connection
-  - Bug fix: Error when trying to connect after reinitializing the profile with an active connection
-  - Bug fix: Configuration value spelling when changing default protocol
-  - Bug fix: Wrong API in update check
+- Feature: Wait for connection when using auto-connect
+- Enhancement: Option to allow access to LAN with Kill Switch
+- Enhancement: Inform user about this document when displaying update notification
+- Bug fix: Potential IPv6 leak when reconnecting the network interface with an active connection
+- Bug fix: Error when trying to connect after reinitializing the profile with an active connection
+- Bug fix: Configuration value spelling when changing default protocol
+- Bug fix: Wrong API in update check
 
 ## v2.1.2
 
