@@ -63,7 +63,7 @@ from .utils import (
 )
 # Constants
 from .constants import (
-    CONFIG_DIR, CONFIG_FILE, PASSFILE, USER, VERSION, SPLIT_TUNNEL_FILE
+    CONFIG_DIR, DATA_DIR, CACHE_DIR, CONFIG_FILE, PASSFILE, USER, VERSION, SPLIT_TUNNEL_FILE
 )
 
 
@@ -80,13 +80,15 @@ def cli():
     """Run user's input command."""
 
     # Initial log values
-    change_file_owner(os.path.join(CONFIG_DIR, "pvpn-cli.log"))
+    change_file_owner(os.path.join(CACHE_DIR, "pvpn-cli.log"))
     logger.debug("###########################")
     logger.debug("### NEW PROCESS STARTED ###")
     logger.debug("###########################")
     logger.debug(sys.argv)
     logger.debug("USER: {0}".format(USER))
     logger.debug("CONFIG_DIR: {0}".format(CONFIG_DIR))
+    logger.debug("DATA_DIR: {0}".format(DATA_DIR))
+    logger.debug("CACHE_DIR: {0}".format(CACHE_DIR))
 
     args = docopt(__doc__, version="ProtonVPN-CLI v{0}".format(VERSION))
     logger.debug("Arguments\n{0}".format(str(args).replace("\n", "")))
@@ -179,6 +181,16 @@ def init_cli():
         os.mkdir(CONFIG_DIR)
         logger.debug("Config Directory created")
     change_file_owner(CONFIG_DIR)
+
+    if not os.path.isdir(CACHE_DIR):
+        os.mkdir(CACHE_DIR)
+        logger.debug("Cache Directory created")
+    change_file_owner(CACHE_DIR)
+
+    if not os.path.isdir(DATA_DIR):
+        os.mkdir(DATA_DIR)
+        logger.debug("Data Directory created")
+    change_file_owner(DATA_DIR)
 
     # Warn user about reinitialization
     try:
