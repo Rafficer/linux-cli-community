@@ -22,7 +22,7 @@ from .utils import (
 )
 # Constants
 from .constants import (
-    CONFIG_DIR, TEMPLATE_FILE, OVPN_FILE, PASSFILE, CONFIG_FILE
+    CACHE_DIR, DATA_DIR, TEMPLATE_FILE, OVPN_FILE, PASSFILE, CONFIG_FILE
 )
 
 
@@ -361,7 +361,7 @@ def status():
     if not is_connected():
         logger.debug("Disconnected")
         print("Status:     Disconnected")
-        if os.path.isfile(os.path.join(CONFIG_DIR, "iptables.backup")):
+        if os.path.isfile(os.path.join(DATA_DIR, "iptables.backup")):
             print("[!] Kill Switch is currently active.")
             logger.debug("Kill Switch active while VPN disconnected")
         else:
@@ -407,7 +407,7 @@ def status():
     last_connection = get_config_value("metadata", "connected_time")
     connection_time = time.time() - int(last_connection)
 
-    if os.path.isfile(os.path.join(CONFIG_DIR, "iptables.backup")):
+    if os.path.isfile(os.path.join(DATA_DIR, "iptables.backup")):
         killswitch_on = True
     else:
         killswitch_on = False
@@ -462,7 +462,7 @@ def openvpn_connect(servername, protocol):
 
     print("Connecting to {0} via {1}...".format(servername, protocol.upper()))
 
-    with open(os.path.join(CONFIG_DIR, "ovpn.log"), "w+") as f:
+    with open(os.path.join(CACHE_DIR, "ovpn.log"), "w+") as f:
         subprocess.Popen(
             [
                 "openvpn",
@@ -475,7 +475,7 @@ def openvpn_connect(servername, protocol):
     logger.debug("OpenVPN process started")
     time_start = time.time()
 
-    with open(os.path.join(CONFIG_DIR, "ovpn.log"), "r") as f:
+    with open(os.path.join(CACHE_DIR, "ovpn.log"), "r") as f:
         while True:
             content = f.read()
             f.seek(0)
@@ -548,7 +548,7 @@ def manage_dns(mode, dns_server=False):
     restore: Revert changes and restore original configuration
     """
 
-    backupfile = os.path.join(CONFIG_DIR, "resolv.conf.backup")
+    backupfile = os.path.join(DATA_DIR, "resolv.conf.backup")
     resolvconf_path = os.path.realpath("/etc/resolv.conf")
 
     if mode == "leak_protection":
@@ -633,8 +633,8 @@ def manage_ipv6(mode):
     restore: Revert changes and restore original configuration.
     """
 
-    ipv6_backupfile = os.path.join(CONFIG_DIR, "ipv6.backup")
-    ip6tables_backupfile = os.path.join(CONFIG_DIR, "ip6tables.backup")
+    ipv6_backupfile = os.path.join(DATA_DIR, "ipv6.backup")
+    ip6tables_backupfile = os.path.join(DATA_DIR, "ip6tables.backup")
 
     if mode == "disable":
 
@@ -764,7 +764,7 @@ def manage_killswitch(mode, proto=None, port=None):
     reason this will completely block access to the internet.
     """
 
-    backupfile = os.path.join(CONFIG_DIR, "iptables.backup")
+    backupfile = os.path.join(DATA_DIR, "iptables.backup")
 
     if mode == "restore":
         logger.debug("Restoring iptables")
@@ -788,7 +788,7 @@ def manage_killswitch(mode, proto=None, port=None):
             logger.debug("Kill Switch backup exists")
             manage_killswitch("restore")
 
-        with open(os.path.join(CONFIG_DIR, "ovpn.log"), "r") as f:
+        with open(os.path.join(CACHE_DIR, "ovpn.log"), "r") as f:
             content = f.read()
             device = re.search(r"(TUN\/TAP device) (.+) opened", content)
             if not device:
