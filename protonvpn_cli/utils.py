@@ -23,7 +23,7 @@ from .constants import (
 def call_api(endpoint, json_format=True, handle_errors=True):
     """Call to the ProtonVPN API."""
 
-    api_domain = "https://api.protonmail.ch"
+    api_domain = "https://api.protonvpn.ch"
     url = api_domain + endpoint
 
     headers = {
