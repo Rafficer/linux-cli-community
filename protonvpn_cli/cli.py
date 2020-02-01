@@ -224,11 +224,11 @@ def init_cli():
 
     print()
     print(
-        "You entered the following information:\n",
-        "Username: {0}\n".format(ovpn_username),
-        "Password: {0}\n".format("*" * len(ovpn_password)),
-        "Tier: {0}\n".format(protonvpn_plans[user_tier]),
-        "Default protocol: {0}\n".format(user_protocol.upper()),
+        "You entered the following information:\n" +
+        "Username: {0}\n".format(ovpn_username) +
+        "Password: {0}\n".format("*" * len(ovpn_password)) +
+        "Tier: {0}\n".format(protonvpn_plans[user_tier]) +
+        "Default protocol: {0}".format(user_protocol.upper())
     )
     print()
 

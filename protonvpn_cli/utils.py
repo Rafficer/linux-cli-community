@@ -339,7 +339,7 @@ def check_root():
                                    stderr=subprocess.PIPE)
             if not check.returncode == 0:
                 logger.debug("{0} not found".format(program))
-                print("'{0}' not found. \n".format(program),
+                print("'{0}' not found. \n".format(program) +
                       "Please install {0}.".format(program))
                 sys.exit(1)
 
@@ -445,7 +445,7 @@ def check_init(check_props=True):
                     get_config_value("USER", prop)
                 except KeyError:
                     print(
-                        "[!] {0} is missing from configuration.\n".format(prop), # noqa
+                        "[!] {0} is missing from configuration.\n".format(prop) + # noqa
                         "[!] Please run 'protonvpn configure' to set it."
                     )
                     logger.debug(
