@@ -190,7 +190,7 @@ def country_f(country_code, protocol=None):
 
     if len(server_pool) == 0:
         print(
-            "[!] No Server in country {0} found\n".format(country_code),
+            "[!] No Server in country {0} found\n".format(country_code) +
             "[!] Please choose a valid country"
         )
         logger.debug("No server in country {0}".format(country_code))
@@ -262,7 +262,7 @@ def direct(user_input, protocol=None):
                      "{0}".format('-' + tor if tor is not None else '')
     else:
         print(
-            "[!] '{0}' is not a valid servername\n".format(user_input),
+            "[!] '{0}' is not a valid servername\n".format(user_input) +
             "[!] Please enter a valid servername"
         )
         logger.debug("'{0}' is not a valid servername'".format(user_input))
