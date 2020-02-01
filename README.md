@@ -95,3 +95,7 @@ For updating, you just need to pull the latest version of the repository with gi
 |`protonvpn --help`                 | Show help message.                                    |
 
 All connect options can be used with the `-p` flag to explicitly specify which transmission protocol is used for that connection (either `udp` or `tcp`).
+
+## Contributing
+
+If you want to contribute to this project, please read the [contribution guide](https://github.com/ProtonVPN/protonvpn-cli-ng/blob/master/CONTRIBUTING.md).
