@@ -162,6 +162,7 @@ def init_cli():
             "dns_leak_protection": "1",
             "custom_dns": "None",
             "check_update_interval": "3",
+            "split_tunnel": "0",
         }
         config["metadata"] = {
             "last_api_pull": "0",
