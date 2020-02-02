@@ -420,7 +420,7 @@ def check_update():
         )
 
 
-def check_init(check_props=True):
+def check_init():
     """Check if a profile has been initialized, quit otherwise."""
 
     try:
@@ -431,27 +431,33 @@ def check_init(check_props=True):
             )
             logger.debug("Initialized Profile not found")
             sys.exit(1)
-        elif check_props:
-            # Check if required properties are set.
-            # This is to ensure smooth updates so the user can be warned
-            # when a property is missing and can be ordered
-            # to run `protonvpn configure` or something else.
+        else:
+            # Check if required configuration values are set
+            # If this isn't the case it will set a default value
 
-            required_props = ["username", "tier", "default_protocol",
-                              "dns_leak_protection", "custom_dns"]
+            default_conf = {
+                "USER": {
+                    "username": "username",
+                    "tier": "0",
+                    "default_protocol": "udp",
+                    "dns_leak_protection": "1",
+                    "custom_dns": "None",
+                    "check_update_interval": "3",
+                    "killswitch": "0",
+                    "split_tunnel": "0",
+                },
+            }
 
-            for prop in required_props:
-                try:
-                    get_config_value("USER", prop)
-                except KeyError:
-                    print(
-                        "[!] {0} is missing from configuration.\n".format(prop) + # noqa
-                        "[!] Please run 'protonvpn configure' to set it."
-                    )
-                    logger.debug(
-                        "{0} is missing from configuration".format(prop)
-                    )
-                    sys.exit(1)
+            for section in default_conf:
+                for config_key in default_conf[section]:
+                    try:
+                        get_config_value(section, config_key)
+                    except KeyError:
+                        logger.debug("Config {0}/{1} not found, default set"
+                                     .format(section, config_key))
+                        set_config_value(section, config_key,
+                                         default_conf[section][config_key])
+
     except KeyError:
         print(
             "[!] There has been no profile initialized yet. "
