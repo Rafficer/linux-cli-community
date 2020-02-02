@@ -139,7 +139,7 @@ def cli():
         connection.status()
     elif args.get("configure"):
         check_root()
-        check_init(check_props=False)
+        check_init()
         configure_cli()
     elif args.get("refresh"):
         pull_server_data(force=True)
