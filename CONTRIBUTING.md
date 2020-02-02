@@ -15,3 +15,5 @@ By making a contribution to this project you agree to the following:
 1. Ensure that your code is [Flake8](https://flake8.pycqa.org/en/latest/) compatible. In cases this doesn't work out, use the `# noqa` comment.
 2. Ensure that your code is compatible with the lowest Python Version supported by this project (Currently 3.5)
 3. If applicable, update [DOCUMENTATION.md](https://github.com/ProtonVPN/protonvpn-cli-ng/blob/master/DOCUMENTATION.md) and [USAGE.md](https://github.com/ProtonVPN/protonvpn-cli-ng/blob/master/USAGE.md) to reflect changes correctly.
+4. If your PR fixes an issue, prefix your commit or the PR title with `Fix #42:` where 42 is the corresponding issue number.
+5. Follow [best practices](https://chris.beams.io/posts/git-commit/) in your commit messages.
