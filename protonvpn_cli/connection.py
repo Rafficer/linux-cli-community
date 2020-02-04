@@ -769,7 +769,7 @@ def manage_killswitch(mode, proto=None, port=None):
     Disable and enable the VPN Kill Switch.
 
     The Kill Switch creates IPTables rules that only allow connections to go
-    through the OpenVPN device. If the OpenVPN process stops for some unkown
+    through the OpenVPN device. If the OpenVPN process stops for some unknown
     reason this will completely block access to the internet.
     """
 
