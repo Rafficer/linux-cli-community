@@ -18,7 +18,8 @@ from .utils import (
     check_init, pull_server_data, is_connected,
     get_servers, get_server_value, get_config_value,
     set_config_value, get_ip_info, get_country_name,
-    get_fastest_server, check_update, get_default_nic
+    get_fastest_server, check_update, get_default_nic,
+    get_transferred_data
 )
 # Constants
 from .constants import (
@@ -416,6 +417,8 @@ def status():
     connection_time = str(datetime.timedelta(
         seconds=connection_time)).split(".")[0]
 
+    tx_amount, rx_amount = get_transferred_data()
+
     # Print Status Output
     logger.debug("Printing status")
     print(
@@ -428,7 +431,9 @@ def status():
         "Kill Switch:  {0}\n".format(killswitch_status) +
         "Country:      {0}\n".format(country) +
         "City:         {0}\n".format(city) +
-        "Load:         {0}%".format(load)
+        "Load:         {0}%\n".format(load) +
+        "Received:     {0}\n".format(rx_amount) +
+        "Sent:         {0}".format(tx_amount)
     )
 
 
