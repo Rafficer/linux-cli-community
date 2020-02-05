@@ -9,6 +9,7 @@ import re
 import fileinput
 import random
 import ipaddress
+import math
 # External Libraries
 import requests
 # ProtonVPN-CLI functions
@@ -475,3 +476,38 @@ def is_valid_ip(ipaddr):
 
     else:
         return False
+
+
+def get_transferred_data():
+    """Reads and returns the amount of data transferred during a session
+    from the /sys/ directory"""
+
+    def convert_size(size_bytes):
+        """Converts byte amounts into human readable formats"""
+        if size_bytes == 0:
+            return "0B"
+        size_name = ("B", "KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB")
+
+        i = int(math.floor(math.log(size_bytes, 1000)))
+        p = math.pow(1000, i)
+        s = round(size_bytes / p, 2)
+        return "{0} {1}".format(s, size_name[i])
+
+    base_path = "/sys/class/net/{0}/statistics/{1}"
+
+    if os.path.isfile(base_path.format('proton0', 'rx_bytes')):
+        adapter_name = 'proton0'
+    elif os.path.isfile(base_path.format('tun0', 'rx_bytes')):
+        adapter_name = 'tun0'
+    else:
+        logger.debug("No usage stats for VPN interface available")
+        return '-', '-'
+
+    # Get transmitted and received bytes from /sys/ directory
+    with open(base_path.format(adapter_name, 'tx_bytes'), "r") as f:
+        tx_bytes = int(f.read())
+
+    with open(base_path.format(adapter_name, 'rx_bytes'), "r") as f:
+        rx_bytes = int(f.read())
+
+    return convert_size(tx_bytes), convert_size(rx_bytes)
