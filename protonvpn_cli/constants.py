@@ -13,4 +13,4 @@ SERVER_INFO_FILE = os.path.join(CONFIG_DIR, "serverinfo.json")
 SPLIT_TUNNEL_FILE = os.path.join(CONFIG_DIR, "split_tunnel.txt")
 OVPN_FILE = os.path.join(CONFIG_DIR, "connect.ovpn")
 PASSFILE = os.path.join(CONFIG_DIR, "pvpnpass")
-VERSION = "2.2.1"
+VERSION = "2.2.2"
