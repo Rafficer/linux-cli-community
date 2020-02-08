@@ -2,6 +2,7 @@
 
 ## Table of Contents
 
+- [v2.2.2](#v222)
 - [v2.2.1](#v221)
 - [v2.2.0](#v220)
 - [v2.1.2](#v212)
@@ -9,6 +10,11 @@
 - [v2.1.0](#v210)
 - [v2.0.0](#v200)
 - [v0.1.0](#v010)
+
+## v2.2.2
+
+- Enhancement: Display usage statistics in status
+- Bug fix: Kill Switch activation failed due to missing configuration value
 
 ## v2.2.1
 
