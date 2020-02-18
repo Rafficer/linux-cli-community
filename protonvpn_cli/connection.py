@@ -584,9 +584,12 @@ def manage_dns(mode, dns_server=False):
         # Remove previous nameservers
         dns_regex = re.compile(r"^nameserver .*$")
 
-        for line in fileinput.input(resolvconf_path, inplace=True):
-            if not dns_regex.search(line) and not dns_regex.search(line):
-                print(line, end="")
+        with open(backupfile, 'r') as backup_handle:
+            with open(resolvconf_path, 'w') as resolvconf_handle:
+                for line in backup_handle:
+                    if not dns_regex.search(line):
+                        resolvconf_handle.write(line)
+
         logger.debug("Removed existing DNS Servers")
 
         # Add ProtonVPN managed DNS Server to resolv.conf
