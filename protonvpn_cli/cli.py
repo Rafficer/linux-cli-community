@@ -52,7 +52,8 @@ import getpass
 import shutil
 import time
 # External Libraries
-from docopt import docopt
+# from docopt import docopt
+import click
 # protonvpn-cli Functions
 from . import connection
 from .logger import logger
@@ -66,7 +67,7 @@ from .constants import (
     CONFIG_DIR, CONFIG_FILE, PASSFILE, USER, VERSION, SPLIT_TUNNEL_FILE
 )
 
-
+@click.group()
 def main():
     """Main function"""
     try:
@@ -78,7 +79,10 @@ def main():
 
 def cli():
     """Run user's input command."""
-
+    
+    # Check for root
+    check_root()
+    
     # Initial log values
     change_file_owner(os.path.join(CONFIG_DIR, "pvpn-cli.log"))
     logger.debug("###########################")
@@ -87,69 +91,69 @@ def cli():
     logger.debug(sys.argv)
     logger.debug("USER: {0}".format(USER))
     logger.debug("CONFIG_DIR: {0}".format(CONFIG_DIR))
-
-    args = docopt(__doc__, version="ProtonVPN-CLI v{0}".format(VERSION))
-    logger.debug("Arguments\n{0}".format(str(args).replace("\n", "")))
-
+    return
     # Parse arguments
-    if args.get("init"):
-        init_cli()
-    elif args.get("c") or args.get("connect"):
-        check_root()
-        check_init()
+    # if args.get("init"):
+    #     init_cli()
+    # elif args.get("c") or args.get("connect"):
+    #     check_root()
+    #     check_init()
 
-        # Wait until a connection to the ProtonVPN API can be made
-        # As this is mainly for automatically connecting on boot, it only
-        # activates when the environment variable PVPN_WAIT is 1
-        # Otherwise it wouldn't connect when a VPN process without
-        # internet access exists or the Kill Switch is active
-        if int(os.environ.get("PVPN_WAIT", 0)) > 0:
-            wait_for_network(int(os.environ["PVPN_WAIT"]))
+    #     # Wait until a connection to the ProtonVPN API can be made
+    #     # As this is mainly for automatically connecting on boot, it only
+    #     # activates when the environment variable PVPN_WAIT is 1
+    #     # Otherwise it wouldn't connect when a VPN process without
+    #     # internet access exists or the Kill Switch is active
+    #     if int(os.environ.get("PVPN_WAIT", 0)) > 0:
+    #         wait_for_network(int(os.environ["PVPN_WAIT"]))
 
-        protocol = args.get("-p")
-        if protocol is not None and protocol.lower().strip() in ["tcp", "udp"]:
-            protocol = protocol.lower().strip()
+    #     protocol = args.get("-p")
+    #     if protocol is not None and protocol.lower().strip() in ["tcp", "udp"]:
+    #         protocol = protocol.lower().strip()
 
-        if args.get("--random"):
-            connection.random_c(protocol)
-        elif args.get("--fastest"):
-            connection.fastest(protocol)
-        elif args.get("<servername>"):
-            connection.direct(args.get("<servername>"), protocol)
-        elif args.get("--cc") is not None:
-            connection.country_f(args.get("--cc"), protocol)
-        # Features: 1: Secure-Core, 2: Tor, 4: P2P
-        elif args.get("--p2p"):
-            connection.feature_f(4, protocol)
-        elif args.get("--sc"):
-            connection.feature_f(1, protocol)
-        elif args.get("--tor"):
-            connection.feature_f(2, protocol)
-        else:
-            connection.dialog()
-    elif args.get("r") or args.get("reconnect"):
-        check_root()
-        check_init()
-        connection.reconnect()
-    elif args.get("d") or args.get("disconnect"):
-        check_root()
-        check_init()
-        connection.disconnect()
-    elif args.get("s") or args.get("status"):
-        connection.status()
-    elif args.get("configure"):
-        check_root()
-        check_init()
-        configure_cli()
-    elif args.get("refresh"):
-        pull_server_data(force=True)
-        make_ovpn_template()
-    elif args.get("examples"):
-        print_examples()
+    #     if args.get("--random"):
+    #         connection.random_c(protocol)
+    #     elif args.get("--fastest"):
+    #         connection.fastest(protocol)
+    #     elif args.get("<servername>"):
+    #         connection.direct(args.get("<servername>"), protocol)
+    #     elif args.get("--cc") is not None:
+    #         connection.country_f(args.get("--cc"), protocol)
+    #     # Features: 1: Secure-Core, 2: Tor, 4: P2P
+    #     elif args.get("--p2p"):
+    #         connection.feature_f(4, protocol)
+    #     elif args.get("--sc"):
+    #         connection.feature_f(1, protocol)
+    #     elif args.get("--tor"):
+    #         connection.feature_f(2, protocol)
+    #     else:
+    #         connection.dialog()
+    # elif args.get("r") or args.get("reconnect"):
+    #     check_root()
+    #     check_init()
+    #     connection.reconnect()
+    # elif args.get("d") or args.get("disconnect"):
+    #     check_root()
+    #     check_init()
+    #     connection.disconnect()
+    # elif args.get("s") or args.get("status"):
+    #     connection.status()
+    # elif args.get("configure"):
+    #     check_root()
+    #     check_init()
+    #     configure_cli()
+    # elif args.get("refresh"):
+    #     pull_server_data(force=True)
+    #     make_ovpn_template()
+    # elif args.get("examples"):
+    #     print_examples()
 
-
-def init_cli():
-    """Initialize the CLI."""
+@main.command()
+@click.option("--inline", nargs=3)
+# @click.argument("tier", required=False)
+# @click.argument("default_protocol", required=False)
+def init(inline=False):
+    """Initialize the CLI. If --inline then <username> <plan> <default protocol>."""
 
     def init_config_file():
         """"Initialize configuration file."""
@@ -173,7 +177,7 @@ def init_cli():
         change_file_owner(CONFIG_FILE)
         logger.debug("pvpn-cli.cfg initialized")
 
-    check_root()
+    
 
     if not os.path.isdir(CONFIG_DIR):
         os.mkdir(CONFIG_DIR)
@@ -197,28 +201,45 @@ def init_cli():
         pass
 
     term_width = shutil.get_terminal_size()[0]
-    print("[ -- PROTONVPN-CLI INIT -- ]\n".center(term_width))
 
-    init_msg = (
-        "ProtonVPN uses two different sets of credentials, one for the "
-        "website and official apps where the username is most likely your "
-        "e-mail, and one for connecting to the VPN servers.\n\n"
-        "You can find the OpenVPN credentials at "
-        "https://account.protonvpn.com/account.\n\n"
-        "--- Please make sure to use the OpenVPN credentials ---\n"
-    ).splitlines()
+    # If len(inline) > 0 then user is using --inline then it returns (username, plan, default protocol)
+    if not len(inline) == 0:
+        password = click.prompt("Enter your password", hide_input=True)
+        retype_password = click.prompt("Enter your password", hide_input=True)
 
-    for line in init_msg:
-        print(textwrap.fill(line, width=term_width))
+        # Check if passwords match
+        if password != retype_password:
+            print("[!] Passwords do not match")
+            return
+        
+        ovpn_username = inline[0]
+        ovpn_password = password
+        user_tier = int(inline[1])
+        user_protocol = inline[2]
+        print(inline)
+    else:
+        print("[ -- PROTONVPN-CLI INIT -- ]\n".center(term_width))
 
-    # Set ProtonVPN Username and Password
-    ovpn_username, ovpn_password = set_username_password(write=False)
+        init_msg = (
+            "ProtonVPN uses two different sets of credentials, one for the "
+            "website and official apps where the username is most likely your "
+            "e-mail, and one for connecting to the VPN servers.\n\n"
+            "You can find the OpenVPN credentials at "
+            "https://account.protonvpn.com/account.\n\n"
+            "--- Please make sure to use the OpenVPN credentials ---\n"
+        ).splitlines()
 
-    # Set the ProtonVPN Plan
-    user_tier = set_protonvpn_tier(write=False)
+        for line in init_msg:
+            print(textwrap.fill(line, width=term_width))
 
-    # Set default Protocol
-    user_protocol = set_default_protocol(write=False)
+        # Set ProtonVPN Username and Password via interface
+        ovpn_username, ovpn_password = set_username_password(write=False)
+
+        # Set the ProtonVPN Plan
+        user_tier = set_protonvpn_tier(write=False)
+
+        # Set default Protocol
+        user_protocol = set_default_protocol(write=False)
 
     protonvpn_plans = {1: "Free", 2: "Basic", 3: "Plus", 4: "Visionary"}
 
