@@ -38,6 +38,7 @@ setup(
         "requests",
         "docopt",
         "pythondialog",
+        "click"
     ],
     python_requires=">=3.5",
     classifiers=[
