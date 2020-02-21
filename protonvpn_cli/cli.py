@@ -150,8 +150,6 @@ def cli():
 
 @main.command()
 @click.option("--inline", nargs=3)
-# @click.argument("tier", required=False)
-# @click.argument("default_protocol", required=False)
 def init(inline=False):
     """Initialize the CLI. If --inline then <username> <plan> <default protocol>."""
 
@@ -324,9 +322,13 @@ def print_examples():
     print(examples)
 
 
+@main.group("configure")
 def configure_cli():
     """Change single configuration values"""
+    return
 
+@configure_cli.command()
+def menu():
     while True:
         print(
             "What do you want to change?\n"
@@ -376,7 +378,7 @@ def configure_cli():
             )
             time.sleep(0.5)
 
-
+@configure_cli.command()
 def purge_configuration():
     """Purges CLI configuration"""
 
@@ -395,28 +397,42 @@ def purge_configuration():
         shutil.rmtree(CONFIG_DIR)
     print("Configuration purged.")
 
-
-def set_username_password(write=False):
+@configure_cli.command("user")
+@click.argument("username")
+def set_username_password(write=False, username=False):
     """Set the ProtonVPN Username and Password."""
-
     print()
-    ovpn_username = input("Enter your ProtonVPN OpenVPN username: ")
+    if not len(username) == 0:
+        ovpn_username = username[0]
+        password = click.prompt("Enter your password", hide_input=True)
+        retype_password = click.prompt("Repeat your password", hide_input=True)
 
-    # Ask for the password and confirmation until both are the same
-    while True:
-        ovpn_password1 = getpass.getpass(
-            "Enter your ProtonVPN OpenVPN password: "
-        )
-        ovpn_password2 = getpass.getpass(
-            "Confirm your ProtonVPN OpenVPN password: "
-        )
+        # Check if passwords match
+        if password != retype_password:
+            print("[!] Passwords do not match")
+            return
+        
+        ovpn_username = username[0]
+        ovpn_password1 = password
+        write = True
+    else:
+        ovpn_username = input("Enter your ProtonVPN OpenVPN username: ")
 
-        if not ovpn_password1 == ovpn_password2:
-            print()
-            print("[!] The passwords do not match. Please try again.")
-        else:
-            break
+        # Ask for the password and confirmation until both are the same
+        while True:
+            ovpn_password1 = getpass.getpass(
+                "Enter your ProtonVPN OpenVPN password: "
+            )
+            ovpn_password2 = getpass.getpass(
+                "Confirm your ProtonVPN OpenVPN password: "
+            )
 
+            if not ovpn_password1 == ovpn_password2:
+                print()
+                print("[!] The passwords do not match. Please try again.")
+            else:
+                break
+    print()
     if write:
         set_config_value("USER", "username", ovpn_username)
 
@@ -426,33 +442,38 @@ def set_username_password(write=False):
             os.chmod(PASSFILE, 0o600)
 
         print("Username and Password has been updated!")
-
     return ovpn_username, ovpn_password1
 
-
-def set_protonvpn_tier(write=False):
+@configure_cli.command("tier")
+@click.argument("tier")
+def set_protonvpn_tier(write=False, tier=False):
     """Set the users ProtonVPN Plan."""
 
     protonvpn_plans = {1: "Free", 2: "Basic", 3: "Plus", 4: "Visionary"}
 
     print()
-    print("Please choose your ProtonVPN Plan")
 
-    for plan in protonvpn_plans:
-        print("{0}) {1}".format(plan, protonvpn_plans[plan]))
+    if not len(tier) == 0:
+        user_tier = int(tier)
+        write = True
+    else:
+        print("Please choose your ProtonVPN Plan")
 
-    while True:
-        print()
-        user_tier = input("Your plan: ")
+        for plan in protonvpn_plans:
+            print("{0}) {1}".format(plan, protonvpn_plans[plan]))
 
-        try:
-            user_tier = int(user_tier)
-            # Check if the choice exists in the dictionary
-            protonvpn_plans[user_tier]
-            break
-        except (KeyError, ValueError):
+        while True:
             print()
-            print("[!] Invalid choice. Please enter the number of your plan.")
+            user_tier = input("Your plan: ")
+
+            try:
+                user_tier = int(user_tier)
+                # Check if the choice exists in the dictionary
+                protonvpn_plans[user_tier]
+                break
+            except (KeyError, ValueError):
+                print()
+                print("[!] Invalid choice. Please enter the number of your plan.")
 
     if write:
         # Set Visionary to plus as it has the same access
@@ -468,41 +489,53 @@ def set_protonvpn_tier(write=False):
 
     return user_tier
 
-
-def set_default_protocol(write=False):
+@configure_cli.command("protocol")
+@click.argument("protocol")
+def set_default_protocol(write=False, protocol=False):
     """Set the users default protocol"""
 
+    protonvpn_protocols = {1: "udp", 2: "tcp"}
+
     print()
-    print(
-        "Choose the default OpenVPN protocol.\n"
-        "OpenVPN can act on two different protocols: UDP and TCP.\n"
-        "UDP is preferred for speed but might be blocked in some networks.\n"
-        "TCP is not as fast but a lot harder to block.\n"
-        "Input your preferred protocol. (Default: UDP)\n"
-    )
 
-    protonvpn_protocols = {1: "UDP", 2: "TCP"}
+    protocol = protocol.strip().lower()
 
-    for protocol in protonvpn_protocols:
-        print("{0}) {1}".format(protocol, protonvpn_protocols[protocol]))
+    if not len(protocol) == 0: 
+        if protocol not in protonvpn_protocols[1].lower() and protocol not in protonvpn_protocols[2].lower():
+            print("[!] Invalid choice. ")
+            return
+        user_protocol = protocol
+        write = True
+    else:
+        print(
+            "Choose the default OpenVPN protocol.\n"
+            "OpenVPN can act on two different protocols: UDP and TCP.\n"
+            "UDP is preferred for speed but might be blocked in some networks.\n"
+            "TCP is not as fast but a lot harder to block.\n"
+            "Input your preferred protocol. (Default: UDP)\n"
+        )
 
-    while True:
-        print()
-        user_protocol_choice = input("Your choice: ")
 
-        try:
-            if user_protocol_choice == "":
-                user_protocol_choice = 1
-            user_protocol_choice = int(user_protocol_choice)
-            # Check if the choice exists in the dictionary
-            user_protocol = protonvpn_protocols[user_protocol_choice].lower()
-            break
-        except (KeyError, ValueError):
+        for protocol in protonvpn_protocols:
+            print("{0}) {1}".format(protocol, protonvpn_protocols[protocol]))
+
+        while True:
             print()
-            print(
-                "[!] Invalid choice. "
-                "Please enter the number of your preferred protocol."
-            )
+            user_protocol_choice = input("Your choice: ")
+
+            try:
+                if user_protocol_choice == "":
+                    user_protocol_choice = 1
+                user_protocol_choice = int(user_protocol_choice)
+                # Check if the choice exists in the dictionary
+                user_protocol = protonvpn_protocols[user_protocol_choice].lower()
+                break
+            except (KeyError, ValueError):
+                print()
+                print(
+                    "[!] Invalid choice. "
+                    "Please enter the number of your preferred protocol."
+                )
 
     if write:
         set_config_value("USER", "default_protocol", user_protocol)
@@ -510,7 +543,7 @@ def set_default_protocol(write=False):
 
     return user_protocol
 
-
+@configure_cli.command("dns")
 def set_dns_protection():
     """Enable or disable DNS Leak Protection and custom DNS"""
 
@@ -569,7 +602,7 @@ def set_dns_protection():
     set_config_value("USER", "custom_dns", custom_dns)
     print("DNS Management updated.")
 
-
+@configure_cli.command("killswitch")
 def set_killswitch():
     """Enable or disable the Kill Switch."""
 
@@ -621,7 +654,7 @@ def set_killswitch():
     print()
     print("Kill Switch configuration updated.")
 
-
+@configure_cli.command("tunneling")
 def set_split_tunnel():
     """Enable or disable split tunneling"""
 
