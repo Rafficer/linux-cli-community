@@ -322,12 +322,40 @@ def print_examples():
     print(examples)
 
 
-@main.group("configure")
+@main.group()
 def configure_cli():
     """Change single configuration values"""
     return
 
-@configure_cli.command()
+@click.option("--user")
+@click.option("--tier")
+@click.option("--protocol")
+@click.option("--dns")
+@click.option("--killswitch")
+@click.option("--tunnel")
+@click.option("--purge")
+@main.command("configure")
+def configure(user, tier, protocol, dns, killswitch, tunnel, purge):
+    if user:
+        set_username_password(write=True, username=user)
+    elif tier:
+        set_protonvpn_tier(write=True, tier=tier)
+    elif protocol:
+        set_default_protocol(write=True, protocol=protocol)
+    elif dns:
+        # To-do
+        set_dns_protection(write=True)    
+    elif killswitch:
+        # To-do
+        set_killswitch()
+    elif tunnel:
+        # To-do
+        set_split_tunnel()
+    elif purge:
+        # To-do
+        purge_configuration()
+
+@configure_cli.command("menu")
 def menu():
     while True:
         print(
@@ -378,7 +406,6 @@ def menu():
             )
             time.sleep(0.5)
 
-@configure_cli.command()
 def purge_configuration():
     """Purges CLI configuration"""
 
@@ -397,8 +424,6 @@ def purge_configuration():
         shutil.rmtree(CONFIG_DIR)
     print("Configuration purged.")
 
-@configure_cli.command("user")
-@click.argument("username")
 def set_username_password(write=False, username=False):
     """Set the ProtonVPN Username and Password."""
     print()
@@ -444,8 +469,6 @@ def set_username_password(write=False, username=False):
         print("Username and Password has been updated!")
     return ovpn_username, ovpn_password1
 
-@configure_cli.command("tier")
-@click.argument("tier")
 def set_protonvpn_tier(write=False, tier=False):
     """Set the users ProtonVPN Plan."""
 
@@ -489,8 +512,6 @@ def set_protonvpn_tier(write=False, tier=False):
 
     return user_tier
 
-@configure_cli.command("protocol")
-@click.argument("protocol")
 def set_default_protocol(write=False, protocol=False):
     """Set the users default protocol"""
 
@@ -543,7 +564,6 @@ def set_default_protocol(write=False, protocol=False):
 
     return user_protocol
 
-@configure_cli.command("dns")
 def set_dns_protection():
     """Enable or disable DNS Leak Protection and custom DNS"""
 
@@ -602,7 +622,6 @@ def set_dns_protection():
     set_config_value("USER", "custom_dns", custom_dns)
     print("DNS Management updated.")
 
-@configure_cli.command("killswitch")
 def set_killswitch():
     """Enable or disable the Kill Switch."""
 
@@ -654,7 +673,6 @@ def set_killswitch():
     print()
     print("Kill Switch configuration updated.")
 
-@configure_cli.command("tunneling")
 def set_split_tunnel():
     """Enable or disable split tunneling"""
 
