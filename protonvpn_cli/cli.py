@@ -146,7 +146,8 @@ def cli():
     #     make_ovpn_template()
     # elif args.get("examples"):
     #     print_examples()
-
+@click.option("--inline", nargs=3)
+@main.command("init")
 def init(inline=False):
     """Initialize the CLI. If --inline then <username> <plan> <default protocol>."""
 
@@ -170,9 +171,7 @@ def init(inline=False):
         with open(CONFIG_FILE, "w") as f:
             config.write(f)
         change_file_owner(CONFIG_FILE)
-        logger.debug("pvpn-cli.cfg initialized")
-
-    
+        logger.debug("pvpn-cli.cfg initialized")    
 
     if not os.path.isdir(CONFIG_DIR):
         os.mkdir(CONFIG_DIR)
@@ -198,7 +197,8 @@ def init(inline=False):
     term_width = shutil.get_terminal_size()[0]
 
     # If len(inline) > 0 then user is using --inline then it returns (username, plan, default protocol)
-    if not len(inline) == 0:
+    if inline and all(inline):
+        
         password = click.prompt("Enter your password", hide_input=True)
         retype_password = click.prompt("Enter your password", hide_input=True)
 
@@ -211,7 +211,7 @@ def init(inline=False):
         ovpn_password = password
         user_tier = int(inline[1])
         user_protocol = inline[2]
-        print(inline)
+
     else:
         print("[ -- PROTONVPN-CLI INIT -- ]\n".center(term_width))
 
@@ -424,7 +424,7 @@ def set_username_password(write=False, inline_username=False):
     """Set the ProtonVPN Username and Password."""
     print()
     
-    if all(inline_username):
+    if inline_username and all(inline_username):
 
         password = click.prompt("Enter your password", hide_input=True)
         retype_password = click.prompt("Repeat your password", hide_input=True)
@@ -472,7 +472,7 @@ def set_protonvpn_tier(write=False, inline_tier=False):
 
     print()
 
-    if not len(inline_tier) == 0:
+    if inline_tier and all(inline_tier):
         user_tier = int(inline_tier)
     else:
         print("Please choose your ProtonVPN Plan")
@@ -514,12 +514,14 @@ def set_default_protocol(write=False, inline_protocol=False):
 
     print()
 
-    inline_protocol = inline_protocol.strip().lower()
+    if inline_protocol and all(inline_protocol): 
 
-    if not len(inline_protocol) == 0: 
+        inline_protocol = inline_protocol.strip().lower()
+
         if inline_protocol not in protonvpn_protocols[1].lower() and inline_protocol not in protonvpn_protocols[2].lower():
             print("[!] Invalid choice. ")
             return
+
         user_protocol = inline_protocol
     else:
         print(
