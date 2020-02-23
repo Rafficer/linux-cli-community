@@ -351,7 +351,7 @@ def configure(user, tier, protocol, dns, killswitch, split_tunnel, purge):
         # To-do
         purge_configuration()
 
-@configure_cli.command("menu")
+@main.command("settings")
 def menu():
     while True:
         print(
@@ -574,7 +574,6 @@ def set_dns_protection(inline_protocol=False):
         else:
             dns_leak_protection = 0
 
-        sys.exit(1)
     else:
         while True:
             print()
@@ -634,49 +633,60 @@ def set_dns_protection(inline_protocol=False):
 def set_killswitch(inline_killswitch=False):
     """Enable or disable the Kill Switch."""
 
-    while True:
-        print()
-        print(
-            "The Kill Switch will block all network traffic\n"
-            "if the VPN connection drops unexpectedly.\n"
-            "\n"
-            "Please note that the Kill Switch assumes only one network interface being active.\n" # noqa
-            "\n"
-            "1) Enable Kill Switch (Block access to/from LAN)\n"
-            "2) Enable Kill Switch (Allow access to/from LAN)\n"
-            "3) Disable Kill Switch"
-        )
-        print()
-        user_choice = input(
-                "Please enter your choice or leave empty to quit: "
-        )
-        user_choice = user_choice.lower().strip()
-        if user_choice == "1":
-            killswitch = 1
-            break
-        elif user_choice == "2":
-            killswitch = 2
-            break
-        elif user_choice == "3":
-            killswitch = 0
-            break
-        elif user_choice == "":
-            print("Quitting configuration.")
-            sys.exit(0)
-        else:
-            print(
-                "[!] Invalid choice. Please enter the number of your choice.\n"
-            )
-            time.sleep(0.5)
+    if inline_killswitch and all(inline_killswitch):
 
-    if killswitch and int(get_config_value("USER", "split_tunnel")):
-        set_config_value("USER", "split_tunnel", 0)
-        print()
-        print(
-            "[!] Kill Switch can't be used with Split Tunneling.\n" +
-            "[!] Split Tunneling has been disabled."
-        )
-        time.sleep(1)
+        killswitch = 0
+        inline_killswitch = inline_killswitch.strip().lower()
+
+        if inline_killswitch == "enable-block-lan":
+            killswitch = 1
+        elif inline_killswitch == "enable-allow-lan":
+            killswitch = 2
+
+    else:
+        while True:
+            print()
+            print(
+                "The Kill Switch will block all network traffic\n"
+                "if the VPN connection drops unexpectedly.\n"
+                "\n"
+                "Please note that the Kill Switch assumes only one network interface being active.\n" # noqa
+                "\n"
+                "1) Enable Kill Switch (Block access to/from LAN)\n"
+                "2) Enable Kill Switch (Allow access to/from LAN)\n"
+                "3) Disable Kill Switch"
+            )
+            print()
+            user_choice = input(
+                    "Please enter your choice or leave empty to quit: "
+            )
+            user_choice = user_choice.lower().strip()
+            if user_choice == "1":
+                killswitch = 1
+                break
+            elif user_choice == "2":
+                killswitch = 2
+                break
+            elif user_choice == "3":
+                killswitch = 0
+                break
+            elif user_choice == "":
+                print("Quitting configuration.")
+                sys.exit(0)
+            else:
+                print(
+                    "[!] Invalid choice. Please enter the number of your choice.\n"
+                )
+                time.sleep(0.5)
+
+        if killswitch and int(get_config_value("USER", "split_tunnel")):
+            set_config_value("USER", "split_tunnel", 0)
+            print()
+            print(
+                "[!] Kill Switch can't be used with Split Tunneling.\n" +
+                "[!] Split Tunneling has been disabled."
+            )
+            time.sleep(1)
 
     set_config_value("USER", "killswitch", killswitch)
     print()
