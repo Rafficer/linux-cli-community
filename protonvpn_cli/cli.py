@@ -328,7 +328,7 @@ def configure_cli():
 @click.option("-u", "--user")
 @click.option("-t", "--tier")
 @click.option("-p","--protocol")
-@click.option("-d", "--dns", nargs=2)
+@click.option("-d", "--dns", multiple=True)
 @click.option("-ks", "--killswitch")
 @click.option("-sp", "--split-tunnel", nargs=2)
 @click.option("-p", "--purge")
@@ -341,14 +341,12 @@ def configure(user, tier, protocol, dns, killswitch, split_tunnel, purge):
     elif protocol:
         set_default_protocol(write=True, inline_protocol=protocol)
     elif dns:
-        # To-do
         set_dns_protection(inline_protocol=dns)    
     elif killswitch:
-        # To-do
-        set_killswitch()
+        set_killswitch(inline_killswitch=killswitch)
     elif split_tunnel:
         # To-do
-        set_split_tunnel()
+        set_split_tunnel(inline_sp=split_tunnel)
     elif purge:
         # To-do
         purge_configuration()
@@ -563,9 +561,20 @@ def set_default_protocol(write=False, inline_protocol=False):
 def set_dns_protection(inline_protocol=False):
     """Enable or disable DNS Leak Protection and custom DNS"""
 
-    if inline_protocol == True:
-        dns_leak_protection, custom_dns = inline_protocol
-        print(inline_protocol)
+    if all(inline_protocol):
+        dns_leak_protection = inline_protocol[0].strip().lower()
+        custom_dns= None
+
+        if dns_leak_protection == "enable":
+            dns_leak_protection = 1
+        elif dns_leak_protection == "custom":
+            dns_leak_protection = 0
+            # [1:] because the first element is the one that contains the option enable/disable/custom
+            custom_dns = " ".join(dns for dns in inline_protocol[1:])
+        else:
+            dns_leak_protection = 0
+
+        sys.exit(1)
     else:
         while True:
             print()
@@ -622,7 +631,7 @@ def set_dns_protection(inline_protocol=False):
     set_config_value("USER", "custom_dns", custom_dns)
     print("DNS Management updated.")
 
-def set_killswitch():
+def set_killswitch(inline_killswitch=False):
     """Enable or disable the Kill Switch."""
 
     while True:
@@ -673,7 +682,7 @@ def set_killswitch():
     print()
     print("Kill Switch configuration updated.")
 
-def set_split_tunnel():
+def set_split_tunnel(inline_sp=False):
     """Enable or disable split tunneling"""
 
     print()
