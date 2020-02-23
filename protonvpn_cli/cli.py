@@ -324,7 +324,7 @@ def print_examples():
 @click.option("-sp", "--split-tunnel", multiple=True, help="-sp <enable|disable> [-sp <ip1>] [-sp <ip2>] [-sp <ip3>]")
 @click.option("-d", "--dns", multiple=True, help="-d <enable|custom|disable> [-d <dns1>] [-d <dns2>] [-d <dns3>]")
 @click.option("-p","--protocol", help="-p <tcp|udp>")
-@click.option("-t", "--tier", help="-t <1|2|3|4>")
+@click.option("-t", "--tier", type=int, help="-t <1|2|3|4>")
 @click.option("-u", "--user", help="-u <protonvpn_username>")
 @main.command("configure")
 def configure(user, tier, protocol, dns, killswitch, split_tunnel, purge):
@@ -349,7 +349,7 @@ def configure(user, tier, protocol, dns, killswitch, split_tunnel, purge):
 
 @main.command("settings")
 def menu():
-    """Display the configurations menu to the user."""
+    """Display the configurations menu."""
     check_init()
 
     while True:
@@ -432,8 +432,9 @@ def set_username_password(write=False, inline_username=False):
 
         # Check if passwords match
         if password != retype_password:
+            print()
             print("[!] Passwords do not match")
-            return
+            sys.exit(1)
         
         ovpn_username = inline_username
         ovpn_password1 = password
@@ -474,7 +475,14 @@ def set_protonvpn_tier(write=False, inline_tier=False):
     print()
 
     if inline_tier and all(inline_tier):
-        user_tier = int(inline_tier)
+
+        inline_tier = int(inline_tier)
+
+        if inline_tier not in protonvpn_plans:
+            print("[!] Invalid choice. ")
+            sys.exit(1)
+
+        user_tier = inline_tier
     else:
         print("Please choose your ProtonVPN Plan")
 
@@ -520,6 +528,7 @@ def set_default_protocol(write=False, inline_protocol=False):
         inline_protocol = inline_protocol.strip().lower()
 
         if inline_protocol not in protonvpn_protocols[1].lower() and inline_protocol not in protonvpn_protocols[2].lower():
+            
             print("[!] Invalid choice. ")
             return
 
@@ -564,7 +573,7 @@ def set_default_protocol(write=False, inline_protocol=False):
 def set_dns_protection(inline_protocol=False):
     """Enable or disable DNS Leak Protection and custom DNS"""
 
-    if all(inline_protocol):
+    if inline_protocol and all(inline_protocol):
         dns_leak_protection = inline_protocol[0].strip().lower()
         custom_dns= None
 
@@ -574,9 +583,12 @@ def set_dns_protection(inline_protocol=False):
             dns_leak_protection = 0
             # [1:] because the first element is the one that contains the option enable/disable/custom
             custom_dns = " ".join(dns for dns in inline_protocol[1:])
-        else:
+        elif dns_leak_protection == "disable":
             dns_leak_protection = 0
-
+        else:   
+            print()
+            print("[!] Invalid choice.")
+            sys.exit(1)
     else:
         while True:
             print()
@@ -638,14 +650,18 @@ def set_killswitch(inline_killswitch=False):
 
     if inline_killswitch and all(inline_killswitch):
 
-        killswitch = 0
         inline_killswitch = inline_killswitch.strip().lower()
 
         if inline_killswitch == "enable-block-lan":
             killswitch = 1
         elif inline_killswitch == "enable-allow-lan":
             killswitch = 2
-
+        elif inline_killswitch == "disable":
+            killswitch = 0
+        else:
+            print()
+            print("[!] Invalid choice.")
+            sys.exit(1)
     else:
         while True:
             print()
@@ -699,13 +715,13 @@ def set_split_tunnel(inline_sp=False):
     """Enable or disable split tunneling"""
 
     if inline_sp and all(inline_sp):
-        
-        if inline_sp[0].strip().lower() == "disable":
+        tunnel_choice = inline_sp[0].strip().lower()
+        if tunnel_choice == "disable":
 
             set_config_value("USER", "split_tunnel", 0)
             if os.path.isfile(SPLIT_TUNNEL_FILE):
                 os.remove(SPLIT_TUNNEL_FILE)
-        else:
+        elif tunnel_choice == "enable":
 
             if int(get_config_value("USER", "killswitch")):
                 set_config_value("USER", "killswitch", 0)
@@ -729,6 +745,10 @@ def set_split_tunnel(inline_sp=False):
                 # split tunneling should be disabled again
                 logger.debug("No split tunneling file existing.")
                 set_config_value("USER", "split_tunnel", 0)
+        else:
+            print()
+            print("[!] Invalid choice.")
+            sys.exit(1)
     else:
 
         print()
