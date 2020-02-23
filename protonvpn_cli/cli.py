@@ -146,6 +146,7 @@ def cli():
     #     make_ovpn_template()
     # elif args.get("examples"):
     #     print_examples()
+
 @click.option("--inline", nargs=3)
 @main.command("init")
 def init(inline=False):
@@ -198,7 +199,7 @@ def init(inline=False):
 
     # If len(inline) > 0 then user is using --inline then it returns (username, plan, default protocol)
     if inline and all(inline):
-        
+
         password = click.prompt("Enter your password", hide_input=True)
         retype_password = click.prompt("Enter your password", hide_input=True)
 
@@ -318,21 +319,19 @@ def print_examples():
 
     print(examples)
 
-
-@main.group()
-def configure_cli():
-    """Change single configuration values"""
-    return
-    
-@click.option("-p", "--purge", is_flag=True)
-@click.option("-ks", "--killswitch")
-@click.option("-sp", "--split-tunnel", multiple=True)
-@click.option("-d", "--dns", multiple=True)
-@click.option("-p","--protocol")
-@click.option("-t", "--tier")
-@click.option("-u", "--user")
+@click.option("-p", "--purge", is_flag=True, help="Purges your configurations")
+@click.option("-ks", "--killswitch", help="-ks <enable-block-lan|enable-allow-lan|disable>")
+@click.option("-sp", "--split-tunnel", multiple=True, help="-sp <enable|disable> [-sp <ip1>] [-sp <ip2>] [-sp <ip3>]")
+@click.option("-d", "--dns", multiple=True, help="-d <enable|custom|disable> [-d <dns1>] [-d <dns2>] [-d <dns3>]")
+@click.option("-p","--protocol", help="-p <tcp|udp>")
+@click.option("-t", "--tier", help="-t <1|2|3|4>")
+@click.option("-u", "--user", help="-u <protonvpn_username>")
 @main.command("configure")
 def configure(user, tier, protocol, dns, killswitch, split_tunnel, purge):
+    """Inline change single configuration values."""
+    
+    check_init()
+
     if user:
         set_username_password(write=True, inline_username=user)
     elif tier:
@@ -346,11 +345,13 @@ def configure(user, tier, protocol, dns, killswitch, split_tunnel, purge):
     elif split_tunnel:
         set_split_tunnel(inline_sp=split_tunnel)
     elif purge:
-        # To-do
         purge_configuration(inline_purge=purge)
 
 @main.command("settings")
 def menu():
+    """Display the configurations menu to the user."""
+    check_init()
+
     while True:
         print(
             "What do you want to change?\n"
