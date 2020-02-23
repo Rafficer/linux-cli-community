@@ -79,9 +79,6 @@ def main():
 def cli():
     """Run user's input command."""
     
-    # Check for root
-    check_root()
-    
     # Initial log values
     change_file_owner(os.path.join(CONFIG_DIR, "pvpn-cli.log"))
     logger.debug("###########################")
