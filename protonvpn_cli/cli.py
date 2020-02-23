@@ -52,7 +52,6 @@ import getpass
 import shutil
 import time
 # External Libraries
-# from docopt import docopt
 import click
 # protonvpn-cli Functions
 from . import connection
@@ -325,7 +324,7 @@ def configure_cli():
     """Change single configuration values"""
     return
     
-@click.option("-p", "--purge")
+@click.option("-p", "--purge", is_flag=True)
 @click.option("-ks", "--killswitch")
 @click.option("-sp", "--split-tunnel", multiple=True)
 @click.option("-d", "--dns", multiple=True)
@@ -348,7 +347,7 @@ def configure(user, tier, protocol, dns, killswitch, split_tunnel, purge):
         set_split_tunnel(inline_sp=split_tunnel)
     elif purge:
         # To-do
-        purge_configuration()
+        purge_configuration(inline_purge=purge)
 
 @main.command("settings")
 def menu():
@@ -401,17 +400,19 @@ def menu():
             )
             time.sleep(0.5)
 
-def purge_configuration():
+def purge_configuration(inline_purge=False):
     """Purges CLI configuration"""
 
-    user_choice = input(
-        "Are you sure you want to purge the configuration? [y/N]: "
-    ).lower().strip()
+    if not inline_purge:
+        user_choice = input(
+            "Are you sure you want to purge the configuration? [y/N]: "
+        ).lower().strip()
 
-    if not user_choice == "y":
-        return
+        if not user_choice == "y":
+            return
 
-    print("Okay :(")
+        print("Okay :(")
+
     time.sleep(0.5)
 
     connection.disconnect(passed=True)
