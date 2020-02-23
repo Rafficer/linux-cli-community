@@ -148,8 +148,6 @@ def cli():
     # elif args.get("examples"):
     #     print_examples()
 
-@main.command()
-@click.option("--inline", nargs=3)
 def init(inline=False):
     """Initialize the CLI. If --inline then <username> <plan> <default protocol>."""
 
@@ -326,29 +324,29 @@ def print_examples():
 def configure_cli():
     """Change single configuration values"""
     return
-
-@click.option("--user")
-@click.option("--tier")
-@click.option("--protocol")
-@click.option("--dns")
-@click.option("--killswitch")
-@click.option("--tunnel")
-@click.option("--purge")
+    
+@click.option("-u", "--user")
+@click.option("-t", "--tier")
+@click.option("-p","--protocol")
+@click.option("-d", "--dns", nargs=2)
+@click.option("-ks", "--killswitch")
+@click.option("-sp", "--split-tunnel", nargs=2)
+@click.option("-p", "--purge")
 @main.command("configure")
-def configure(user, tier, protocol, dns, killswitch, tunnel, purge):
+def configure(user, tier, protocol, dns, killswitch, split_tunnel, purge):
     if user:
-        set_username_password(write=True, username=user)
+        set_username_password(write=True, inline_username=user)
     elif tier:
-        set_protonvpn_tier(write=True, tier=tier)
+        set_protonvpn_tier(write=True, inline_tier=tier)
     elif protocol:
-        set_default_protocol(write=True, protocol=protocol)
+        set_default_protocol(write=True, inline_protocol=protocol)
     elif dns:
         # To-do
-        set_dns_protection(write=True)    
+        set_dns_protection(inline_protocol=dns)    
     elif killswitch:
         # To-do
         set_killswitch()
-    elif tunnel:
+    elif split_tunnel:
         # To-do
         set_split_tunnel()
     elif purge:
@@ -424,11 +422,12 @@ def purge_configuration():
         shutil.rmtree(CONFIG_DIR)
     print("Configuration purged.")
 
-def set_username_password(write=False, username=False):
+def set_username_password(write=False, inline_username=False):
     """Set the ProtonVPN Username and Password."""
     print()
-    if not len(username) == 0:
-        ovpn_username = username[0]
+    
+    if all(inline_username):
+
         password = click.prompt("Enter your password", hide_input=True)
         retype_password = click.prompt("Repeat your password", hide_input=True)
 
@@ -437,9 +436,8 @@ def set_username_password(write=False, username=False):
             print("[!] Passwords do not match")
             return
         
-        ovpn_username = username[0]
+        ovpn_username = inline_username
         ovpn_password1 = password
-        write = True
     else:
         ovpn_username = input("Enter your ProtonVPN OpenVPN username: ")
 
@@ -469,16 +467,15 @@ def set_username_password(write=False, username=False):
         print("Username and Password has been updated!")
     return ovpn_username, ovpn_password1
 
-def set_protonvpn_tier(write=False, tier=False):
+def set_protonvpn_tier(write=False, inline_tier=False):
     """Set the users ProtonVPN Plan."""
 
     protonvpn_plans = {1: "Free", 2: "Basic", 3: "Plus", 4: "Visionary"}
 
     print()
 
-    if not len(tier) == 0:
-        user_tier = int(tier)
-        write = True
+    if not len(inline_tier) == 0:
+        user_tier = int(inline_tier)
     else:
         print("Please choose your ProtonVPN Plan")
 
@@ -512,21 +509,20 @@ def set_protonvpn_tier(write=False, tier=False):
 
     return user_tier
 
-def set_default_protocol(write=False, protocol=False):
+def set_default_protocol(write=False, inline_protocol=False):
     """Set the users default protocol"""
 
     protonvpn_protocols = {1: "udp", 2: "tcp"}
 
     print()
 
-    protocol = protocol.strip().lower()
+    inline_protocol = inline_protocol.strip().lower()
 
-    if not len(protocol) == 0: 
-        if protocol not in protonvpn_protocols[1].lower() and protocol not in protonvpn_protocols[2].lower():
+    if not len(inline_protocol) == 0: 
+        if inline_protocol not in protonvpn_protocols[1].lower() and inline_protocol not in protonvpn_protocols[2].lower():
             print("[!] Invalid choice. ")
             return
-        user_protocol = protocol
-        write = True
+        user_protocol = inline_protocol
     else:
         print(
             "Choose the default OpenVPN protocol.\n"
@@ -564,59 +560,63 @@ def set_default_protocol(write=False, protocol=False):
 
     return user_protocol
 
-def set_dns_protection():
+def set_dns_protection(inline_protocol=False):
     """Enable or disable DNS Leak Protection and custom DNS"""
 
-    while True:
-        print()
-        print(
-            "DNS Leak Protection makes sure that you always use "
-            "ProtonVPN's DNS servers.\n"
-            "For security reasons this option is recommended.\n"
-            "\n"
-            "1) Enable DNS Leak Protection (recommended)\n"
-            "2) Configure Custom DNS Servers\n"
-            "3) Disable DNS Management"
-        )
-        print()
-        user_choice = input(
-                "Please enter your choice or leave empty to quit: "
-        )
-        user_choice = user_choice.lower().strip()
-        if user_choice == "1":
-            dns_leak_protection = 1
-            custom_dns = None
-            break
-        elif user_choice == "2":
-            dns_leak_protection = 0
-            custom_dns = input(
-                "Please enter your custom DNS servers (space separated): "
-            )
-            custom_dns = custom_dns.strip().split()
-
-            # Check DNS Servers for validity
-            if len(custom_dns) > 3:
-                print("[!] Don't enter more than 3 DNS Servers")
-                return
-
-            for dns in custom_dns:
-                if not is_valid_ip(dns):
-                    print("[!] {0} is invalid. Please try again.".format(dns))
-                    return
-            custom_dns = " ".join(dns for dns in custom_dns)
-            break
-        elif user_choice == "3":
-            dns_leak_protection = 0
-            custom_dns = None
-            break
-        elif user_choice == "":
-            print("Quitting configuration.")
-            sys.exit(0)
-        else:
+    if inline_protocol == True:
+        dns_leak_protection, custom_dns = inline_protocol
+        print(inline_protocol)
+    else:
+        while True:
+            print()
             print(
-                "[!] Invalid choice. Please enter the number of your choice.\n"
+                "DNS Leak Protection makes sure that you always use "
+                "ProtonVPN's DNS servers.\n"
+                "For security reasons this option is recommended.\n"
+                "\n"
+                "1) Enable DNS Leak Protection (recommended)\n"
+                "2) Configure Custom DNS Servers\n"
+                "3) Disable DNS Management"
             )
-            time.sleep(0.5)
+            print()
+            user_choice = input(
+                    "Please enter your choice or leave empty to quit: "
+            )
+            user_choice = user_choice.lower().strip()
+            if user_choice == "1":
+                dns_leak_protection = 1
+                custom_dns = None
+                break
+            elif user_choice == "2":
+                dns_leak_protection = 0
+                custom_dns = input(
+                    "Please enter your custom DNS servers (space separated): "
+                )
+                custom_dns = custom_dns.strip().split()
+
+                # Check DNS Servers for validity
+                if len(custom_dns) > 3:
+                    print("[!] Don't enter more than 3 DNS Servers")
+                    return
+
+                for dns in custom_dns:
+                    if not is_valid_ip(dns):
+                        print("[!] {0} is invalid. Please try again.".format(dns))
+                        return
+                custom_dns = " ".join(dns for dns in custom_dns)
+                break
+            elif user_choice == "3":
+                dns_leak_protection = 0
+                custom_dns = None
+                break
+            elif user_choice == "":
+                print("Quitting configuration.")
+                sys.exit(0)
+            else:
+                print(
+                    "[!] Invalid choice. Please enter the number of your choice.\n"
+                )
+                time.sleep(0.5)
 
     set_config_value("USER", "dns_leak_protection", dns_leak_protection)
     set_config_value("USER", "custom_dns", custom_dns)
