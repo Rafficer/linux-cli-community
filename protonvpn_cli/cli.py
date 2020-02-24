@@ -318,7 +318,7 @@ def print_examples():
 
 @click.option("-p", "--purge", is_flag=True, help="Purges your configurations")
 @click.option("-ks", "--killswitch", help="-ks <enable-block-lan|enable-allow-lan|disable>")
-@click.option("-sp", "--split-tunnel", multiple=True, help="-sp <enable|disable> [-sp <ip1>] [-sp <ip2>] [-sp <ip3>]")
+@click.option("-sp", "--split-tunnel", multiple=True, help="-sp <enable|disable> [-sp <add>] [-sp <ip1>] [-sp <ip2>] [-sp <ip3>]")
 @click.option("-d", "--dns", multiple=True, help="-d <enable|custom|disable> [-d <dns1>] [-d <dns2>] [-d <dns3>]")
 @click.option("-p","--protocol", help="-p <tcp|udp>")
 @click.option("-t", "--tier", type=int, help="-t <1|2|3|4>")
@@ -578,8 +578,14 @@ def set_dns_protection(inline_protocol=False):
             dns_leak_protection = 1
         elif dns_leak_protection == "custom":
             dns_leak_protection = 0
+
             # [1:] because the first element is the one that contains the option enable/disable/custom
-            custom_dns = " ".join(dns for dns in inline_protocol[1:])
+            for dns in inline_protocol[1:]:
+                if not is_valid_ip(dns):
+                    print("[!] {0} is invalid. Please try again.".format(dns))
+                    sys.exit(1)
+                custom_dns = " ".join(dns for dns in inline_protocol[1:])
+
         elif dns_leak_protection == "disable":
             dns_leak_protection = 0
         else:   
@@ -713,12 +719,17 @@ def set_split_tunnel(inline_sp=False):
 
     if inline_sp and all(inline_sp):
         tunnel_choice = inline_sp[0].strip().lower()
+
         if tunnel_choice == "disable":
 
             set_config_value("USER", "split_tunnel", 0)
             if os.path.isfile(SPLIT_TUNNEL_FILE):
                 os.remove(SPLIT_TUNNEL_FILE)
+
         elif tunnel_choice == "enable":
+
+            add_or_create = inline_sp[1].strip().lower()
+            ip_list = []
 
             if int(get_config_value("USER", "killswitch")):
                 set_config_value("USER", "killswitch", 0)
@@ -731,8 +742,23 @@ def set_split_tunnel(inline_sp=False):
 
             set_config_value("USER", "split_tunnel", 1)
 
-            with open(SPLIT_TUNNEL_FILE, "w") as f:
-                for ip in inline_sp[1:]:
+            # Checks if the users wants to add new IP or just create a new file
+            if add_or_create == "add":
+                add_or_create = "a"
+                inline_sp = inline_sp[2:]
+            else:
+                add_or_create = "w"
+                inline_sp = inline_sp[1:]
+
+            for ip in inline_sp:
+                if not is_valid_ip(ip):
+                    print()
+                    print("[!] Invalid IP: {0}".format(ip))
+                    sys.exit(1)
+                ip_list.append(ip)
+
+            with open(SPLIT_TUNNEL_FILE, add_or_create) as f:
+                for ip in ip_list:
                     f.write("\n{0}".format(ip))
 
             if os.path.isfile(SPLIT_TUNNEL_FILE):
