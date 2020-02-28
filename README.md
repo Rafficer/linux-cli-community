@@ -75,24 +75,29 @@ For updating, you just need to pull the latest version of the repository with gi
 
 #### For more detailed information, see the extensive [usage guide](https://github.com/ProtonVPN/protonvpn-cli-ng/blob/master/USAGE.md).
 
-| **Command**                       | **Description**                                       |
-|:----------------------------------|:------------------------------------------------------|
-|`protonvpn init`                   | Initialize ProtonVPN profile.                         |
-|`protonvpn connect, c`             | Select a ProtonVPN server and connect to it.          |
-|`protonvpn c [servername]`         | Connect to a specified server.                        |
-|`protonvpn c -r`                   | Connect to a random server.                           |
-|`protonvpn c -f`                   | Connect to the fastest server.                        |
-|`protonvpn c --p2p`                | Connect to the fastest P2P server.                    |
-|`protonvpn c --cc [countrycode]`   | Connect to the fastest server in a specified country. |
-|`protonvpn c --sc`                 | Connect to the fastest Secure Core server.            |
-|`protonvpn reconnect, r`           | Reconnect or connect to the last server used.         |
-|`protonvpn disconnect, d`          | Disconnect the current session.                       |
-|`protonvpn status, s`              | Print connection status.                              |
-|`protonvpn configure`              | Change CLI configuration.                             |
-|`protonvpn refresh`                | Refresh OpenVPN configuration and server data.        |
-|`protonvpn examples`               | Print example commands.                               |
-|`protonvpn --version`              | Display version.                                      |
-|`protonvpn --help`                 | Show help message.                                    |
+| **Command**                        | **Description**                                       |
+|:-----------------------------------|:------------------------------------------------------|
+|`protonvpn init [--inline]`         | Initialize ProtonVPN profile.                         |
+|`protonvpn cli connect, c`          | Select a ProtonVPN server and connect to it.          |
+|`protonvpn cli c [servername]`      | Connect to a specified server.                        |
+|`protonvpn cli c -r`                | Connect to a random server.                           |
+|`protonvpn cli c -f`                | Connect to the fastest server.                        |
+|`protonvpn cli c -p2p`              | Connect to the fastest P2P server.                    |
+|`protonvpn cli c -cc [countrycode]` | Connect to the fastest server in a specified country. |
+|`protonvpn cli c -sc`               | Connect to the fastest Secure Core server.            |
+|`protonvpn cli reconnect, r`        | Reconnect or connect to the last server used.         |
+|`protonvpn cli disconnect, d`       | Disconnect the current session.                       |
+|`protonvpn cli status, s`           | Print connection status.                              |
+|`protonvpn cli configure`           | Inline change CLI configurations.                     |
+|`protonvpn cli settings`            | Display configurations menu.                          |
+|`protonvpn cli refresh, re`         | Refresh OpenVPN configuration and server data.        |
+|`protonvpn cli examples, e`         | Print example commands.                               |
+|`protonvpn cli version, v`          | Display version.                                      |
+|`protonvpn --help`                  | Show commands and help message.                       |
+|`protonvpn cli --help`              | Show cli help message.                                |
+|`protonvpn init --help`             | Show init help message.                               |
+|`protonvpn configure --help`        | Show configure help message.                          |
+|`protonvpn settings --help`         | Show settings help message.                           |
 
 All connect options can be used with the `-p` flag to explicitly specify which transmission protocol is used for that connection (either `udp` or `tcp`).
 
