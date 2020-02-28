@@ -91,6 +91,10 @@ def cli(action, protocol, server, fastest, random, country, securecore, peer2pee
             connection.feature_f(4, protocol)
         elif tor:
             connection.feature_f(2, protocol)
+        else:
+            print()
+            print("[!] You need to provide at least one option to connect to a server.")
+            sys.exit(1)
     elif action == "d" or action == "disconnect":
         connection.disconnect()
     elif action == "r" or action == "reconnect" :
@@ -107,6 +111,10 @@ def cli(action, protocol, server, fastest, random, country, securecore, peer2pee
     elif action == "v" or action == "version":
         print()
         print("ProtonVPN-CLI v{0}".format(VERSION))
+    else:
+        print()
+        print("[!] You need to provide a valid choice.")
+        sys.exit(1)
 
 @click.option("--inline", nargs=3)
 @main.command("init", context_settings=dict(help_option_names=['-h', '--help']))
