@@ -315,6 +315,9 @@ def configure(user, tier, protocol, dns, killswitch, split_tunnel, purge):
         set_split_tunnel(inline_sp=split_tunnel)
     elif purge:
         purge_configuration(inline_purge=purge)
+    else:
+        print()
+        print("[!] You need to provide at least one option, followed by an appopriate argument(s).")
 
 @main.command("settings", context_settings=dict(help_option_names=['-h', '--help']))
 def settings():
