@@ -66,8 +66,9 @@ from .constants import (
     CONFIG_DIR, CONFIG_FILE, PASSFILE, USER, VERSION, SPLIT_TUNNEL_FILE
 )
 
-
-def startup_checker():
+@click.group()
+def main():
+    """ProtonVPN CLI Main."""
     check_root()
     check_init()
 
@@ -79,19 +80,37 @@ def startup_checker():
     logger.debug("USER: {0}".format(USER))
     logger.debug("CONFIG_DIR: {0}".format(CONFIG_DIR))
 
+ 
 @click.option("--tor", "-t", is_flag=True, help="Connect to the fastest server with Tor.")
 @click.option("--peer2peer", "-p2p", is_flag=True, help="Connect to the fastest server with Peer2Peer.")
 @click.option("--securecore", "-sc", is_flag=True, help="Connect to a server with Secure Core.")
-@click.option("--country", "-c", is_flag=True, help="Connect to the fastest server in a country.")
-@click.option("--random", "-r", is_flag=True, help="Connect to the fastest server.")
+@click.option("--country", "-cc", help="Connect to the fastest server in a specific country.")
+@click.option("--random", "-r", is_flag=True, help="Connect to a random server.")
 @click.option("--fastest", "-f", is_flag=True, help="Connect to the fastest server.")
 @click.option("--server", "-s", help="Indicates connect to be connected to.")
-@click.option("--protocol", "-p", help="Specified the protocol to be used.")
+@click.option("--protocol", "-p", help="The protocol to be used.", default=None)
 @click.argument("action")
-@click.command()
-def main(action, protocol, server, fastest, random, country, securecore, peer2peer, tor):
-    """Main CLI."""
-    startup_checker()
+@main.command("cli", context_settings=dict(help_option_names=['-h', '--help']))
+def cli(action, protocol, server, fastest, random, country, securecore, peer2peer, tor):
+    """Main CLI commands.
+
+    Actions:\n
+    m  |  menu         Display connection menu.\n
+    c  |  connect      To connect to a server.\n
+    d  |  disconnect   To disconnect from server.\n
+    r  |  reconnect    To reconnect to the last connected server.\n
+    s  |  status       To display status.\n
+    re |  refresh      To refresh servers cache.\n
+    e  |  examples     To show examples on how to use the CLI.
+    """
+
+    # Wait until a connection to the ProtonVPN API can be made
+    # As this is mainly for automatically connecting on boot, it only
+    # activates when the environment variable PVPN_WAIT is 1
+    # Otherwise it wouldn't connect when a VPN process without
+    # internet access exists or the Kill Switch is active
+    if int(os.environ.get("PVPN_WAIT", 0)) > 0:
+        wait_for_network(int(os.environ["PVPN_WAIT"]))
 
     if protocol:
         if protocol is None or not protocol.lower().strip() in ["tcp", "udp"]:
@@ -100,96 +119,39 @@ def main(action, protocol, server, fastest, random, country, securecore, peer2pe
             sys.exit(1)
         protocol = protocol.lower().strip()
 
+    # Features: 1: Secure-Core, 2: Tor, 4: P2P
+
     if action == "c" or action == "connect":
         if server:
-            print("Connect to specific server")
+            connection.country_f(server, protocol)
         elif fastest:
-            print("Connect to fastest server")
+            connection.fastest(protocol)
         elif random:
-            print("Connect to a random server")
+            connection.random_c(protocol)
         elif country:
-            print("Connecto to a specific country")
+            connection.country_f(country, protocol)
         elif securecore:
-            print("Connect to secure core")
+            connection.feature_f(1, protocol)
         elif peer2peer:
-            print("Connect to peer2peer")
+            connection.feature_f(4, protocol)
         elif tor:
-            print("Connec to tor server")
+            connection.feature_f(2, protocol)
     elif action == "d" or action == "disconnect":
-        print("Disconnect")
+        connection.disconnect()
     elif action == "r" or action == "reconnect" :
-        print("Reconnect")
+        connection.reconnect()
     elif action == "s" or action == "status":
-        print("Show status")    
-
-    # protonvpn (c | connect) [<servername>] [-p <protocol>]
-    # protonvpn (c | connect) [-f | --fastest] [-p <protocol>]
-    # protonvpn (c | connect) [--cc <code>] [-p <protocol>]
-    # protonvpn (c | connect) [--sc] [-p <protocol>]
-    # protonvpn (c | connect) [--p2p] [-p <protocol>]
-    # protonvpn (c | connect) [--tor] [-p <protocol>]
-    # protonvpn (c | connect) [-r | --random] [-p <protocol>]
-    # protonvpn (r | reconnect)
-    # protonvpn (d | disconnect)
-    # protonvpn (s | status)
-
-    # Parse arguments
-    # if args.get("init"):
-    #     init_cli()
-    # elif args.get("c") or args.get("connect"):
-
-
-    #     # Wait until a connection to the ProtonVPN API can be made
-    #     # As this is mainly for automatically connecting on boot, it only
-    #     # activates when the environment variable PVPN_WAIT is 1
-    #     # Otherwise it wouldn't connect when a VPN process without
-    #     # internet access exists or the Kill Switch is active
-    #     if int(os.environ.get("PVPN_WAIT", 0)) > 0:
-    #         wait_for_network(int(os.environ["PVPN_WAIT"]))
-
-    #     protocol = args.get("-p")
-    #     if protocol is not None and protocol.lower().strip() in ["tcp", "udp"]:
-    #         protocol = protocol.lower().strip()
-
-    #     if args.get("--random"):
-    #         connection.random_c(protocol)
-    #     elif args.get("--fastest"):
-    #         connection.fastest(protocol)
-    #     elif args.get("<servername>"):
-    #         connection.direct(args.get("<servername>"), protocol)
-    #     elif args.get("--cc") is not None:
-    #         connection.country_f(args.get("--cc"), protocol)
-    #     # Features: 1: Secure-Core, 2: Tor, 4: P2P
-    #     elif args.get("--p2p"):
-    #         connection.feature_f(4, protocol)
-    #     elif args.get("--sc"):
-    #         connection.feature_f(1, protocol)
-    #     elif args.get("--tor"):
-    #         connection.feature_f(2, protocol)
-    #     else:
-    #         connection.dialog()
-    # elif args.get("r") or args.get("reconnect"):
-    #     check_root()
-    #     check_init()
-    #     connection.reconnect()
-    # elif args.get("d") or args.get("disconnect"):
-    #     check_root()
-    #     check_init()
-    #     connection.disconnect()
-    # elif args.get("s") or args.get("status"):
-    #     connection.status()
-    # elif args.get("configure"):
-    #     check_root()
-    #     check_init()
-    #     configure_cli()
-    # elif args.get("refresh"):
-    #     pull_server_data(force=True)
-    #     make_ovpn_template()
-    # elif args.get("examples"):
-    #     print_examples()
+        connection.status()
+    elif action == "re" or action == "refresh":
+        pull_server_data(force=True)
+        make_ovpn_template()   
+    elif action == "e" or action == "examples":
+        print_examples()
+    elif action == "m" or action == "menu":
+        connection.dialog()
 
 @click.option("--inline", nargs=3)
-@click.command("init")
+@main.command("init", context_settings=dict(help_option_names=['-h', '--help']))
 def init(inline=False):
     """Initialize the CLI. If --inline then <username> <plan> <default protocol>."""
 
@@ -333,28 +295,28 @@ def print_examples():
     """Print some examples on how to use this program"""
 
     examples = (
-        "protonvpn connect\n"
-        "               Display a menu and select server interactively.\n\n"
-        "protonvpn c BE-5\n"
-        "               Connect to BE#5 with the default protocol.\n\n"
-        "protonvpn connect NO#3 -p tcp\n"
-        "               Connect to NO#3 with TCP.\n\n"
+        "\nprotonvpn menu\n"
+        "   -Display a menu and select server interactively.\n\n"
+        "protonvpn c -s BE-5\n"
+        "   -Connect to BE#5 with the default protocol.\n\n"
+        "protonvpn connect -s NO#3 -p tcp\n"
+        "   -Connect to NO#3 with TCP.\n\n"
         "protonvpn c --fastest\n"
-        "               Connect to the fastest VPN Server.\n\n"
-        "protonvpn connect --cc AU\n"
-        "               Connect to the fastest Australian server\n"
-        "               with the default protocol.\n\n"
-        "protonvpn c --p2p -p tcp\n"
-        "               Connect to the fastest torrent server with TCP.\n\n"
-        "protonvpn c --sc\n"
-        "               Connect to the fastest Secure-Core server with\n"
-        "               the default protocol.\n\n"
+        "   -Connect to the fastest VPN Server.\n\n"
+        "protonvpn connect --country AU\n"
+        "   -Connect to the fastest Australian server\n"
+        "   with the default protocol.\n\n"
+        "protonvpn c -p2p -p tcp\n"
+        "   -Connect to the fastest torrent server with TCP.\n\n"
+        "protonvpn c -sc\n"
+        "   -Connect to the fastest Secure-Core server with\n"
+        "   the default protocol.\n\n"
         "protonvpn reconnect\n"
-        "               Reconnect the currently active session or connect\n"
-        "               to the last connected server.\n\n"
+        "   -Reconnect the currently active session or connect\n"
+        "   to the last connected server.\n\n"
         "protonvpn disconnect\n"
-        "               Disconnect the current session.\n\n"
-        "protonvpn s\n"
+        "   -Disconnect the current session.\n\n"
+        "protonvpn status\n"
         "               Print information about the current session."
     )
 
@@ -367,7 +329,7 @@ def print_examples():
 @click.option("-p","--protocol", help="-p <tcp|udp>")
 @click.option("-t", "--tier", type=int, help="-t <1|2|3|4>")
 @click.option("-u", "--user", help="-u <protonvpn_username>")
-@click.command("configure")
+@main.command("configure", context_settings=dict(help_option_names=['-h', '--help']))
 def configure(user, tier, protocol, dns, killswitch, split_tunnel, purge):
     """Inline change single configuration values."""
     
@@ -388,8 +350,8 @@ def configure(user, tier, protocol, dns, killswitch, split_tunnel, purge):
     elif purge:
         purge_configuration(inline_purge=purge)
 
-@click.command("settings")
-def menu():
+@main.command("settings", context_settings=dict(help_option_names=['-h', '--help']))
+def settings():
     """Display the configurations menu."""
     check_init()
 
