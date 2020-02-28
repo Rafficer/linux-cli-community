@@ -104,6 +104,9 @@ def cli(action, protocol, server, fastest, random, country, securecore, peer2pee
         print_examples()
     elif action == "m" or action == "menu":
         connection.dialog()
+    elif action == "v" or action == "version":
+        print()
+        print("ProtonVPN-CLI v{0}".format(VERSION))
 
 @click.option("--inline", nargs=3)
 @main.command("init", context_settings=dict(help_option_names=['-h', '--help']))
