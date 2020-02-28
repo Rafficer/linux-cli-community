@@ -36,7 +36,6 @@ setup(
     url="https://github.com/protonvpn/protonvpn-cli-ng",
     install_requires=[
         "requests",
-        "docopt",
         "pythondialog",
         "click"
     ],
