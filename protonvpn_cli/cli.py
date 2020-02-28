@@ -66,20 +66,11 @@ from .constants import (
     CONFIG_DIR, CONFIG_FILE, PASSFILE, USER, VERSION, SPLIT_TUNNEL_FILE
 )
 
-@click.group()
-def main():
-    """Main function"""
-    try:
-        cli()
-    except KeyboardInterrupt:
-        print("\nQuitting...")
-        sys.exit(1)
 
+def startup_checker():
+    check_root()
+    check_init()
 
-def cli():
-    """Run user's input command."""
-    
-    # Initial log values
     change_file_owner(os.path.join(CONFIG_DIR, "pvpn-cli.log"))
     logger.debug("###########################")
     logger.debug("### NEW PROCESS STARTED ###")
@@ -87,13 +78,66 @@ def cli():
     logger.debug(sys.argv)
     logger.debug("USER: {0}".format(USER))
     logger.debug("CONFIG_DIR: {0}".format(CONFIG_DIR))
-    return
+
+@click.option("--tor", "-t", is_flag=True, help="Connect to the fastest server with Tor.")
+@click.option("--peer2peer", "-p2p", is_flag=True, help="Connect to the fastest server with Peer2Peer.")
+@click.option("--securecore", "-sc", is_flag=True, help="Connect to a server with Secure Core.")
+@click.option("--country", "-c", is_flag=True, help="Connect to the fastest server in a country.")
+@click.option("--random", "-r", is_flag=True, help="Connect to the fastest server.")
+@click.option("--fastest", "-f", is_flag=True, help="Connect to the fastest server.")
+@click.option("--server", "-s", help="Indicates connect to be connected to.")
+@click.option("--protocol", "-p", help="Specified the protocol to be used.")
+@click.argument("action")
+@click.command()
+def main(action, protocol, server, fastest, random, country, securecore, peer2peer, tor):
+    """Main CLI."""
+    startup_checker()
+
+    if protocol:
+        if protocol is None or not protocol.lower().strip() in ["tcp", "udp"]:
+            print()
+            print("[!] The provided protocol is invalid. Either use UDP or UDP.")
+            sys.exit(1)
+        protocol = protocol.lower().strip()
+
+    if action == "c" or action == "connect":
+        if server:
+            print("Connect to specific server")
+        elif fastest:
+            print("Connect to fastest server")
+        elif random:
+            print("Connect to a random server")
+        elif country:
+            print("Connecto to a specific country")
+        elif securecore:
+            print("Connect to secure core")
+        elif peer2peer:
+            print("Connect to peer2peer")
+        elif tor:
+            print("Connec to tor server")
+    elif action == "d" or action == "disconnect":
+        print("Disconnect")
+    elif action == "r" or action == "reconnect" :
+        print("Reconnect")
+    elif action == "s" or action == "status":
+        print("Show status")    
+
+    # protonvpn (c | connect) [<servername>] [-p <protocol>]
+    # protonvpn (c | connect) [-f | --fastest] [-p <protocol>]
+    # protonvpn (c | connect) [--cc <code>] [-p <protocol>]
+    # protonvpn (c | connect) [--sc] [-p <protocol>]
+    # protonvpn (c | connect) [--p2p] [-p <protocol>]
+    # protonvpn (c | connect) [--tor] [-p <protocol>]
+    # protonvpn (c | connect) [-r | --random] [-p <protocol>]
+    # protonvpn (r | reconnect)
+    # protonvpn (d | disconnect)
+    # protonvpn (s | status)
+
     # Parse arguments
     # if args.get("init"):
     #     init_cli()
     # elif args.get("c") or args.get("connect"):
-    #     check_root()
-    #     check_init()
+
 
     #     # Wait until a connection to the ProtonVPN API can be made
     #     # As this is mainly for automatically connecting on boot, it only
@@ -145,7 +189,7 @@ def cli():
     #     print_examples()
 
 @click.option("--inline", nargs=3)
-@main.command("init")
+@click.command("init")
 def init(inline=False):
     """Initialize the CLI. If --inline then <username> <plan> <default protocol>."""
 
@@ -323,7 +367,7 @@ def print_examples():
 @click.option("-p","--protocol", help="-p <tcp|udp>")
 @click.option("-t", "--tier", type=int, help="-t <1|2|3|4>")
 @click.option("-u", "--user", help="-u <protonvpn_username>")
-@main.command("configure")
+@click.command("configure")
 def configure(user, tier, protocol, dns, killswitch, split_tunnel, purge):
     """Inline change single configuration values."""
     
@@ -344,7 +388,7 @@ def configure(user, tier, protocol, dns, killswitch, split_tunnel, purge):
     elif purge:
         purge_configuration(inline_purge=purge)
 
-@main.command("settings")
+@click.command("settings")
 def menu():
     """Display the configurations menu."""
     check_init()
