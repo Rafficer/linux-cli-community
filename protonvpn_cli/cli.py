@@ -1,48 +1,3 @@
-"""
-A CLI for ProtonVPN.
-
-Usage:
-    protonvpn init
-    protonvpn (c | connect) [<servername>] [-p <protocol>]
-    protonvpn (c | connect) [-f | --fastest] [-p <protocol>]
-    protonvpn (c | connect) [--cc <code>] [-p <protocol>]
-    protonvpn (c | connect) [--sc] [-p <protocol>]
-    protonvpn (c | connect) [--p2p] [-p <protocol>]
-    protonvpn (c | connect) [--tor] [-p <protocol>]
-    protonvpn (c | connect) [-r | --random] [-p <protocol>]
-    protonvpn (r | reconnect)
-    protonvpn (d | disconnect)
-    protonvpn (s | status)
-    protonvpn configure
-    protonvpn refresh
-    protonvpn examples
-    protonvpn (-h | --help)
-    protonvpn (-v | --version)
-
-Options:
-    -f, --fastest       Select the fastest ProtonVPN server.
-    -r, --random        Select a random ProtonVPN server.
-    --cc CODE           Determine the country for fastest connect.
-    --sc                Connect to the fastest Secure-Core server.
-    --p2p               Connect to the fastest torrent server.
-    --tor               Connect to the fastest Tor server.
-    -p PROTOCOL         Determine the protocol (UDP or TCP).
-    -h, --help          Show this help message.
-    -v, --version       Display version.
-
-Commands:
-    init                Initialize a ProtonVPN profile.
-    c, connect          Connect to a ProtonVPN server.
-    r, reconnect        Reconnect to the last server.
-    d, disconnect       Disconnect the current session.
-    s, status           Show connection status.
-    configure           Change ProtonVPN-CLI configuration.
-    refresh             Refresh OpenVPN configuration and server data.
-    examples            Print some example commands.
-
-Arguments:
-    <servername>        Servername (CH#4, CH-US-1, HK5-Tor).
-"""
 # Standard Libraries
 import sys
 import os
@@ -68,7 +23,7 @@ from .constants import (
 
 @click.group()
 def main():
-    """ProtonVPN CLI Main."""
+    """ProtonVPN CLI entry point."""
     check_root()
     check_init()
 
@@ -92,7 +47,7 @@ def main():
 @click.argument("action")
 @main.command("cli", context_settings=dict(help_option_names=['-h', '--help']))
 def cli(action, protocol, server, fastest, random, country, securecore, peer2peer, tor):
-    """Main CLI commands.
+    """Allows a user to give inline commands. A connection menu can also be invoked.
 
     Actions:\n
     m  |  menu         Display connection menu.\n
@@ -153,7 +108,7 @@ def cli(action, protocol, server, fastest, random, country, securecore, peer2pee
 @click.option("--inline", nargs=3)
 @main.command("init", context_settings=dict(help_option_names=['-h', '--help']))
 def init(inline=False):
-    """Initialize the CLI. If --inline then <username> <plan> <default protocol>."""
+    """Initializes the CLI. If --inline then <username> <plan> <default protocol> need to be provided."""
 
     def init_config_file():
         """"Initialize configuration file."""
