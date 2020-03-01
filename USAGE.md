@@ -438,6 +438,7 @@ Systemd is the current init system of most major Linux distributions. This guide
    [Service]
    Type=forking
    ExecStart=/usr/local/bin/protonvpn connect -f
+   ExecStop=/usr/local/bin/protonvpn disconnect
    Environment=PVPN_WAIT=300
    Environment=PVPN_DEBUG=1
    Environment=SUDO_USER=user
