@@ -641,6 +641,11 @@ def manage_ipv6(mode):
     restore: Revert changes and restore original configuration.
     """
 
+    ipv6_enabled_file = "/proc/net/if_inet6"
+
+    if not os.path.isfile(ipv6_enabled_file):
+        return
+
     ipv6_backupfile = os.path.join(CONFIG_DIR, "ipv6.backup")
     ip6tables_backupfile = os.path.join(CONFIG_DIR, "ip6tables.backup")
 
