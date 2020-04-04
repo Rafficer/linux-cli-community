@@ -52,19 +52,16 @@ import getpass
 import shutil
 import time
 # External Libraries
-from docopt import docopt
+from docopt import docopt  # type: ignore
 # protonvpn-cli Functions
 from . import connection
 from .logger import logger
-from .utils import (
-    check_root, change_file_owner, pull_server_data, make_ovpn_template,
-    check_init, set_config_value, get_config_value, is_valid_ip,
-    wait_for_network
-)
+from .utils import (check_root, change_file_owner, pull_server_data,
+                    make_ovpn_template, check_init, set_config_value,
+                    get_config_value, is_valid_ip, wait_for_network)
 # Constants
-from .constants import (
-    CONFIG_DIR, CONFIG_FILE, PASSFILE, USER, VERSION, SPLIT_TUNNEL_FILE
-)
+from .constants import (CONFIG_DIR, CONFIG_FILE, PASSFILE, USER, VERSION,
+                        SPLIT_TUNNEL_FILE)
 
 
 def main():
@@ -150,7 +147,6 @@ def cli():
 
 def init_cli():
     """Initialize the CLI."""
-
     def init_config_file():
         """"Initialize configuration file."""
         config = configparser.ConfigParser()
@@ -185,8 +181,7 @@ def init_cli():
         if int(get_config_value("USER", "initialized")):
             print("An initialized profile has been found.")
             overwrite = input(
-                "Are you sure you want to overwrite that profile? [y/N]: "
-            )
+                "Are you sure you want to overwrite that profile? [y/N]: ")
             if overwrite.strip().lower() != "y":
                 print("Quitting...")
                 sys.exit(1)
@@ -223,18 +218,15 @@ def init_cli():
     protonvpn_plans = {1: "Free", 2: "Basic", 3: "Plus", 4: "Visionary"}
 
     print()
-    print(
-        "You entered the following information:\n" +
-        "Username: {0}\n".format(ovpn_username) +
-        "Password: {0}\n".format("*" * len(ovpn_password)) +
-        "Tier: {0}\n".format(protonvpn_plans[user_tier]) +
-        "Default protocol: {0}".format(user_protocol.upper())
-    )
+    print("You entered the following information:\n" +
+          "Username: {0}\n".format(ovpn_username) +
+          "Password: {0}\n".format("*" * len(ovpn_password)) +
+          "Tier: {0}\n".format(protonvpn_plans[user_tier]) +
+          "Default protocol: {0}".format(user_protocol.upper()))
     print()
 
     user_confirmation = input(
-        "Is this information correct? [Y/n]: "
-    ).strip().lower()
+        "Is this information correct? [Y/n]: ").strip().lower()
 
     if user_confirmation == "y" or user_confirmation == "":
         print("Writing configuration to disk...")
@@ -297,8 +289,7 @@ def print_examples():
         "protonvpn disconnect\n"
         "               Disconnect the current session.\n\n"
         "protonvpn s\n"
-        "               Print information about the current session."
-    )
+        "               Print information about the current session.")
 
     print(examples)
 
@@ -307,21 +298,18 @@ def configure_cli():
     """Change single configuration values"""
 
     while True:
-        print(
-            "What do you want to change?\n"
-            "\n"
-            "1) Username and Password\n"
-            "2) ProtonVPN Plan\n"
-            "3) Default Protocol\n"
-            "4) DNS Management\n"
-            "5) Kill Switch\n"
-            "6) Split Tunneling\n"
-            "7) Purge Configuration\n"
-        )
+        print("What do you want to change?\n"
+              "\n"
+              "1) Username and Password\n"
+              "2) ProtonVPN Plan\n"
+              "3) Default Protocol\n"
+              "4) DNS Management\n"
+              "5) Kill Switch\n"
+              "6) Split Tunneling\n"
+              "7) Purge Configuration\n")
 
         user_choice = input(
-            "Please enter your choice or leave empty to quit: "
-        )
+            "Please enter your choice or leave empty to quit: ")
 
         user_choice = user_choice.lower().strip()
         if user_choice == "1":
@@ -360,8 +348,8 @@ def purge_configuration():
     """Purges CLI configuration"""
 
     user_choice = input(
-        "Are you sure you want to purge the configuration? [y/N]: "
-    ).lower().strip()
+        "Are you sure you want to purge the configuration? [y/N]: ").lower(
+        ).strip()
 
     if not user_choice == "y":
         return
@@ -384,11 +372,9 @@ def set_username_password(write=False):
     # Ask for the password and confirmation until both are the same
     while True:
         ovpn_password1 = getpass.getpass(
-            "Enter your ProtonVPN OpenVPN password: "
-        )
+            "Enter your ProtonVPN OpenVPN password: ")
         ovpn_password2 = getpass.getpass(
-            "Confirm your ProtonVPN OpenVPN password: "
-        )
+            "Confirm your ProtonVPN OpenVPN password: ")
 
         if not ovpn_password1 == ovpn_password2:
             print()
@@ -452,13 +438,11 @@ def set_default_protocol(write=False):
     """Set the users default protocol"""
 
     print()
-    print(
-        "Choose the default OpenVPN protocol.\n"
-        "OpenVPN can act on two different protocols: UDP and TCP.\n"
-        "UDP is preferred for speed but might be blocked in some networks.\n"
-        "TCP is not as fast but a lot harder to block.\n"
-        "Input your preferred protocol. (Default: UDP)\n"
-    )
+    print("Choose the default OpenVPN protocol.\n"
+          "OpenVPN can act on two different protocols: UDP and TCP.\n"
+          "UDP is preferred for speed but might be blocked in some networks.\n"
+          "TCP is not as fast but a lot harder to block.\n"
+          "Input your preferred protocol. (Default: UDP)\n")
 
     protonvpn_protocols = {1: "UDP", 2: "TCP"}
 
@@ -478,10 +462,8 @@ def set_default_protocol(write=False):
             break
         except (KeyError, ValueError):
             print()
-            print(
-                "[!] Invalid choice. "
-                "Please enter the number of your preferred protocol."
-            )
+            print("[!] Invalid choice. "
+                  "Please enter the number of your preferred protocol.")
 
     if write:
         set_config_value("USER", "default_protocol", user_protocol)
@@ -495,19 +477,16 @@ def set_dns_protection():
 
     while True:
         print()
-        print(
-            "DNS Leak Protection makes sure that you always use "
-            "ProtonVPN's DNS servers.\n"
-            "For security reasons this option is recommended.\n"
-            "\n"
-            "1) Enable DNS Leak Protection (recommended)\n"
-            "2) Configure Custom DNS Servers\n"
-            "3) Disable DNS Management"
-        )
+        print("DNS Leak Protection makes sure that you always use "
+              "ProtonVPN's DNS servers.\n"
+              "For security reasons this option is recommended.\n"
+              "\n"
+              "1) Enable DNS Leak Protection (recommended)\n"
+              "2) Configure Custom DNS Servers\n"
+              "3) Disable DNS Management")
         print()
         user_choice = input(
-                "Please enter your choice or leave empty to quit: "
-        )
+            "Please enter your choice or leave empty to quit: ")
         user_choice = user_choice.lower().strip()
         if user_choice == "1":
             dns_leak_protection = 1
@@ -516,8 +495,7 @@ def set_dns_protection():
         elif user_choice == "2":
             dns_leak_protection = 0
             custom_dns = input(
-                "Please enter your custom DNS servers (space separated): "
-            )
+                "Please enter your custom DNS servers (space separated): ")
             custom_dns = custom_dns.strip().split()
 
             # Check DNS Servers for validity
@@ -558,16 +536,14 @@ def set_killswitch():
             "The Kill Switch will block all network traffic\n"
             "if the VPN connection drops unexpectedly.\n"
             "\n"
-            "Please note that the Kill Switch assumes only one network interface being active.\n" # noqa
+            "Please note that the Kill Switch assumes only one network interface being active.\n"  # noqa
             "\n"
             "1) Enable Kill Switch (Block access to/from LAN)\n"
             "2) Enable Kill Switch (Allow access to/from LAN)\n"
-            "3) Disable Kill Switch"
-        )
+            "3) Disable Kill Switch")
         print()
         user_choice = input(
-                "Please enter your choice or leave empty to quit: "
-        )
+            "Please enter your choice or leave empty to quit: ")
         user_choice = user_choice.lower().strip()
         if user_choice == "1":
             killswitch = 1
@@ -590,10 +566,8 @@ def set_killswitch():
     if killswitch and int(get_config_value("USER", "split_tunnel")):
         set_config_value("USER", "split_tunnel", 0)
         print()
-        print(
-            "[!] Kill Switch can't be used with Split Tunneling.\n" +
-            "[!] Split Tunneling has been disabled."
-        )
+        print("[!] Kill Switch can't be used with Split Tunneling.\n" +
+              "[!] Split Tunneling has been disabled.")
         time.sleep(1)
 
     set_config_value("USER", "killswitch", killswitch)
@@ -611,19 +585,15 @@ def set_split_tunnel():
         if int(get_config_value("USER", "killswitch")):
             set_config_value("USER", "killswitch", 0)
             print()
-            print(
-                "[!] Split Tunneling can't be used with Kill Switch.\n" +
-                "[!] Kill Switch has been disabled.\n"
-            )
+            print("[!] Split Tunneling can't be used with Kill Switch.\n" +
+                  "[!] Kill Switch has been disabled.\n")
             time.sleep(1)
 
         set_config_value("USER", "split_tunnel", 1)
 
         while True:
-            ip = input(
-                "Please enter an IP or CIDR to exclude from VPN.\n"
-                "Or leave empty to stop: "
-            ).strip()
+            ip = input("Please enter an IP or CIDR to exclude from VPN.\n"
+                       "Or leave empty to stop: ").strip()
 
             if ip == "":
                 break

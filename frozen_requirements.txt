@@ -1,0 +1,7 @@
+certifi==2019.11.28
+chardet==3.0.4
+docopt==0.6.2
+idna==2.9
+pythondialog==3.5.1
+requests==2.23.0
+urllib3==1.25.8

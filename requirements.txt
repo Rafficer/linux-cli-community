@@ -1,4 +1,4 @@
 # Call with pip install -r requirements.txt
-docopt
-requests
-pythondialog
+docopt >= 0.6.2 
+requests >= 2.23.0 
+pythondialog >= 3.5.1

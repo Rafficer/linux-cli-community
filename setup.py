@@ -1,35 +1,20 @@
 """setup.py: setuptools control."""
 
-
 import re
-from setuptools import setup
+from setuptools import setup  # type: ignore
 
-
-version = re.search(
+version = re.search(  # type: ignore
     r'(VERSION = "(\d.\d.\d)")',
-    open("protonvpn_cli/constants.py").read(),
-    re.M
-    ).group(2)
-
-
-long_descr = """
-The official Linux CLI for ProtonVPN.
-
-For further information and a usage guide, please view the project page:
-
-https://github.com/ProtonVPN/protonvpn-cli-ng
-"""
-
+    open("protonvpn_cli/constants.py").read(), re.M).group(2)
 
 setup(
     name="protonvpn_cli",
     packages=["protonvpn_cli"],
-    entry_points={
-        "console_scripts": ["protonvpn = protonvpn_cli.cli:main"]
-        },
+    entry_points={"console_scripts": ["protonvpn = protonvpn_cli.cli:main"]},
     version=version,
     description="Linux command-line client for ProtonVPN",
-    long_description=long_descr,
+    long_description=open('README.md').read(),
+    long_description_content_type="text/markdown",
     author="Proton Technologies AG",
     author_email="contact@protonvpn.com",
     license="GPLv3",

@@ -1,0 +1,5 @@
+pytest>=5.2.0
+mypy>= 0.761
+yapf>= 0.29.0
+setuptools>= 45.1.0
+twine>= 3.1.1

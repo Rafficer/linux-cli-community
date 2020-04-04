@@ -103,6 +103,8 @@ venv/
 ENV/
 env.bak/
 venv.bak/
+build.env.sh
+.pvpn-cli/
 
 # Spyder project settings
 .spyderproject

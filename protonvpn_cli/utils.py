@@ -15,10 +15,8 @@ import requests
 # ProtonVPN-CLI functions
 from .logger import logger
 # Constants
-from .constants import (
-    USER, CONFIG_FILE, SERVER_INFO_FILE, TEMPLATE_FILE, SPLIT_TUNNEL_FILE,
-    VERSION
-)
+from .constants import (USER, CONFIG_FILE, SERVER_INFO_FILE, TEMPLATE_FILE,
+                        SPLIT_TUNNEL_FILE, VERSION)
 
 
 def call_api(endpoint, json_format=True, handle_errors=True):
@@ -44,20 +42,16 @@ def call_api(endpoint, json_format=True, handle_errors=True):
         response = requests.get(url, headers=headers)
     except (requests.exceptions.ConnectionError,
             requests.exceptions.ConnectTimeout):
-        print(
-            "[!] There was an error connecting to the ProtonVPN API.\n"
-            "[!] Please make sure your connection is working properly!"
-        )
+        print("[!] There was an error connecting to the ProtonVPN API.\n"
+              "[!] Please make sure your connection is working properly!")
         logger.debug("Error connecting to ProtonVPN API")
         sys.exit(1)
     try:
         response.raise_for_status()
     except requests.exceptions.HTTPError:
-        print(
-            "[!] There was an error with accessing the ProtonVPN API.\n"
-            "[!] Please make sure your connection is working properly!\n"
-            "[!] HTTP Error Code: {0}".format(response.status_code)
-        )
+        print("[!] There was an error with accessing the ProtonVPN API.\n"
+              "[!] Please make sure your connection is working properly!\n"
+              "[!] HTTP Error Code: {0}".format(response.status_code))
         logger.debug("Bad Return Code: {0}".format(response.status_code))
         sys.exit(1)
 
@@ -106,7 +100,10 @@ def get_servers():
     user_tier = int(get_config_value("USER", "tier"))
 
     # Sort server IDs by Tier
-    return [server for server in servers if server["Tier"] <= user_tier and server["Status"] == 1] # noqa
+    return [
+        server for server in servers
+        if server["Tier"] <= user_tier and server["Status"] == 1
+    ]  # noqa
 
 
 def get_server_value(servername, key, servers):
@@ -130,9 +127,7 @@ def set_config_value(group, key, value):
     config.read(CONFIG_FILE)
     config[group][key] = str(value)
 
-    logger.debug(
-        "Writing {0} to [{1}] in config file".format(key, group)
-    )
+    logger.debug("Writing {0} to [{1}] in config file".format(key, group))
 
     with open(CONFIG_FILE, "w+") as f:
         config.write(f)
@@ -160,26 +155,22 @@ def get_fastest_server(server_pool):
     """Return the fastest server from a list of servers"""
 
     # Sort servers by "speed" and select top n according to pool_size
-    fastest_pool = sorted(
-        server_pool, key=lambda server: server["Score"]
-    )
+    fastest_pool = sorted(server_pool, key=lambda server: server["Score"])
     if len(fastest_pool) >= 50:
         pool_size = 4
     else:
         pool_size = 1
     logger.debug(
-        "Returning fastest server with pool size {0}".format(pool_size)
-    )
+        "Returning fastest server with pool size {0}".format(pool_size))
     fastest_server = random.choice(fastest_pool[:pool_size])["Name"]
     return fastest_server
 
 
 def get_default_nic():
     """Find and return the default network interface"""
-    default_route = subprocess.run(
-        "ip route show | grep default",
-        stdout=subprocess.PIPE, shell=True
-    )
+    default_route = subprocess.run("ip route show | grep default",
+                                   stdout=subprocess.PIPE,
+                                   shell=True)
 
     # Get the default nic from ip route show output
     default_nic = default_route.stdout.decode().strip().split()[4]
@@ -192,10 +183,8 @@ def is_connected():
                                     stdout=subprocess.PIPE)
     ovpn_processes = ovpn_processes.stdout.decode("utf-8").split()
 
-    logger.debug(
-        "Checking connection Status. OpenVPN processes: {0}"
-        .format(len(ovpn_processes))
-        )
+    logger.debug("Checking connection Status. OpenVPN processes: {0}".format(
+        len(ovpn_processes)))
     return True if ovpn_processes != [] else False
 
 
@@ -238,9 +227,9 @@ def make_ovpn_template():
     server_id = server_data["LogicalServers"][0]["ID"]
 
     config_file_response = call_api(
-        "/vpn/config?Platform=linux&LogicalID={0}&Protocol=tcp".format(server_id),  # noqa
-        json_format=False
-    )
+        "/vpn/config?Platform=linux&LogicalID={0}&Protocol=tcp".format(
+            server_id),  # noqa
+        json_format=False)
 
     with open(TEMPLATE_FILE, "wb") as f:
         for chunk in config_file_response.iter_content(100000):
@@ -266,9 +255,7 @@ def make_ovpn_template():
                 netmask = None
 
                 if not is_valid_ip(line):
-                    logger.debug(
-                        "[!] '{0}' is invalid. Skipped.".format(line)
-                    )
+                    logger.debug("[!] '{0}' is invalid. Skipped.".format(line))
                     continue
 
                 if "/" in line:
@@ -281,14 +268,10 @@ def make_ovpn_template():
                     netmask = "255.255.255.255"
 
                 if is_valid_ip(ip):
-                    f.write(
-                        "\nroute {0} {1} net_gateway".format(ip, netmask)
-                    )
+                    f.write("\nroute {0} {1} net_gateway".format(ip, netmask))
 
                 else:
-                    logger.debug(
-                        "[!] '{0}' is invalid. Skipped.".format(line)
-                    )
+                    logger.debug("[!] '{0}' is invalid. Skipped.".format(line))
 
         logger.debug("Split Tunneling Written")
 
@@ -307,13 +290,14 @@ def make_ovpn_template():
 
 def change_file_owner(path):
     """Change the owner of specific files to the sudo user."""
-    uid = int(subprocess.run(["id", "-u", USER],
-                             stdout=subprocess.PIPE).stdout)
-    gid = int(subprocess.run(["id", "-u", USER],
-                             stdout=subprocess.PIPE).stdout)
+    uid = int(
+        subprocess.run(["id", "-u", USER], stdout=subprocess.PIPE).stdout)
+    gid = int(
+        subprocess.run(["id", "-u", USER], stdout=subprocess.PIPE).stdout)
 
-    current_owner = subprocess.run(["id", "-nu", str(os.stat(path).st_uid)],
-                                   stdout=subprocess.PIPE).stdout
+    current_owner = subprocess.run(
+        ["id", "-nu", str(os.stat(path).st_uid)],
+        stdout=subprocess.PIPE).stdout
     current_owner = current_owner.decode().rstrip("\n")
 
     # Only change file owner if it wasn't owned by current running user.
@@ -325,10 +309,8 @@ def change_file_owner(path):
 def check_root():
     """Check if the program was executed as root and prompt the user."""
     if os.geteuid() != 0:
-        print(
-            "[!] The program was not executed as root.\n"
-            "[!] Please run as root."
-        )
+        print("[!] The program was not executed as root.\n"
+              "[!] Please run as root.")
         logger.debug("Program wasn't executed as root")
         sys.exit(1)
     else:
@@ -347,7 +329,6 @@ def check_root():
 
 def check_update():
     """Return the download URL if an Update is available, False if otherwise"""
-
     def get_latest_version():
         """Return the latest version from pypi"""
         logger.debug("Calling pypi API")
@@ -360,9 +341,7 @@ def check_update():
         try:
             r.raise_for_status()
         except requests.exceptions.HTTPError:
-            logger.debug(
-                "HTTP Error with pypi API: {0}".format(r.status_code)
-            )
+            logger.debug("HTTP Error with pypi API: {0}".format(r.status_code))
             return False
 
         release = r.json()["info"]["version"]
@@ -410,14 +389,13 @@ def check_update():
         print()
         print(
             "A new Update for ProtonVPN-CLI (v{0}) ".format('.'.join(
-                [str(x) for x in latest_version])
-                ) +
-            "is available.\n" +
+                [str(x) for x in latest_version])) + "is available.\n" +
             "Follow the Update instructions on\n" +
-            "https://github.com/ProtonVPN/protonvpn-cli-ng/blob/master/USAGE.md#updating-protonvpn-cli\n" + # noqa
+            "https://github.com/ProtonVPN/protonvpn-cli-ng/blob/master/USAGE.md#updating-protonvpn-cli\n"
+            +  # noqa
             "\n"
             "To see what's new, check out the changelog:\n" +
-            "https://github.com/ProtonVPN/protonvpn-cli-ng/blob/master/CHANGELOG.md" # noqa
+            "https://github.com/ProtonVPN/protonvpn-cli-ng/blob/master/CHANGELOG.md"  # noqa
         )
 
 
@@ -426,10 +404,8 @@ def check_init():
 
     try:
         if not int(get_config_value("USER", "initialized")):
-            print(
-                "[!] There has been no profile initialized yet. "
-                "Please run 'protonvpn init'."
-            )
+            print("[!] There has been no profile initialized yet. "
+                  "Please run 'protonvpn init'.")
             logger.debug("Initialized Profile not found")
             sys.exit(1)
         else:
@@ -454,28 +430,26 @@ def check_init():
                     try:
                         get_config_value(section, config_key)
                     except KeyError:
-                        logger.debug("Config {0}/{1} not found, default set"
-                                     .format(section, config_key))
+                        logger.debug(
+                            "Config {0}/{1} not found, default set".format(
+                                section, config_key))
                         set_config_value(section, config_key,
                                          default_conf[section][config_key])
 
     except KeyError:
-        print(
-            "[!] There has been no profile initialized yet. "
-            "Please run 'protonvpn init'."
-        )
+        print("[!] There has been no profile initialized yet. "
+              "Please run 'protonvpn init'.")
         logger.debug("Initialized Profile not found")
         sys.exit(1)
 
 
 def is_valid_ip(ipaddr):
-    valid_ip_re = re.compile(
-        r'^(25[0-5]|2[0-4][0-9]|[0-1]?[0-9][0-9]?)\.'
-        r'(25[0-5]|2[0-4][0-9]|[0-1]?[0-9][0-9]?)\.'
-        r'(25[0-5]|2[0-4][0-9]|[0-1]?[0-9][0-9]?)\.'
-        r'(25[0-5]|2[0-4][0-9]|[0-1]?[0-9][0-9]?)'
-        r'(/(3[0-2]|[12][0-9]|[1-9]))?$'  # Matches CIDR
-    )
+    valid_ip_re = re.compile(r'^(25[0-5]|2[0-4][0-9]|[0-1]?[0-9][0-9]?)\.'
+                             r'(25[0-5]|2[0-4][0-9]|[0-1]?[0-9][0-9]?)\.'
+                             r'(25[0-5]|2[0-4][0-9]|[0-1]?[0-9][0-9]?)\.'
+                             r'(25[0-5]|2[0-4][0-9]|[0-1]?[0-9][0-9]?)'
+                             r'(/(3[0-2]|[12][0-9]|[1-9]))?$'  # Matches CIDR
+                             )
 
     if valid_ip_re.match(ipaddr):
         return True
@@ -487,7 +461,6 @@ def is_valid_ip(ipaddr):
 def get_transferred_data():
     """Reads and returns the amount of data transferred during a session
     from the /sys/ directory"""
-
     def convert_size(size_bytes):
         """Converts byte amounts into human readable formats"""
         if size_bytes == 0:
