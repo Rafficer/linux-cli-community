@@ -20,7 +20,37 @@ ProtonVPN-CLI is a full rewrite of the [bash protonvpn-cli](https://github.com/P
 
 For more detailed information on installing, updating and uninstalling, please view the extensive [usage guide](https://github.com/ProtonVPN/linux-cli/blob/master/USAGE.md#installation--updating).
 
-### Installing Dependencies
+### Installing from distribution repositories
+
+For the following Linux distribution(s), install the official `protonvpn-cli` package:
+
+#### Fedora
+
+```sh
+sudo dnf install -y protonvpn-cli
+```
+
+#### CentOS & RHEL
+
+`protonvpn-cli` is available for CentOS/RHEL 7.x and 8.x via the [EPEL repositories](https://fedoraproject.org/wiki/EPEL).
+
+**For CentOS/RHEL 7.x**:
+
+```sh
+sudo yum install https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm
+sudo yum install protonvpn-cli
+```
+
+**For CentOS/RHEL 8.x**:
+
+```sh
+sudo dnf install https://dl.fedoraproject.org/pub/epel/epel-release-latest-8.noarch.rpm
+sudo dnf install -y protonvpn-cli
+```
+
+### Installing from PyPI
+
+#### Installing Dependencies
 
 **Dependencies:**
 
@@ -39,7 +69,7 @@ Depending on your distribution, run the appropriate following command to install
 |OpenSUSE/SLES                            | `sudo zypper in -y openvpn dialog python3-pip python3-setuptools`  |
 |Arch Linux/Manjaro                       | `sudo pacman -S openvpn dialog python-pip python-setuptools`       |
 
-### Installing ProtonVPN-CLI
+#### Installing ProtonVPN-CLI
 
 Installation happens via Python's package manager PIP.
 
@@ -47,7 +77,7 @@ Installation happens via Python's package manager PIP.
 
 `sudo pip3 install protonvpn-cli`
 
-### Updating ProtonVPN-CLI
+#### Updating ProtonVPN-CLI
 
 `sudo pip3 install protonvpn-cli --upgrade`
 

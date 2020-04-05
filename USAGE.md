@@ -7,16 +7,19 @@ This document provides an extensive guide on how to install and use ProtonVPN-CL
 - [ProtonVPN-CLI Usage Documentation](#protonvpn-cli-usage-documentation)
   - [Table of Contents](#table-of-contents)
   - [Installation & Updating](#installation--updating)
-    - [Installing Dependencies](#installing-dependencies)
-    - [Installing ProtonVPN-CLI](#installing-protonvpn-cli)
-    - [Updating ProtonVPN-CLI](#updating-protonvpn-cli)
-    - [Initialization](#initialization)
-    - [Uninstall](#uninstall)
-    - [Example Installation on Ubuntu 18.04](#example-installation-on-ubuntu-1804)
+    - [Installing from distribution repositories](#installing-from-distribution-repositories)
+      - [Fedora](#fedora)
+      - [CentOS & RHEL](#centos--rhel)
+    - [Installing from PyPI](#installing-from-pypi)
+      - [Installing ProtonVPN-CLI](#installing-protonvpn-cli)
+      - [Updating ProtonVPN-CLI](#updating-protonvpn-cli)
+      - [Uninstall](#uninstall)
+      - [Example Installation on Ubuntu 18.04](#example-installation-on-ubuntu-1804)
     - [Installing in a virtual environment](#installing-in-a-virtual-environment)
       - [Install](#install)
       - [Update](#update)
       - [Uninstall](#uninstall-1)
+  - [Initialization](#initialization)
   - [Commands](#commands)
     - [List of all Commands](#list-of-all-commands)
     - [Command Explanations](#command-explanations)
@@ -36,7 +39,35 @@ This document provides an extensive guide on how to install and use ProtonVPN-CL
 
 ## Installation & Updating
 
-### Installing Dependencies
+### Installing from distribution repositories
+
+For the following Linux distribution(s), install the official `protonvpn-cli` package:
+
+#### Fedora
+
+```sh
+sudo dnf install -y protonvpn-cli
+```
+
+#### CentOS & RHEL
+
+`protonvpn-cli` is available for CentOS/RHEL 7.x and 8.x via the [EPEL repositories](https://fedoraproject.org/wiki/EPEL).
+
+**For CentOS/RHEL 7.x**:
+
+```sh
+sudo yum install https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm
+sudo yum install protonvpn-cli
+```
+
+**For CentOS/RHEL 8.x**:
+
+```sh
+sudo dnf install https://dl.fedoraproject.org/pub/epel/epel-release-latest-8.noarch.rpm
+sudo dnf install -y protonvpn-cli
+```
+
+### Installing from PyPI
 
 **Dependencies:**
 
@@ -55,7 +86,7 @@ Depending on your distribution, run the appropriate following command to install
 |OpenSUSE/SLES                            | `sudo zypper in -y openvpn dialog python3-pip python3-setuptools`  |
 |Arch Linux/Manjaro                       | `sudo pacman -S openvpn dialog python-pip python-setuptools`       |
 
-### Installing ProtonVPN-CLI
+#### Installing ProtonVPN-CLI
 
 Installation happens via Python's package manager PIP.
 
@@ -63,15 +94,11 @@ Installation happens via Python's package manager PIP.
 
 `sudo pip3 install protonvpn-cli`
 
-### Updating ProtonVPN-CLI
+#### Updating ProtonVPN-CLI
 
 `sudo pip3 install protonvpn-cli --upgrade`
 
-### Initialization
-
-Before you can use ProtonVPN-CLI, you need to initialize it. Run `sudo protonvpn init` and follow the prompts on the screen.
-
-### Uninstall
+#### Uninstall
 
 If you want to uninstall ProtonVPN-CLI, run `protonvpn configure` first and purge the configuration. Then uninstall through the package manager you used for installation.
 
@@ -81,7 +108,7 @@ For PIP this would be
 
 Bye Bye 😔
 
-### Example Installation on Ubuntu 18.04
+#### Example Installation on Ubuntu 18.04
 
 1. Installing dependencies
 
@@ -188,6 +215,10 @@ Now you should be able to use the protonvpn command from anywhere in the system 
 3. Delete the symlink
 
     `sudo unlink /usr/local/bin/protonvpn`
+
+## Initialization
+
+Before you can use ProtonVPN-CLI, you need to initialize it. Run `sudo protonvpn init` and follow the prompts on the screen.
 
 ## Commands
 
