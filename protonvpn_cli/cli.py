@@ -21,11 +21,35 @@ from .constants import (
     CONFIG_DIR, CONFIG_FILE, PASSFILE, USER, VERSION, SPLIT_TUNNEL_FILE
 )
 
-@click.group()
-def main():
-    """ProtonVPN CLI entry point."""
-    check_root()
-    check_init()
+@click.option("-pu", "--purge", is_flag=True, help="Purge user configuration.")
+@click.option("-i", "--init-inline", nargs=4, help="Intialize profile inline.")
+@click.option("-ks", "--killswitch", help="Configure killswitch.", type=click.Choice(['block-lan', 'allow-lan', 'disable']))
+@click.option("-sp", "--split-tunnel", multiple=True, help="-sp <enable|disable> [-sp <add>] [-sp <ip1>] [-sp <ip2>] [-sp <ip3>]")
+@click.option("-d", "--dns", multiple=True, help="-d <enable|custom|disable> [-d <dns1>] [-d <dns2>] [-d <dns3>]")
+@click.option("-p","--protocol", help="-p <tcp|udp>", type=click.Choice(['udp', 'tcp']))
+@click.option("-t", "--tier", help="Editer user tier.", type=click.Choice(['1', '2', '3', '4']))
+@click.option("-u", "--user", nargs=2, help="-u -uname <protonvpn_user> -pwd <protonvpn_password>")
+@click.option("-t", "--tor", is_flag=True, help="Connect to the fastest server with Tor.")
+@click.option("-p2p", "--peer2peer", is_flag=True, help="Connect to the fastest server with Peer2Peer.")
+@click.option("-sc", "--securecore", is_flag=True, help="Connect to a server with Secure Core.")
+@click.option("-cc", "--country", help="Connect to the fastest server in a specific country.")
+@click.option("-r", "--random", is_flag=True, help="Connect to a random server.")
+@click.option("-f", "--fastest",is_flag=True, help="Connect to the fastest server.")
+@click.option("-s", "--server", help="Connect to specific server.")
+@click.argument("action")
+@click.command(context_settings=dict(help_option_names=['-h', '--help']))
+def main(action, protocol, server, fastest, random, country, securecore, peer2peer, tor, purge, user, tier, dns, split_tunnel, killswitch, init_inline):
+    """ProtonVPN CLI entry point.
+    Actions:\n
+    m    | menu         Display connection menu.\n
+    c    | connect      To connect to a server.\n
+    d    | disconnect   To disconnect from server.\n
+    r    | reconnect    To reconnect to the last connected server.\n
+    s    | status       To display status.\n
+    re   | refresh      To refresh servers cache.\n
+    e    | examples     To show examples on how to use the CLI.\n
+    conf | configure    To display configurations.
+    """
 
     change_file_owner(os.path.join(CONFIG_DIR, "pvpn-cli.log"))
     logger.debug("###########################")
@@ -35,29 +59,8 @@ def main():
     logger.debug("USER: {0}".format(USER))
     logger.debug("CONFIG_DIR: {0}".format(CONFIG_DIR))
 
- 
-@click.option("--tor", "-t", is_flag=True, help="Connect to the fastest server with Tor.")
-@click.option("--peer2peer", "-p2p", is_flag=True, help="Connect to the fastest server with Peer2Peer.")
-@click.option("--securecore", "-sc", is_flag=True, help="Connect to a server with Secure Core.")
-@click.option("--country", "-cc", help="Connect to the fastest server in a specific country.")
-@click.option("--random", "-r", is_flag=True, help="Connect to a random server.")
-@click.option("--fastest", "-f", is_flag=True, help="Connect to the fastest server.")
-@click.option("--server", "-s", help="Indicates connect to be connected to.")
-@click.option("--protocol", "-p", help="The protocol to be used.", default=None)
-@click.argument("action")
-@main.command("cli", context_settings=dict(help_option_names=['-h', '--help']))
-def cli(action, protocol, server, fastest, random, country, securecore, peer2peer, tor):
-    """Allows a user to give inline commands. A connection menu can also be invoked.
-
-    Actions:\n
-    m  |  menu         Display connection menu.\n
-    c  |  connect      To connect to a server.\n
-    d  |  disconnect   To disconnect from server.\n
-    r  |  reconnect    To reconnect to the last connected server.\n
-    s  |  status       To display status.\n
-    re |  refresh      To refresh servers cache.\n
-    e  |  examples     To show examples on how to use the CLI.
-    """
+    check_root()
+    check_init()
 
     # Wait until a connection to the ProtonVPN API can be made
     # As this is mainly for automatically connecting on boot, it only
@@ -75,10 +78,9 @@ def cli(action, protocol, server, fastest, random, country, securecore, peer2pee
         protocol = protocol.lower().strip()
 
     # Features: 1: Secure-Core, 2: Tor, 4: P2P
-
     if action == "c" or action == "connect":
         if server:
-            connection.country_f(server, protocol)
+            connection.direct(server, protocol)
         elif fastest:
             connection.fastest(protocol)
         elif random:
@@ -111,14 +113,34 @@ def cli(action, protocol, server, fastest, random, country, securecore, peer2pee
     elif action == "v" or action == "version":
         print()
         print("ProtonVPN-CLI v{0}".format(VERSION))
+    elif action == "init":
+        if init_inline and all(init_inline):
+            init(inline=True, args=init_inline)
+        else:
+            init()
+    elif action == "configure" or action == "conf":
+        if user and all(user):
+            set_username_password(write=True, inline_username=user)
+        elif tier and all(tier):
+            set_protonvpn_tier(write=True, inline_tier=tier)
+        elif protocol and all(protocol):
+            set_default_protocol(write=True, inline_protocol=protocol)
+        elif dns and all(dns):
+            set_dns_protection(inline_protocol=dns) 
+        elif killswitch and all(killswitch):
+            set_killswitch(inline_killswitch=killswitch)
+        elif split_tunnel and all(split_tunnel):
+            set_split_tunnel(inline_sp=split_tunnel)
+        elif purge:
+            purge_configuration(inline_purge=True)
+        else:
+            settings()
     else:
         print()
         print("[!] You need to provide a valid choice.")
         sys.exit(1)
 
-@click.option("--inline", nargs=3)
-@main.command("init", context_settings=dict(help_option_names=['-h', '--help']))
-def init(inline=False):
+def init(inline=False, args=False):
     """Initializes the CLI. If --inline then <username> <plan> <default protocol> need to be provided."""
 
     def init_config_file():
@@ -149,25 +171,26 @@ def init(inline=False):
     change_file_owner(CONFIG_DIR)
 
     # Warn user about reinitialization
-    try:
-        if int(get_config_value("USER", "initialized")):
-            print("An initialized profile has been found.")
-            overwrite = input(
-                "Are you sure you want to overwrite that profile? [y/N]: "
-            )
-            if overwrite.strip().lower() != "y":
-                print("Quitting...")
-                sys.exit(1)
-            # Disconnect, so every setting (Kill Switch, IPv6, ...)
-            # will be reverted (See #62)
-            connection.disconnect(passed=True)
-    except KeyError:
-        pass
+    if not inline:
+        try:
+            if int(get_config_value("USER", "initialized")):
+                print("An initialized profile has been found.")
+                overwrite = input(
+                    "Are you sure you want to overwrite that profile? [y/N]: "
+                )
+                if overwrite.strip().lower() != "y":
+                    print("Quitting...")
+                    sys.exit(1)
+                # Disconnect, so every setting (Kill Switch, IPv6, ...)
+                # will be reverted (See #62)
+                connection.disconnect(passed=True)
+        except KeyError:
+            pass
 
     term_width = shutil.get_terminal_size()[0]
 
-    # If len(inline) > 0 then user is using --inline then it returns (username, plan, default protocol)
-    if inline and all(inline):
+    # If len(args) > 0 then user is using --init-inline then it returns (username, plan, default protocol)
+    if inline:
 
         password = click.prompt("Enter your password", hide_input=True)
         retype_password = click.prompt("Enter your password", hide_input=True)
@@ -177,10 +200,10 @@ def init(inline=False):
             print("[!] Passwords do not match")
             return
         
-        ovpn_username = inline[0]
+        ovpn_username = args[0]
         ovpn_password = password
-        user_tier = int(inline[1])
-        user_protocol = inline[2]
+        user_tier = int(args[1])
+        user_protocol = args[2]
 
     else:
         print("[ -- PROTONVPN-CLI INIT -- ]\n".center(term_width))
@@ -288,38 +311,6 @@ def print_examples():
 
     print(examples)
 
-@click.option("-p", "--purge", is_flag=True, help="Purges your configurations")
-@click.option("-ks", "--killswitch", help="-ks <enable-block-lan|enable-allow-lan|disable>")
-@click.option("-sp", "--split-tunnel", multiple=True, help="-sp <enable|disable> [-sp <add>] [-sp <ip1>] [-sp <ip2>] [-sp <ip3>]")
-@click.option("-d", "--dns", multiple=True, help="-d <enable|custom|disable> [-d <dns1>] [-d <dns2>] [-d <dns3>]")
-@click.option("-p","--protocol", help="-p <tcp|udp>")
-@click.option("-t", "--tier", type=int, help="-t <1|2|3|4>")
-@click.option("-u", "--user", help="-u <protonvpn_username>")
-@main.command("configure", context_settings=dict(help_option_names=['-h', '--help']))
-def configure(user, tier, protocol, dns, killswitch, split_tunnel, purge):
-    """Inline change single configuration values."""
-    
-    check_init()
-
-    if user:
-        set_username_password(write=True, inline_username=user)
-    elif tier:
-        set_protonvpn_tier(write=True, inline_tier=tier)
-    elif protocol:
-        set_default_protocol(write=True, inline_protocol=protocol)
-    elif dns:
-        set_dns_protection(inline_protocol=dns)    
-    elif killswitch:
-        set_killswitch(inline_killswitch=killswitch)
-    elif split_tunnel:
-        set_split_tunnel(inline_sp=split_tunnel)
-    elif purge:
-        purge_configuration(inline_purge=purge)
-    else:
-        print()
-        print("[!] You need to provide at least one option, followed by an appopriate argument(s).")
-
-@main.command("settings", context_settings=dict(help_option_names=['-h', '--help']))
 def settings():
     """Display the configurations menu."""
     check_init()
@@ -397,19 +388,9 @@ def set_username_password(write=False, inline_username=False):
     """Set the ProtonVPN Username and Password."""
     print()
     
-    if inline_username and all(inline_username):
-
-        password = click.prompt("Enter your password", hide_input=True)
-        retype_password = click.prompt("Repeat your password", hide_input=True)
-
-        # Check if passwords match
-        if password != retype_password:
-            print()
-            print("[!] Passwords do not match")
-            sys.exit(1)
-        
-        ovpn_username = inline_username
-        ovpn_password1 = password
+    if inline_username and all(inline_username):        
+        ovpn_username = inline_username[0]
+        ovpn_password1 = inline_username[1]
     else:
         ovpn_username = input("Enter your ProtonVPN OpenVPN username: ")
 
@@ -621,6 +602,7 @@ def set_dns_protection(inline_protocol=False):
 
     set_config_value("USER", "dns_leak_protection", dns_leak_protection)
     set_config_value("USER", "custom_dns", custom_dns)
+    print()
     print("DNS Management updated.")
 
 def set_killswitch(inline_killswitch=False):
@@ -630,9 +612,9 @@ def set_killswitch(inline_killswitch=False):
 
         inline_killswitch = inline_killswitch.strip().lower()
 
-        if inline_killswitch == "enable-block-lan":
+        if inline_killswitch == "block-lan":
             killswitch = 1
-        elif inline_killswitch == "enable-allow-lan":
+        elif inline_killswitch == "allow-lan":
             killswitch = 2
         elif inline_killswitch == "disable":
             killswitch = 0
