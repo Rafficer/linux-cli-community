@@ -409,7 +409,7 @@ def set_username_password(write=False):
 def set_protonvpn_tier(write=False):
     """Set the users ProtonVPN Plan."""
 
-    protonvpn_plans_selection = {1: "Free", 2: "Basic", 3: "Plus or Visionary", 4: "Go back to menu"}
+    protonvpn_plans_selection = {1: "Free", 2: "Basic", 3: "Plus", 4: "Visionary", 5: "Go back to menu"}
 
     print()
     print("Please choose your ProtonVPN Plan")
@@ -433,6 +433,10 @@ def set_protonvpn_tier(write=False):
             print("[!] Invalid choice. Please enter the number of your plan.")
 
     if write:
+
+        # Set Visionary to plus as it has the same access
+        if user_tier == 4:
+            user_tier = 3
 
         # Lower tier by one to match API allocation
         user_tier -= 1
