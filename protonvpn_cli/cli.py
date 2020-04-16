@@ -212,13 +212,13 @@ def init_cli():
         print(textwrap.fill(line, width=term_width))
 
     # Set ProtonVPN Username and Password
-    ovpn_username, ovpn_password = set_username_password(write=False)
+    ovpn_username, ovpn_password = set_username_password(write=False, init=True)
 
     # Set the ProtonVPN Plan
-    user_tier = set_protonvpn_tier(write=False)
+    user_tier = set_protonvpn_tier(write=False, init=True)
 
     # Set default Protocol
-    user_protocol = set_default_protocol(write=False)
+    user_protocol = set_default_protocol(write=False, init=True)
 
     protonvpn_plans = {1: "Free", 2: "Basic", 3: "Plus", 4: "Visionary"}
 
@@ -369,13 +369,19 @@ def purge_configuration():
     print("Configuration purged.")
 
 
-def set_username_password(write=False):
+def set_username_password(write=False, init=False):
     """Set the ProtonVPN Username and Password."""
 
     print()
-    ovpn_username = input("Enter your ProtonVPN OpenVPN username or 'menu' to go back to menu: ")
+    input_message_ovpn_username = "Enter your ProtonVPN OpenVPN username"
+    if init:
+        input_message_ovpn_username += ": "
+    if not init:
+        input_message_ovpn_username += " or 'menu' to go back to menu: "
 
-    if ovpn_username == "menu":
+    ovpn_username = input(input_message_ovpn_username)
+
+    if not init and ovpn_username == "menu":
         configure_cli()
 
     # Ask for the password and confirmation until both are the same
@@ -406,10 +412,13 @@ def set_username_password(write=False):
     return ovpn_username, ovpn_password1
 
 
-def set_protonvpn_tier(write=False):
+def set_protonvpn_tier(write=False, init=False):
     """Set the users ProtonVPN Plan."""
 
-    protonvpn_plans_selection = {1: "Free", 2: "Basic", 3: "Plus", 4: "Visionary", 5: "Go back to menu"}
+    protonvpn_plans_selection = {1: "Free", 2: "Basic", 3: "Plus", 4: "Visionary"}
+
+    if not init:
+        protonvpn_plans_selection[5] = "Go back to menu"
 
     print()
     print("Please choose your ProtonVPN Plan")
@@ -425,7 +434,7 @@ def set_protonvpn_tier(write=False):
             user_tier = int(user_tier)
             # Check if the choice exists in the dictionary
             protonvpn_plans_selection[user_tier]
-            if user_tier == 4:
+            if not init and user_tier == 5:
                 configure_cli()
             break
         except (KeyError, ValueError):
@@ -448,19 +457,22 @@ def set_protonvpn_tier(write=False):
     return user_tier
 
 
-def set_default_protocol(write=False):
+def set_default_protocol(write=False, init=False):
     """Set the users default protocol"""
 
     print()
     print(
-        "Choose the default OpenVPN protocol or go back to menu.\n"
+        "Choose the default OpenVPN protocol.\n"
         "OpenVPN can act on two different protocols: UDP and TCP.\n"
         "UDP is preferred for speed but might be blocked in some networks.\n"
         "TCP is not as fast but a lot harder to block.\n"
         "Input your preferred protocol. (Default: UDP)\n"
     )
 
-    protonvpn_protocols_choice = {1: "UDP", 2: "TCP", 3: "Go back to menu"}
+    protonvpn_protocols_choice = {1: "UDP", 2: "TCP"}
+
+    if not init :
+        protonvpn_protocols_choice[3] = "Go back to menu"
 
     for protocol in protonvpn_protocols_choice:
         print("{0}) {1}".format(protocol, protonvpn_protocols_choice[protocol]))
@@ -472,7 +484,7 @@ def set_default_protocol(write=False):
         try:
             if user_protocol_choice == "":
                 user_protocol_choice = 1
-            elif user_protocol_choice == "3":
+            elif user_protocol_choice == "3" and not init:
                 configure_cli()
             user_protocol_choice = int(user_protocol_choice)
             # Check if the choice exists in the dictionary
@@ -482,7 +494,7 @@ def set_default_protocol(write=False):
             print()
             print(
                 "[!] Invalid choice. "
-                "Please enter the number of your preferred protocol or exit to menu (3)."
+                "Please enter the number of your preferred protocol."
             )
 
     if write:
