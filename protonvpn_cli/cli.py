@@ -212,13 +212,13 @@ def init_cli():
         print(textwrap.fill(line, width=term_width))
 
     # Set ProtonVPN Username and Password
-    ovpn_username, ovpn_password = set_username_password(write=False, init=True)
+    ovpn_username, ovpn_password = set_username_password(init=True)
 
     # Set the ProtonVPN Plan
-    user_tier = set_protonvpn_tier(write=False, init=True)
+    user_tier = set_protonvpn_tier(init=True)
 
     # Set default Protocol
-    user_protocol = set_default_protocol(write=False, init=True)
+    user_protocol = set_default_protocol(init=True)
 
     protonvpn_plans = {1: "Free", 2: "Basic", 3: "Plus", 4: "Visionary"}
 
@@ -326,20 +326,35 @@ def configure_cli():
 
         user_choice = user_choice.lower().strip()
         if user_choice == "1":
-            set_username_password(write=True)
+            try:
+                set_username_password()
+                time.sleep(1)
+            except KeyboardInterrupt:
+                print()
         elif user_choice == "2":
-            set_protonvpn_tier(write=True)
+            set_protonvpn_tier()
+            time.sleep(1)
+            print()
         elif user_choice == "3":
-            set_default_protocol(write=True)
+            set_default_protocol()
+            time.sleep(1)
+            print()
         elif user_choice == "4":
             set_dns_protection()
+            time.sleep(1)
+            print()
         elif user_choice == "5":
             set_killswitch()
+            time.sleep(1)
+            print()
         elif user_choice == "6":
             set_split_tunnel()
-        # Make sure this is always the last option
+            time.sleep(1)
+            print()
         elif user_choice == "7":
             purge_configuration()
+            break
+        # Make sure this is always the last option
         elif user_choice == "8" or user_choice == "":
             print("Quitting configuration.")
             sys.exit(0)
@@ -369,20 +384,11 @@ def purge_configuration():
     print("Configuration purged.")
 
 
-def set_username_password(write=False, init=False):
+def set_username_password(init=False):
     """Set the ProtonVPN Username and Password."""
 
     print()
-    input_message_ovpn_username = "Enter your ProtonVPN OpenVPN username"
-    if init:
-        input_message_ovpn_username += ": "
-    if not init:
-        input_message_ovpn_username += " or 'menu' to go back to menu: "
-
-    ovpn_username = input(input_message_ovpn_username)
-
-    if not init and ovpn_username == "menu":
-        configure_cli()
+    ovpn_username = input("Enter your ProtonVPN OpenVPN username: ")
 
     # Ask for the password and confirmation until both are the same
     while True:
@@ -399,7 +405,7 @@ def set_username_password(write=False, init=False):
         else:
             break
 
-    if write:
+    if not init:
         set_config_value("USER", "username", ovpn_username)
 
         with open(PASSFILE, "w") as f:
@@ -412,10 +418,12 @@ def set_username_password(write=False, init=False):
     return ovpn_username, ovpn_password1
 
 
-def set_protonvpn_tier(write=False, init=False):
+def set_protonvpn_tier(init=False):
     """Set the users ProtonVPN Plan."""
 
-    protonvpn_plans_selection = {1: "Free", 2: "Basic", 3: "Plus", 4: "Visionary"}
+    protonvpn_plans_selection = {
+        1: "Free", 2: "Basic", 3: "Plus", 4: "Visionary"
+    }
 
     if not init:
         protonvpn_plans_selection[5] = "Go back to menu"
@@ -435,14 +443,13 @@ def set_protonvpn_tier(write=False, init=False):
             # Check if the choice exists in the dictionary
             protonvpn_plans_selection[user_tier]
             if not init and user_tier == 5:
-                configure_cli()
+                return
             break
         except (KeyError, ValueError):
             print()
             print("[!] Invalid choice. Please enter the number of your plan.")
 
-    if write:
-
+    if not init:
         # Set Visionary to plus as it has the same access
         if user_tier == 4:
             user_tier = 3
@@ -457,7 +464,7 @@ def set_protonvpn_tier(write=False, init=False):
     return user_tier
 
 
-def set_default_protocol(write=False, init=False):
+def set_default_protocol(init=False):
     """Set the users default protocol"""
 
     print()
@@ -471,11 +478,13 @@ def set_default_protocol(write=False, init=False):
 
     protonvpn_protocols_choice = {1: "UDP", 2: "TCP"}
 
-    if not init :
+    if not init:
         protonvpn_protocols_choice[3] = "Go back to menu"
 
     for protocol in protonvpn_protocols_choice:
-        print("{0}) {1}".format(protocol, protonvpn_protocols_choice[protocol]))
+        print("{0}) {1}".format(
+            protocol, protonvpn_protocols_choice[protocol])
+        )
 
     while True:
         print()
@@ -485,10 +494,10 @@ def set_default_protocol(write=False, init=False):
             if user_protocol_choice == "":
                 user_protocol_choice = 1
             elif user_protocol_choice == "3" and not init:
-                configure_cli()
+                return
             user_protocol_choice = int(user_protocol_choice)
             # Check if the choice exists in the dictionary
-            user_protocol = protonvpn_protocols_choice[user_protocol_choice].lower()
+            user_protocol = protonvpn_protocols_choice[user_protocol_choice].lower() # noqa
             break
         except (KeyError, ValueError):
             print()
@@ -497,7 +506,7 @@ def set_default_protocol(write=False, init=False):
                 "Please enter the number of your preferred protocol."
             )
 
-    if write:
+    if not init:
         set_config_value("USER", "default_protocol", user_protocol)
         print("Default protocol has been updated.")
 
@@ -520,7 +529,7 @@ def set_dns_protection():
             "4) Go back to menu\n"
         )
         user_choice = input(
-                "Please enter your choice or leave empty to go back to menu: "
+                "Please enter your choice: "
         )
         user_choice = user_choice.lower().strip()
         if user_choice == "1":
@@ -550,7 +559,7 @@ def set_dns_protection():
             custom_dns = None
             break
         elif user_choice == "4" or user_choice == "":
-            configure_cli()
+            return
         else:
             print(
                 "[!] Invalid choice. Please enter the number of your choice.\n"
@@ -580,7 +589,7 @@ def set_killswitch():
         )
         print()
         user_choice = input(
-                "Please enter your choice or leave empty to go back to menu: "
+                "Please enter your choice: "
         )
         user_choice = user_choice.lower().strip()
         if user_choice == "1":
@@ -593,7 +602,7 @@ def set_killswitch():
             killswitch = 0
             break
         elif user_choice == "4" or user_choice == "":
-            configure_cli()
+            return
         else:
             print(
                 "[!] Invalid choice. Please enter the number of your choice.\n"
