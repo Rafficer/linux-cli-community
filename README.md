@@ -5,7 +5,7 @@
 
 <p align="center">
     <a href="https://pepy.tech/project/protonvpn-cli"><img alt="Downloads" src="https://pepy.tech/badge/protonvpn-cli"></a>
-    <img alt="GitHub" src="https://img.shields.io/github/license/ProtonVPN/protonvpn-cli-ng">
+    <img alt="GitHub" src="https://img.shields.io/github/license/ProtonVPN/linux-cli">
     <a href="https://pepy.tech/project/protonvpn-cli/week"><img alt="Downloads per Week" src="https://pepy.tech/badge/protonvpn-cli/week"></a>
     <br>
     <a href="https://twitter.com/ProtonVPN"><img alt="Twitter Follow" src="https://img.shields.io/twitter/follow/ProtonVPN?style=social"></a>
@@ -18,7 +18,7 @@ ProtonVPN-CLI is a full rewrite of the [bash protonvpn-cli](https://github.com/P
 
 ## Installation & Updating
 
-For more detailed information on installing, updating and uninstalling, please view the extensive [usage guide](https://github.com/ProtonVPN/protonvpn-cli-ng/blob/master/USAGE.md#installation--updating).
+For more detailed information on installing, updating and uninstalling, please view the extensive [usage guide](https://github.com/ProtonVPN/linux-cli/blob/master/USAGE.md#installation--updating).
 
 ### Installing Dependencies
 
@@ -53,17 +53,17 @@ Installation happens via Python's package manager PIP.
 
 ### Manual Installation from source
 
-*Disclaimer: If you are unsure about what you're doing, please follow the [normal installation guide](https://github.com/ProtonVPN/protonvpn-cli-ng/blob/master/USAGE.md#installation--updating).*
+*Disclaimer: If you are unsure about what you're doing, please follow the [normal installation guide](https://github.com/ProtonVPN/linux-cli/blob/master/USAGE.md#installation--updating).*
 
 It is recommended to do the manual installation in a virtual environment. Especially if it serves the purpose of developing.
 
 1. Clone this repository
 
-    `git clone https://github.com/protonvpn/protonvpn-cli-ng`
+    `git clone https://github.com/protonvpn/linux-cli`
 
 2. Step into the directory
 
-   `cd protonvpn-cli-ng`
+   `cd linux-cli`
 
 3. Install
 
@@ -73,7 +73,7 @@ For updating, you just need to pull the latest version of the repository with gi
 
 ### How to use
 
-#### For more detailed information, see the extensive [usage guide](https://github.com/ProtonVPN/protonvpn-cli-ng/blob/master/USAGE.md).
+#### For more detailed information, see the extensive [usage guide](https://github.com/ProtonVPN/linux-cli/blob/master/USAGE.md).
 
 | **Command**                       | **Description**                                       |
 |:----------------------------------|:------------------------------------------------------|
@@ -98,4 +98,4 @@ All connect options can be used with the `-p` flag to explicitly specify which t
 
 ## Contributing
 
-If you want to contribute to this project, please read the [contribution guide](https://github.com/ProtonVPN/protonvpn-cli-ng/blob/master/CONTRIBUTING.md).
+If you want to contribute to this project, please read the [contribution guide](https://github.com/ProtonVPN/linux-cli/blob/master/CONTRIBUTING.md).

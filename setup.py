@@ -17,7 +17,7 @@ The official Linux CLI for ProtonVPN.
 
 For further information and a usage guide, please view the project page:
 
-https://github.com/ProtonVPN/protonvpn-cli-ng
+https://github.com/ProtonVPN/linux-cli
 """
 
 
@@ -33,7 +33,7 @@ setup(
     author="Proton Technologies AG",
     author_email="contact@protonvpn.com",
     license="GPLv3",
-    url="https://github.com/protonvpn/protonvpn-cli-ng",
+    url="https://github.com/protonvpn/linux-cli",
     install_requires=[
         "requests",
         "docopt",
