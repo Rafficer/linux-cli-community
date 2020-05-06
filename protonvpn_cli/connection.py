@@ -526,8 +526,8 @@ def openvpn_connect(servername, protocol):
                 sys.exit(1)
             # Stop after 45s
             elif time.time() - time_start >= 45:
-                print("Connection timed out after 45 Seconds")
-                logger.debug("Connection timed out after 45 Seconds")
+                print("Connection failed.")
+                logger.debug("Connection failed after 45 Seconds")
                 sys.exit(1)
             time.sleep(0.1)
 
