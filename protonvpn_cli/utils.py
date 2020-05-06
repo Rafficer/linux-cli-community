@@ -188,7 +188,7 @@ def get_default_nic():
 
 def is_connected():
     """Check if a VPN connection already exists."""
-    ovpn_processes = subprocess.run(["pgrep", "--exact", "openvpn"],
+    ovpn_processes = subprocess.run(["pgrep", "-x", "openvpn"],
                                     stdout=subprocess.PIPE)
     ovpn_processes = ovpn_processes.stdout.decode("utf-8").split()
 
