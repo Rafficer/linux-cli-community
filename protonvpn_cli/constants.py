@@ -2,6 +2,7 @@ import os
 import getpass
 import pwd
 
+# This implementation is mostly for GUI support. See #168
 try:
     USER = pwd.getpwuid(int(os.environ["PKEXEC_UID"])).pw_name
 except KeyError:
