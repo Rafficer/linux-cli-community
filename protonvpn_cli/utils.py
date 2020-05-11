@@ -195,7 +195,7 @@ def is_connected():
     logger.debug(
         "Checking connection Status. OpenVPN processes: {0}"
         .format(len(ovpn_processes))
-        )
+    )
     return True if ovpn_processes != [] else False
 
 
@@ -340,8 +340,8 @@ def check_root():
                                    stderr=subprocess.PIPE)
             if not check.returncode == 0:
                 logger.debug("{0} not found".format(program))
-                print("'{0}' not found. \n".format(program) +
-                      "Please install {0}.".format(program))
+                print("'{0}' not found. \n".format(program)
+                      + "Please install {0}.".format(program))
                 sys.exit(1)
 
 
@@ -411,13 +411,13 @@ def check_update():
         print(
             "A new Update for ProtonVPN-CLI (v{0}) ".format('.'.join(
                 [str(x) for x in latest_version])
-                ) +
-            "is available.\n" +
-            "Follow the Update instructions on\n" +
-            "https://github.com/ProtonVPN/linux-cli/blob/master/USAGE.md#updating-protonvpn-cli\n" + # noqa
-            "\n"
-            "To see what's new, check out the changelog:\n" +
-            "https://github.com/ProtonVPN/linux-cli/blob/master/CHANGELOG.md" # noqa
+            )
+            + "is available.\n"
+            + "Follow the Update instructions on\n"
+            + "https://github.com/ProtonVPN/linux-cli/blob/master/USAGE.md#updating-protonvpn-cli\n"
+            + "\n"
+            + "To see what's new, check out the changelog:\n"
+            + "https://github.com/ProtonVPN/linux-cli/blob/master/CHANGELOG.md"
         )
 
 

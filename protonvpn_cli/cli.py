@@ -224,11 +224,11 @@ def init_cli():
 
     print()
     print(
-        "You entered the following information:\n" +
-        "Username: {0}\n".format(ovpn_username) +
-        "Password: {0}\n".format("*" * len(ovpn_password)) +
-        "Tier: {0}\n".format(protonvpn_plans[user_tier]) +
-        "Default protocol: {0}".format(user_protocol.upper())
+        "You entered the following information:\n"
+        + "Username: {0}\n".format(ovpn_username)
+        + "Password: {0}\n".format("*" * len(ovpn_password))
+        + "Tier: {0}\n".format(protonvpn_plans[user_tier])
+        + "Default protocol: {0}".format(user_protocol.upper())
     )
     print()
 
@@ -506,7 +506,7 @@ def set_dns_protection():
         )
         print()
         user_choice = input(
-                "Please enter your choice or leave empty to quit: "
+            "Please enter your choice or leave empty to quit: "
         )
         user_choice = user_choice.lower().strip()
         if user_choice == "1":
@@ -566,7 +566,7 @@ def set_killswitch():
         )
         print()
         user_choice = input(
-                "Please enter your choice or leave empty to quit: "
+            "Please enter your choice or leave empty to quit: "
         )
         user_choice = user_choice.lower().strip()
         if user_choice == "1":
@@ -591,8 +591,8 @@ def set_killswitch():
         set_config_value("USER", "split_tunnel", 0)
         print()
         print(
-            "[!] Kill Switch can't be used with Split Tunneling.\n" +
-            "[!] Split Tunneling has been disabled."
+            "[!] Kill Switch can't be used with Split Tunneling.\n"
+            + "[!] Split Tunneling has been disabled."
         )
         time.sleep(1)
 
@@ -612,8 +612,8 @@ def set_split_tunnel():
             set_config_value("USER", "killswitch", 0)
             print()
             print(
-                "[!] Split Tunneling can't be used with Kill Switch.\n" +
-                "[!] Kill Switch has been disabled.\n"
+                "[!] Split Tunneling can't be used with Kill Switch.\n"
+                + "[!] Kill Switch has been disabled.\n"
             )
             time.sleep(1)
 
