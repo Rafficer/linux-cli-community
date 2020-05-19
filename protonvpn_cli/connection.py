@@ -18,11 +18,11 @@ from .utils import (
     get_servers, get_server_value, get_config_value,
     set_config_value, get_ip_info, get_country_name,
     get_fastest_server, check_update, get_default_nic,
-    get_transferred_data
+    get_transferred_data, create_openvpn_config
 )
 # Constants
 from .constants import (
-    CONFIG_DIR, TEMPLATE_FILE, OVPN_FILE, PASSFILE, CONFIG_FILE
+    CONFIG_DIR, OVPN_FILE, PASSFILE, CONFIG_FILE
 )
 
 
@@ -445,19 +445,12 @@ def openvpn_connect(servername, protocol):
 
     port = {"udp": 1194, "tcp": 443}
 
-    shutil.copyfile(TEMPLATE_FILE, OVPN_FILE)
-
     servers = get_servers()
     subservers = get_server_value(servername, "Servers", servers)
     ip_list = [subserver["EntryIP"] for subserver in subservers]
 
-    with open(OVPN_FILE, "a") as f:
-        f.write("\n\n")
-        f.write("proto {0}\n".format(protocol.lower()))
-        for ip in ip_list:
-            f.write("remote {0} {1}\n".format(ip, port[protocol.lower()]))
-        logger.debug("IPs: {0}".format(ip_list))
-        logger.debug("connect.ovpn written")
+    # Ports gets casted to a list instead of just a single port to make it iterable
+    create_openvpn_config(serverlist=ip_list, protocol=protocol, ports=[port[protocol.lower()]])
 
     disconnect(passed=True)
 
