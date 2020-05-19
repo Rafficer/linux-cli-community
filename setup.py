@@ -34,10 +34,14 @@ setup(
     author_email="contact@protonvpn.com",
     license="GPLv3",
     url="https://github.com/protonvpn/linux-cli",
+    package_data={
+        "protonvpn_cli": ["templates/*"]
+    },
     install_requires=[
         "requests",
         "docopt",
         "pythondialog",
+        "jinja2",
     ],
     python_requires=">=3.5",
     classifiers=[

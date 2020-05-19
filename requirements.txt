@@ -2,3 +2,4 @@
 docopt
 requests
 pythondialog
+jinja2
