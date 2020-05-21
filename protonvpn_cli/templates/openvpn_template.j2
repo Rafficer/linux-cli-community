@@ -54,6 +54,13 @@ auth-user-pass
 pull
 fast-io
 
+{%- if ipv6_disabled %}
+
+# Remove IPv6 related configurations
+pull-filter ignore "ifconfig-ipv6"
+pull-filter ignore "route-ipv6"
+{%- endif %}
+
 {%- if split %}
 
 # Split Tunneling

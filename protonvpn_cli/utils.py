@@ -199,6 +199,17 @@ def is_connected():
     return True if ovpn_processes != [] else False
 
 
+def is_ipv6_disabled():
+    """Returns True if IPv6 is disabled and False if it's enabled"""
+    ipv6_state = subprocess.run(['sysctl', '-n', 'net.ipv6.conf.all.disable_ipv6'],
+                                stdout=subprocess.PIPE, stderr=subprocess.DEVNULL)
+
+    if ipv6_state.returncode != 0 or int(ipv6_state.stdout):
+        return True
+    else:
+        return False
+
+
 def wait_for_network(wait_time):
     """Check if internet access is working"""
 
@@ -282,12 +293,16 @@ def create_openvpn_config(serverlist, protocol, ports):
 
             ip_nm_pairs.append({"ip": ip, "nm": netmask})
 
+    # IPv6
+    ipv6_disabled = is_ipv6_disabled()
+
     j2_values = {
         "openvpn_protocol": protocol,
         "serverlist": serverlist,
         "openvpn_ports": ports,
         "split": split,
-        "ip_nm_pairs": ip_nm_pairs
+        "ip_nm_pairs": ip_nm_pairs,
+        "ipv6_disabled": ipv6_disabled
     }
 
     render_j2_template(template_file="openvpn_template.j2", destination_file=OVPN_FILE, values=j2_values)
