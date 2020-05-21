@@ -18,7 +18,8 @@ from .utils import (
     get_servers, get_server_value, get_config_value,
     set_config_value, get_ip_info, get_country_name,
     get_fastest_server, check_update, get_default_nic,
-    get_transferred_data, create_openvpn_config
+    get_transferred_data, create_openvpn_config,
+    is_ipv6_disabled
 )
 # Constants
 from .constants import (
@@ -648,6 +649,10 @@ def manage_ipv6(mode):
         if os.path.isfile(ip6tables_backupfile):
             logger.debug("IPv6 backup exists")
             manage_ipv6("restore")
+
+        if is_ipv6_disabled():
+            logger.debug("IPv6 is disabled or unavailable, skipping leak protection")
+            return
 
         # Backing up ip6ables rules
         logger.debug("Backing up ip6tables rules")
