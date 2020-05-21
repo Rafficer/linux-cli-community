@@ -142,6 +142,7 @@ def cli():
         check_init()
         configure_cli()
     elif args.get("refresh"):
+        check_init()
         pull_server_data(force=True)
     elif args.get("examples"):
         print_examples()
@@ -161,6 +162,7 @@ def init_cli():
             "dns_leak_protection": "1",
             "custom_dns": "None",
             "check_update_interval": "3",
+            "api_domain": "https://api.protonvpn.ch",
         }
         config["metadata"] = {
             "last_api_pull": "0",
