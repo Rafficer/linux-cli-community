@@ -1,6 +1,6 @@
 <h1 align="center">ProtonVPN-CLI</h1>
 <p align="center">
-  <img src="https://i.imgur.com/tDrwkX5l.png" alt="Logo"></img>
+  <img src="resources/images/linux-cli-banner.png" alt="Logo"></img>
 </p>
 
 <p align="center">
