@@ -91,7 +91,7 @@ Bye Bye 😔
 
    To install ProtonVPN-CLI type `sudo pip3 install protonvpn-cli` in the terminal and confirm with Enter again. It should look something like this:
 
-   ![ubuntu-pip-install](https://i.imgur.com/jSuftoe.png)
+   ![ubuntu-pip-install](resources/images/usage-ubuntu-pip-install.png)
 
 3. Initialize the ProtonVPN profile
 
@@ -99,31 +99,31 @@ Bye Bye 😔
 
    The client will ask you for your OpenVPN username and password. You can find them at https://account.protonvpn.com/account
 
-   ![openvpn-pass](https://i.imgur.com/EdZ01T9.png)
+   ![openvpn-pass](resources/images/usage-openvpn-pass.png)
 
    Follow the prompts and enter your OpenVPN credentials:
 
-   ![ubuntu-pass-entry](https://i.imgur.com/Vrcq2oO.png)
+   ![ubuntu-pass-entry](resources/images/usage-ubuntu-pass-entry.png)
 
    Next, you need to select your plan. If you are currently enjoying the 7-day free trial of ProtonVPN Plus, select `3) Plus`.
 
-   ![ubuntu-plan](https://i.imgur.com/oQpgeSo.png)
+   ![ubuntu-plan](resources/images/usage-ubuntu-plan.png)
 
    *IMPORTANT: After your trial expires, you will need to reconfigure your plan to 1) Free. To set this up, enter `sudo protonvpn configure`. Then select `2) ProtonVPN Plan`. Finally, select `1) Free`.*
 
    Now, you need to choose which default transmission protocol you want to use. UDP is typically the faster option, while TCP is a more reliable protocol that's better suited for unstable connections and in restricted networks. The default selection is UDP.
 
-   ![ubuntu-proto](https://i.imgur.com/qmcebSO.png)
+   ![ubuntu-proto](resources/images/usage-ubuntu-proto.png)
 
    Finally, confirm your input with `y`
 
-   ![ubuntu-confirm](https://i.imgur.com/P6nRR4u.png)
+   ![ubuntu-confirm](resources/images/usage-ubuntu-confirm.png)
 
 4. Connect to ProtonVPN
 
    You are now ready to connect to ProtonVPN. For example, you can let ProtonVPN-CLI find the fastest server for you. Just type `sudo protonvpn connect -f` and a connection will be established.
 
-   ![ubuntu-connected](https://i.imgur.com/VJVacKe.png)
+   ![ubuntu-connected](resources/images/usage-ubuntu-connected.png)
 
 ### Installing in a virtual environment
 
@@ -230,9 +230,9 @@ To connect to a server, you always need the `connect` option (or just `c`):
 
 Running the above command will give you a menu that lets you select the country, server, and transmission protocol interactively:
 
-![country-selection](https://i.imgur.com/jjJh09J.png)
+![country-selection](resources/images/usage-country-selection.png)
 
-![server-selection](https://i.imgur.com/uXfcHMI.png)
+![server-selection](resources/images/usage-server-selection.png)
 
 If you specify a server name after `connect`, you can connect directly to the server of your choice:
 
@@ -296,13 +296,13 @@ If you want to see the status and information of your current connection, you ca
 
 `protonvpn s`
 
-![status-example](https://i.imgur.com/5tm5nOJ.png)
+![status-example](resources/images/usage-status-example.png)
 
 If you want to change the settings you selected during initialization, you can do this with the `configure` option, just follow the prompts to change your username/password, default protocol and so on:
 
 `protonvpn configure`
 
-![configuration-example](https://i.imgur.com/tHSkBxk.png)
+![configuration-example](resources/images/usage-configuration-example.png)
 
 ## Features
 
@@ -390,7 +390,7 @@ You can disable the prompt for the sudo password when using ProtonVPN-CLI.
 
 1. Enter `sudo which protonvpn` to find where the executable is installed
 
-   ![which-protonvpn](https://i.imgur.com/JjYpviI.png)
+   ![which-protonvpn](resources/images/usage-which-protonvpn.png)
 
 2. Enter `sudo visudo` to edit the sudoers file.
 
@@ -422,7 +422,7 @@ Systemd is the current init system of most major Linux distributions. This guide
 
 1. Find the location of the executable with `sudo which protonvpn`
 
-   ![which-protonvpn](https://i.imgur.com/JjYpviI.png)
+   ![which-protonvpn](resources/images/usage-which-protonvpn.png)
 
 2. Create the unit file in `/etc/systemd/system`
 
