@@ -8,6 +8,7 @@ This document provides an extensive guide on how to install and use ProtonVPN-CL
   - [Table of Contents](#table-of-contents)
   - [Installation & Updating](#installation--updating)
     - [Installing from distribution repositories](#installing-from-distribution-repositories)
+      - [Guix](#guix)
       - [Fedora](#fedora)
       - [CentOS & RHEL](#centos--rhel)
     - [Installing from PyPI](#installing-from-pypi)
@@ -42,6 +43,12 @@ This document provides an extensive guide on how to install and use ProtonVPN-CL
 ### Installing from distribution repositories
 
 For the following Linux distribution(s), install the official `protonvpn-cli` package:
+
+#### Guix
+
+```sh
+guix install protonvpn-cli
+```
 
 #### Fedora
 
@@ -85,6 +92,7 @@ Depending on your distribution, run the appropriate following command to install
 |Ubuntu/Linux Mint/Debian and derivatives | `sudo apt install -y openvpn dialog python3-pip python3-setuptools`|
 |OpenSUSE/SLES                            | `sudo zypper in -y openvpn dialog python3-pip python3-setuptools`  |
 |Arch Linux/Manjaro                       | `sudo pacman -S openvpn dialog python-pip python-setuptools`       |
+|Guix                                     | `guix environment protonvpn-cli`                                   |
 
 #### Installing ProtonVPN-CLI
 
