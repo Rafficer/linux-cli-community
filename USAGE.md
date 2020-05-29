@@ -14,12 +14,12 @@ This document provides an extensive guide on how to install and use ProtonVPN-CL
       - [Installing ProtonVPN-CLI](#installing-protonvpn-cli)
       - [Updating ProtonVPN-CLI](#updating-protonvpn-cli)
       - [Uninstall](#uninstall)
-      - [Example Installation on Ubuntu 18.04](#example-installation-on-ubuntu-1804)
     - [Installing in a virtual environment](#installing-in-a-virtual-environment)
       - [Install](#install)
       - [Update](#update)
       - [Uninstall](#uninstall-1)
   - [Initialization](#initialization)
+  - [Example Installation on Ubuntu 18.04](#example-installation-on-ubuntu-1804)
   - [Commands](#commands)
     - [List of all Commands](#list-of-all-commands)
     - [Command Explanations](#command-explanations)
@@ -108,50 +108,6 @@ For PIP this would be
 
 Bye Bye 😔
 
-#### Example Installation on Ubuntu 18.04
-
-1. Installing dependencies
-
-   To install ProtonVPN-CLI's dependencies, open a terminal and type `sudo apt install -y dialog openvpn python3-pip python3-setuptools` and confirm with Enter. Wait for the installation to finish
-
-2. Installing ProtonVPN-CLI
-
-   To install ProtonVPN-CLI type `sudo pip3 install protonvpn-cli` in the terminal and confirm with Enter again. It should look something like this:
-
-   ![ubuntu-pip-install](resources/images/usage-ubuntu-pip-install.png)
-
-3. Initialize the ProtonVPN profile
-
-   Now you have access to the `protonvpn` command. Before using ProtonVPN-CLI you need to initialize your profile. To do this, type `sudo protonvpn init`
-
-   The client will ask you for your OpenVPN username and password. You can find them at https://account.protonvpn.com/account
-
-   ![openvpn-pass](resources/images/usage-openvpn-pass.png)
-
-   Follow the prompts and enter your OpenVPN credentials:
-
-   ![ubuntu-pass-entry](resources/images/usage-ubuntu-pass-entry.png)
-
-   Next, you need to select your plan. If you are currently enjoying the 7-day free trial of ProtonVPN Plus, select `3) Plus`.
-
-   ![ubuntu-plan](resources/images/usage-ubuntu-plan.png)
-
-   *IMPORTANT: After your trial expires, you will need to reconfigure your plan to 1) Free. To set this up, enter `sudo protonvpn configure`. Then select `2) ProtonVPN Plan`. Finally, select `1) Free`.*
-
-   Now, you need to choose which default transmission protocol you want to use. UDP is typically the faster option, while TCP is a more reliable protocol that's better suited for unstable connections and in restricted networks. The default selection is UDP.
-
-   ![ubuntu-proto](resources/images/usage-ubuntu-proto.png)
-
-   Finally, confirm your input with `y`
-
-   ![ubuntu-confirm](resources/images/usage-ubuntu-confirm.png)
-
-4. Connect to ProtonVPN
-
-   You are now ready to connect to ProtonVPN. For example, you can let ProtonVPN-CLI find the fastest server for you. Just type `sudo protonvpn connect -f` and a connection will be established.
-
-   ![ubuntu-connected](resources/images/usage-ubuntu-connected.png)
-
 ### Installing in a virtual environment
 
 If you're having trouble with the normal installation or don't want to install ProtonVPN-CLI as root, follow this guide to install it in a Python virtual environment.
@@ -219,6 +175,50 @@ Now you should be able to use the protonvpn command from anywhere in the system 
 ## Initialization
 
 Before you can use ProtonVPN-CLI, you need to initialize it. Run `sudo protonvpn init` and follow the prompts on the screen.
+
+## Example Installation on Ubuntu 18.04
+
+1. Installing dependencies
+
+   To install ProtonVPN-CLI's dependencies, open a terminal and type `sudo apt install -y dialog openvpn python3-pip python3-setuptools` and confirm with Enter. Wait for the installation to finish
+
+2. Installing ProtonVPN-CLI
+
+   To install ProtonVPN-CLI type `sudo pip3 install protonvpn-cli` in the terminal and confirm with Enter again. It should look something like this:
+
+   ![ubuntu-pip-install](resources/images/usage-ubuntu-pip-install.png)
+
+3. Initialize the ProtonVPN profile
+
+   Now you have access to the `protonvpn` command. Before using ProtonVPN-CLI you need to initialize your profile. To do this, type `sudo protonvpn init`
+
+   The client will ask you for your OpenVPN username and password. You can find them at https://account.protonvpn.com/account
+
+   ![openvpn-pass](resources/images/usage-openvpn-pass.png)
+
+   Follow the prompts and enter your OpenVPN credentials:
+
+   ![ubuntu-pass-entry](resources/images/usage-ubuntu-pass-entry.png)
+
+   Next, you need to select your plan. If you are currently enjoying the 7-day free trial of ProtonVPN Plus, select `3) Plus`.
+
+   ![ubuntu-plan](resources/images/usage-ubuntu-plan.png)
+
+   *IMPORTANT: After your trial expires, you will need to reconfigure your plan to 1) Free. To set this up, enter `sudo protonvpn configure`. Then select `2) ProtonVPN Plan`. Finally, select `1) Free`.*
+
+   Now, you need to choose which default transmission protocol you want to use. UDP is typically the faster option, while TCP is a more reliable protocol that's better suited for unstable connections and in restricted networks. The default selection is UDP.
+
+   ![ubuntu-proto](resources/images/usage-ubuntu-proto.png)
+
+   Finally, confirm your input with `y`
+
+   ![ubuntu-confirm](resources/images/usage-ubuntu-confirm.png)
+
+4. Connect to ProtonVPN
+
+   You are now ready to connect to ProtonVPN. For example, you can let ProtonVPN-CLI find the fastest server for you. Just type `sudo protonvpn connect -f` and a connection will be established.
+
+   ![ubuntu-connected](resources/images/usage-ubuntu-connected.png)
 
 ## Commands
 
