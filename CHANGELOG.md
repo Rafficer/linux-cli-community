@@ -2,6 +2,7 @@
 
 ## Table of Contents
 
+- [v2.2.3](#v223)
 - [v2.2.2](#v222)
 - [v2.2.1](#v221)
 - [v2.2.0](#v220)
@@ -10,6 +11,14 @@
 - [v2.1.0](#v210)
 - [v2.0.0](#v200)
 - [v0.1.0](#v010)
+
+## v2.2.3
+
+- Enhancement: Option to define API domain via config
+- Enhancement: Improve wording on connection failure
+- Bug fix: Error during connection when IPv6 is disabled system-wide
+- Bug fix: Unable to change DNS in containers
+- Bug fix: `pgrep` not working on some distros
 
 ## v2.2.2
 
