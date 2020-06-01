@@ -2,6 +2,7 @@
 
 ## Table of Contents
 
+- [v2.2.4](#v224)
 - [v2.2.3](#v223)
 - [v2.2.2](#v222)
 - [v2.2.1](#v221)
@@ -11,6 +12,10 @@
 - [v2.1.0](#v210)
 - [v2.0.0](#v200)
 - [v0.1.0](#v010)
+
+## v2.2.4
+
+- Bug fix: Failing to connect when choosing a server via dialog menu
 
 ## v2.2.3
 
