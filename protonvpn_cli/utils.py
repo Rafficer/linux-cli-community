@@ -9,6 +9,8 @@ import re
 import random
 import ipaddress
 import math
+
+from ipaddress import ip_address
 # External Libraries
 import requests
 from jinja2 import Environment, FileSystemLoader
@@ -473,18 +475,10 @@ def check_init():
 
 
 def is_valid_ip(ipaddr):
-    valid_ip_re = re.compile(
-        r'^(25[0-5]|2[0-4][0-9]|[0-1]?[0-9][0-9]?)\.'
-        r'(25[0-5]|2[0-4][0-9]|[0-1]?[0-9][0-9]?)\.'
-        r'(25[0-5]|2[0-4][0-9]|[0-1]?[0-9][0-9]?)\.'
-        r'(25[0-5]|2[0-4][0-9]|[0-1]?[0-9][0-9]?)'
-        r'(/(3[0-2]|[12][0-9]|[1-9]))?$'  # Matches CIDR
-    )
-
-    if valid_ip_re.match(ipaddr):
+    try:
+        ip_address(ipaddr)
         return True
-
-    else:
+    except ValueError:
         return False
 
 
