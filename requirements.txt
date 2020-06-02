@@ -3,3 +3,4 @@ docopt
 requests
 pythondialog
 jinja2
+pytest

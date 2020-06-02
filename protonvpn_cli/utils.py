@@ -8,8 +8,6 @@ import subprocess
 import random
 import ipaddress
 import math
-
-from ipaddress import ip_address
 # External Libraries
 import requests
 from jinja2 import Environment, FileSystemLoader
@@ -475,7 +473,7 @@ def check_init():
 
 def is_valid_ip(ipaddr):
     try:
-        ip_address(ipaddr)
+        ipaddress.ip_interface(ipaddr)
         return True
     except ValueError:
         return False
