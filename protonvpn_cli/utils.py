@@ -5,7 +5,6 @@ import configparser
 import time
 import json
 import subprocess
-import re
 import random
 import ipaddress
 import math
