@@ -451,7 +451,7 @@ def openvpn_connect(servername, protocol):
     ip_list = [subserver["EntryIP"] for subserver in subservers]
 
     # Ports gets casted to a list instead of just a single port to make it iterable
-    create_openvpn_config(serverlist=ip_list, protocol=protocol, ports=[port[protocol.lower()]])
+    create_openvpn_config(serverlist=ip_list, protocol=protocol.lower(), ports=[port[protocol.lower()]])
 
     disconnect(passed=True)
 
