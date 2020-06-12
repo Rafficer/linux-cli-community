@@ -502,3 +502,18 @@ Systemd is the current init system of most major Linux distributions. This guide
    `sudo systemctl enable protonvpn-autoconnect`
 
 Now ProtonVPN-CLI should connect automatically when you boot up your system.
+
+#### Additional steps for systems with encrypted home directory
+
+Because ProtonVPN-CLI can not access encrypted home directories before the user is logged in, setting up auto-connect on systems with encrypted home directories requires a few more steps.
+
+6. Initialize your ProtonVPN profile as root by running:
+   ```sh
+   su
+   protonvpn init
+   ```
+   If you have not set a root password (it is not set by default on most Ubuntu-based distributions) you may run `sudo passwd root` and set the password before running `su`.
+
+7. Open the `/etc/systemd/system/protonvpn-autoconnect.service` file created above and remove the `Environment=SUDO_USER=user` line.
+
+*Note: if the VPN connection drops, you will need to run `su` then `protonvpn r` to reconnect as just `sudo protonvpn r` will not take into account the connection started by root which will cause the reconnection to fail.*
