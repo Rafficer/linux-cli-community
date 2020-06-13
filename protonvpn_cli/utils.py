@@ -110,7 +110,7 @@ def get_servers(force_plus_server=None):
     return [
         server for server in servers
         if server["Tier"] <= user_tier
-        and (force_plus_server is None or (user_tier >= 2 and server["Tier"] == 2) or True)
+        and (force_plus_server is None or (user_tier >= 2 and server["Tier"] == 2) or (force_plus_server is None and True))
         and server["Status"] == 1
     ]
 
