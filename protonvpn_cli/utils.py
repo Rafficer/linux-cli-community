@@ -94,7 +94,7 @@ def pull_server_data(force=False):
         logger.debug("last_api_call updated")
 
 
-def get_servers():
+def get_servers(force_plus_server=None):
     """Return a list of all servers for the users Tier."""
 
     with open(SERVER_INFO_FILE, "r") as f:
@@ -105,8 +105,14 @@ def get_servers():
 
     user_tier = int(get_config_value("USER", "tier"))
 
-    # Sort server IDs by Tier
-    return [server for server in servers if server["Tier"] <= user_tier and server["Status"] == 1] # noqa
+    # Sort server IDs by Tier and filter only Plus servers if specified and
+    # the user's plan allows it
+    return [
+        server for server in servers
+        if server["Tier"] <= user_tier
+        and (force_plus_server is None or (user_tier >= 2 and server["Tier"] == 2) or True)
+        and server["Status"] == 1
+    ]
 
 
 def get_server_value(servername, key, servers):

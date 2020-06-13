@@ -133,6 +133,8 @@ For updating, you just need to pull the latest version of the repository with gi
 
 All connect options can be used with the `-p` flag to explicitly specify which transmission protocol is used for that connection (either `udp` or `tcp`).
 
+The `--plus` flag can be used with `-r | --random`, `-f | --fastest`, and `-cc` to pick only from Plus servers, if the user's plan is compatible.
+
 ## Contributing
 
 If you want to contribute to this project, please read the [contribution guide](https://github.com/ProtonVPN/linux-cli/blob/master/CONTRIBUTING.md).

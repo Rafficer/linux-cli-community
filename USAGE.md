@@ -253,6 +253,8 @@ Before you can use ProtonVPN-CLI, you need to initialize it. Run `sudo protonvpn
 
 All connect options can be used with the `-p` flag to explicitly specify which transmission protocol is used for that connection (either `udp` or `tcp`).
 
+The `--plus` flag can be used with `-r | --random`, `-f | --fastest`, and `-cc` to pick only from Plus servers, if the user's plan is compatible.
+
 ### Command Explanations
 
 You can see the full list of commands by running `protonvpn --help` and a list of examples by running `protonvpn examples`.
@@ -316,6 +318,28 @@ Connect to the fastest server with TCP:
 Connect to a random server with UDP:
 
 `protonvpn c -rp UDP`
+
+To connect to a Plus server when connecting to the fastest server, fastest server in a specific country, or a random server, use the `--plus` flag:
+
+To connect to the fastest Plus server:
+
+`protonvpn c -f --plus`
+
+To connect to the fastest Plus server with TCP:
+
+`protonvpn c -f -p TCP --plus`
+
+To connect to the fastest Plus server in a country (replace UK with the code of the desired country, e.g. `US` for USA, `JP` for Japan, `AU` for Australia, etc.):
+
+`protonvpn c --cc UK --plus`
+
+To connect to a random Plus server:
+
+`protonvpn c -r --plus`
+
+To connect to a random Plus server with UDP:
+
+`protonvpn c -rp UDP --plus`
 
 To disconnect the VPN, you need to use the `disconnect` or `d` option:
 

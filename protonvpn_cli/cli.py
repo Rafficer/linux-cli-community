@@ -4,12 +4,12 @@ A CLI for ProtonVPN.
 Usage:
     protonvpn init
     protonvpn (c | connect) [<servername>] [-p <protocol>]
-    protonvpn (c | connect) [-f | --fastest] [-p <protocol>]
-    protonvpn (c | connect) [--cc <code>] [-p <protocol>]
+    protonvpn (c | connect) [-f | --fastest] [-p <protocol>] [--plus]
+    protonvpn (c | connect) [--cc <code>] [-p <protocol>] [--plus]
     protonvpn (c | connect) [--sc] [-p <protocol>]
     protonvpn (c | connect) [--p2p] [-p <protocol>]
     protonvpn (c | connect) [--tor] [-p <protocol>]
-    protonvpn (c | connect) [-r | --random] [-p <protocol>]
+    protonvpn (c | connect) [-r | --random] [-p <protocol>] [--plus]
     protonvpn (r | reconnect)
     protonvpn (d | disconnect)
     protonvpn (s | status)
@@ -26,6 +26,7 @@ Options:
     --sc                Connect to the fastest Secure-Core server.
     --p2p               Connect to the fastest torrent server.
     --tor               Connect to the fastest Tor server.
+    --plus              Connect to a Plus-tiered server, if compatible with the user's plan
     -p PROTOCOL         Determine the protocol (UDP or TCP).
     -h, --help          Show this help message.
     -v, --version       Display version.
@@ -110,14 +111,16 @@ def cli():
         if protocol is not None and protocol.lower().strip() in ["tcp", "udp"]:
             protocol = protocol.lower().strip()
 
+        force_plus_server = args.get("--plus")
+
         if args.get("--random"):
-            connection.random_c(protocol)
+            connection.random_c(protocol, force_plus_server)
         elif args.get("--fastest"):
-            connection.fastest(protocol)
+            connection.fastest(protocol, force_plus_server)
         elif args.get("<servername>"):
             connection.direct(args.get("<servername>"), protocol)
         elif args.get("--cc") is not None:
-            connection.country_f(args.get("--cc"), protocol)
+            connection.country_f(args.get("--cc"), protocol, force_plus_server)
         # Features: 1: Secure-Core, 2: Tor, 4: P2P
         elif args.get("--p2p"):
             connection.feature_f(4, protocol)

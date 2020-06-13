@@ -124,7 +124,7 @@ def dialog():
     openvpn_connect(server_result, protocol_result)
 
 
-def random_c(protocol=None):
+def random_c(protocol=None, force_plus_server=None):
     """Connect to a random ProtonVPN Server."""
 
     logger.debug("Starting random connect")
@@ -132,14 +132,14 @@ def random_c(protocol=None):
     if not protocol:
         protocol = get_config_value("USER", "default_protocol")
 
-    servers = get_servers()
+    servers = get_servers(force_plus_server)
 
     servername = random.choice(servers)["Name"]
 
     openvpn_connect(servername, protocol)
 
 
-def fastest(protocol=None):
+def fastest(protocol=None, force_plus_server=None):
     """Connect to the fastest server available."""
 
     logger.debug("Starting fastest connect")
@@ -150,7 +150,7 @@ def fastest(protocol=None):
     disconnect(passed=True)
     pull_server_data(force=True)
 
-    servers = get_servers()
+    servers = get_servers(force_plus_server)
 
     # ProtonVPN Features: 1: SECURE-CORE, 2: TOR, 4: P2P
     excluded_features = [1, 2]
@@ -165,7 +165,7 @@ def fastest(protocol=None):
     openvpn_connect(fastest_server, protocol)
 
 
-def country_f(country_code, protocol=None):
+def country_f(country_code, protocol=None, force_plus_server=None):
     """Connect to the fastest server in a specific country."""
     logger.debug("Starting fastest country connect")
 
@@ -177,7 +177,7 @@ def country_f(country_code, protocol=None):
     disconnect(passed=True)
     pull_server_data(force=True)
 
-    servers = get_servers()
+    servers = get_servers(force_plus_server)
 
     # ProtonVPN Features: 1: SECURE-CORE, 2: TOR, 4: P2P
     excluded_features = [1, 2]
