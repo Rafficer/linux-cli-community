@@ -89,8 +89,10 @@ def cli():
     logger.debug("USER: {0}".format(USER))
     logger.debug("CONFIG_DIR: {0}".format(CONFIG_DIR))
     
+    # OO based CLI
     ProtonVPNCLI()
 
+    # Functional based CLI
     # args = docopt(__doc__, version="ProtonVPN-CLI v{0}".format(VERSION))
     # command, args = functional_cli()
     # logger.debug("Arguments\n{0}".format(args))
