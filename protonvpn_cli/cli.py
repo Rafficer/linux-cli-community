@@ -1,4 +1,4 @@
-"""
+usage = """
 A CLI for ProtonVPN.
 
 Usage:
@@ -88,73 +88,75 @@ def cli():
     logger.debug(sys.argv)
     logger.debug("USER: {0}".format(USER))
     logger.debug("CONFIG_DIR: {0}".format(CONFIG_DIR))
+    
+    ProtonVPNCLI()
 
     # args = docopt(__doc__, version="ProtonVPN-CLI v{0}".format(VERSION))
-    command, args = functional_cli()
-    logger.debug("Arguments\n{0}".format(args))
+    # command, args = functional_cli()
+    # logger.debug("Arguments\n{0}".format(args))
 
-    # print("Command: {}\nArgs: {}".format(command, args))
+    # # print("Command: {}\nArgs: {}".format(command, args))
     
-    if command in ["init"]:
-        init_cli()
-    elif command in ["c", "connect"]:
-        check_root()
-        check_init()
+    # if command in ["init"]:
+    #     init_cli()
+    # elif command in ["c", "connect"]:
+    #     check_root()
+    #     check_init()
 
-        # Wait until a connection to the ProtonVPN API can be made
-        # As this is mainly for automatically connecting on boot, it only
-        # activates when the environment variable PVPN_WAIT is 1
-        # Otherwise it wouldn't connect when a VPN process without
-        # internet access exists or the Kill Switch is active
-        if int(os.environ.get("PVPN_WAIT", 0)) > 0:
-            wait_for_network(int(os.environ["PVPN_WAIT"]))
+    #     # Wait until a connection to the ProtonVPN API can be made
+    #     # As this is mainly for automatically connecting on boot, it only
+    #     # activates when the environment variable PVPN_WAIT is 1
+    #     # Otherwise it wouldn't connect when a VPN process without
+    #     # internet access exists or the Kill Switch is active
+    #     if int(os.environ.get("PVPN_WAIT", 0)) > 0:
+    #         wait_for_network(int(os.environ["PVPN_WAIT"]))
 
-        protocol = args.protocol
-        if protocol is not None and protocol.lower().strip() in ["tcp", "udp"]:
-            protocol = protocol.lower().strip()
+    #     protocol = args.protocol
+    #     if protocol is not None and protocol.lower().strip() in ["tcp", "udp"]:
+    #         protocol = protocol.lower().strip()
 
-        if args.random:
-            connection.random_c(protocol)
-        elif args.fastest:
-            connection.fastest(protocol)
-        elif args.servername:
-            connection.direct(args("<servername>"), protocol)
-        elif args.country_code is not None:
-            connection.country_f(args("--cc"), protocol)
-        # Features: 1: Secure-Core, 2: Tor, 4: P2P
-        elif args.peer2peer:
-            connection.feature_f(4, protocol)
-        elif args.secure_core:
-            connection.feature_f(1, protocol)
-        elif args.tor:
-            connection.feature_f(2, protocol)
-        else:
-            connection.dialog()
+    #     if args.random:
+    #         connection.random_c(protocol)
+    #     elif args.fastest:
+    #         connection.fastest(protocol)
+    #     elif args.servername is not None:
+    #         connection.direct(args.servername, protocol)
+    #     elif args.country_code is not None:
+    #         connection.country_f(args.country_code, protocol)
+    #     # Features: 1: Secure-Core, 2: Tor, 4: P2P
+    #     elif args.peer2peer:
+    #         connection.feature_f(4, protocol)
+    #     elif args.secure_core:
+    #         connection.feature_f(1, protocol)
+    #     elif args.tor:
+    #         connection.feature_f(2, protocol)
+    #     else:
+    #         connection.dialog()
 
-    elif command in ["r", "reconnect"]:
-        check_root()
-        check_init()
-        connection.reconnect()
+    # elif command in ["r", "reconnect"]:
+    #     check_root()
+    #     check_init()
+    #     connection.reconnect()
 
-    elif command in ["d", "disconnect"]:
-        check_root()
-        check_init()
-        connection.disconnect()
+    # elif command in ["d", "disconnect"]:
+    #     check_root()
+    #     check_init()
+    #     connection.disconnect()
 
-    elif command in ["s", "status"]:
-        connection.status()
+    # elif command in ["s", "status"]:
+    #     connection.status()
 
-    elif command in ["cf", "configure"]:
-        check_root()
-        check_init()
-        configure_cli()
+    # elif command in ["cf", "configure"]:
+    #     check_root()
+    #     check_init()
+    #     configure_cli()
 
-    elif command in ["rf", "refresh"]:
-        check_init()
-        pull_server_data(force=True)
+    # elif command in ["rf", "refresh"]:
+    #     check_init()
+    #     pull_server_data(force=True)
 
-    elif command in ["ex", "examples"]:
-        print_examples()
+    # elif command in ["ex", "examples"]:
+    #     print_examples()
 
 def functional_cli():
     parser = argparse.ArgumentParser(description="Official ProtonVPN CLI", prog="protonvpn") 
@@ -191,6 +193,134 @@ def functional_cli():
     args = parser.parse_args()
 
     return command[0], args
+
+class ProtonVPNCLI():
+    def __init__(self):
+        parser = argparse.ArgumentParser(
+            description="Official ProtonVPN CLI",
+            prog="protonvpn",
+            usage=usage
+        )
+
+        parser.add_argument("command",  nargs="?", help="Command to be run")
+        parser.add_argument("-v", "--version", required=False, help="Command to be run", action="store_true")
+        
+        args = parser.parse_args(sys.argv[1:2])
+        
+        if args.version:
+            print("ProtonVPN CLI v.{}".format(VERSION))
+            sys.exit(1)
+        elif args.command is None or not hasattr(self, args.command):
+            parser.print_usage()
+            sys.exit(1)
+        
+        getattr(self, args.command)()
+
+    # Intialize ProtonVPN profile
+    def init(self):
+        """Intialiazes ProtonVPN profile. To intialize profile inline, provide the "-i" option."""
+        parser = argparse.ArgumentParser(description="Initialize ProtonVPN profile", prog="protonvpn init")
+        parser.add_argument("-i", nargs=3, required=False, help="Inline intialize profile. (username password protocol)", metavar="")
+        args = parser.parse_args(sys.argv[2:])
+        if args.i:
+            print("Inline method invoked")
+        
+        init_cli()
+        # print(args)
+
+    # Connect to VPN
+    def c(self):
+        """Short for connect"""
+        self.connect()
+    def connect(self):
+        check_root()
+        check_init()
+        
+        parser = argparse.ArgumentParser(description="Connect to ProtonVPN", prog="protonvpn c")
+        group = parser.add_mutually_exclusive_group()
+        group.add_argument("servername", nargs="?", help="Servername (CH#4, CH-US-1, HK5-Tor).", metavar="")
+        group.add_argument("-f", "--fastest", help="Connect to the fastest ProtonVPN server.", action="store_true")
+        group.add_argument("-r", "--random",  help="Connect to a random ProtonVPN server.", action="store_true")
+        group.add_argument("-cc", "--country-code", help="Connect to the specified country code (SE, PT, BR, AR).", metavar="")
+        group.add_argument("-sc", "--secure-core", help="Connect to the fastest Secure-Core server.", action="store_true")
+        group.add_argument("-p2p", "--peer2peer", help="Connect to the fastest torrent server.", action="store_true")
+        group.add_argument("-t", "--tor", help="Connect to the fastest Tor server.", action="store_true")
+        parser.add_argument("-p", "--protocol", help="Connect via specified protocol (UDP or TCP).", choices=["udp", "tcp"], metavar="")
+
+        args = parser.parse_args(sys.argv[2:])
+        # print(args)
+
+        protocol = args.protocol
+        if protocol is not None and protocol.lower().strip() in ["tcp", "udp"]:
+            protocol = protocol.lower().strip()
+
+        if args.random:
+            connection.random_c(protocol)
+        elif args.fastest:
+            connection.fastest(protocol)
+        elif args.servername:
+            connection.direct(args.servername, protocol)
+        elif args.country_code is not None:
+            connection.country_f(args.country_code, protocol)
+        # Features: 1: Secure-Core, 2: Tor, 4: P2P
+        elif args.peer2peer:
+            connection.feature_f(4, protocol)
+        elif args.secure_core:
+            connection.feature_f(1, protocol)
+        elif args.tor:
+            connection.feature_f(2, protocol)
+        else:
+            connection.dialog()
+
+    # Reconnect to last connected VPN server
+    def r(self):
+        """Short for reconnect"""
+        self.reconnect()
+    def reconnect(self):
+        check_root()
+        check_init()
+        connection.reconnect()
+
+    # Disconnect from VPN
+    def d(self):
+        """Short for disconnect"""
+        self.disconnect()
+    def disconnect(self):
+        check_root()
+        check_init()
+        connection.disconnect()
+        
+    # Display VPN status information
+    def s(self):
+        """Short for status"""
+        self.status()
+    def status(self):
+        connection.status()
+        
+    # Open configurations menu
+    def cf(self):
+        """Short for configure"""
+        self.configure()
+    def configure(self):
+        check_root()
+        check_init()
+        configure_cli()
+
+    # Refresh servers
+    def rf(self):
+        """Short for refresh"""
+        self.refresh()
+    def refresh(self):
+        check_init()
+        pull_server_data(force=True)    
+    
+    # Show usage examples
+    def ex(self):
+        """Short for examples"""
+        self.refresh()
+    def examples(self):
+        print_examples()
+        
 
 def init_cli():
     """Initialize the CLI."""
