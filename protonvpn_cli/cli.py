@@ -51,8 +51,9 @@ import configparser
 import getpass
 import shutil
 import time
+import argparse
 # External Libraries
-from docopt import docopt
+# from docopt import docopt
 # protonvpn-cli Functions
 from . import connection
 from .logger import logger
@@ -88,13 +89,15 @@ def cli():
     logger.debug("USER: {0}".format(USER))
     logger.debug("CONFIG_DIR: {0}".format(CONFIG_DIR))
 
-    args = docopt(__doc__, version="ProtonVPN-CLI v{0}".format(VERSION))
-    logger.debug("Arguments\n{0}".format(str(args).replace("\n", "")))
+    # args = docopt(__doc__, version="ProtonVPN-CLI v{0}".format(VERSION))
+    command, args = functional_cli()
+    logger.debug("Arguments\n{0}".format(args))
 
-    # Parse arguments
-    if args.get("init"):
+    # print("Command: {}\nArgs: {}".format(command, args))
+    
+    if command in ["init"]:
         init_cli()
-    elif args.get("c") or args.get("connect"):
+    elif command in ["c", "connect"]:
         check_root()
         check_init()
 
@@ -106,47 +109,88 @@ def cli():
         if int(os.environ.get("PVPN_WAIT", 0)) > 0:
             wait_for_network(int(os.environ["PVPN_WAIT"]))
 
-        protocol = args.get("-p")
+        protocol = args.protocol
         if protocol is not None and protocol.lower().strip() in ["tcp", "udp"]:
             protocol = protocol.lower().strip()
 
-        if args.get("--random"):
+        if args.random:
             connection.random_c(protocol)
-        elif args.get("--fastest"):
+        elif args.fastest:
             connection.fastest(protocol)
-        elif args.get("<servername>"):
-            connection.direct(args.get("<servername>"), protocol)
-        elif args.get("--cc") is not None:
-            connection.country_f(args.get("--cc"), protocol)
+        elif args.servername:
+            connection.direct(args("<servername>"), protocol)
+        elif args.country_code is not None:
+            connection.country_f(args("--cc"), protocol)
         # Features: 1: Secure-Core, 2: Tor, 4: P2P
-        elif args.get("--p2p"):
+        elif args.peer2peer:
             connection.feature_f(4, protocol)
-        elif args.get("--sc"):
+        elif args.secure_core:
             connection.feature_f(1, protocol)
-        elif args.get("--tor"):
+        elif args.tor:
             connection.feature_f(2, protocol)
         else:
             connection.dialog()
-    elif args.get("r") or args.get("reconnect"):
+
+    elif command in ["r", "reconnect"]:
         check_root()
         check_init()
         connection.reconnect()
-    elif args.get("d") or args.get("disconnect"):
+
+    elif command in ["d", "disconnect"]:
         check_root()
         check_init()
         connection.disconnect()
-    elif args.get("s") or args.get("status"):
+
+    elif command in ["s", "status"]:
         connection.status()
-    elif args.get("configure"):
+
+    elif command in ["cf", "configure"]:
         check_root()
         check_init()
         configure_cli()
-    elif args.get("refresh"):
+
+    elif command in ["rf", "refresh"]:
         check_init()
         pull_server_data(force=True)
-    elif args.get("examples"):
+
+    elif command in ["ex", "examples"]:
         print_examples()
 
+def functional_cli():
+    parser = argparse.ArgumentParser(description="Official ProtonVPN CLI", prog="protonvpn") 
+    parser.add_argument("-v", "--version", help="Select the fastest ProtonVPN server.", action="store_true")
+
+    subparsers = parser.add_subparsers(metavar="")
+
+    parser_init = subparsers.add_parser(name="init", help="Initialize a ProtonVPN profile.")
+
+    parser_connect = subparsers.add_parser(name="c", aliases=["connect"], help="Connect to a ProtonVPN server.")
+    group_connect = parser_connect.add_mutually_exclusive_group()
+    group_connect.add_argument("servername", nargs="?",  help="Servername (CH#4, CH-US-1, HK5-Tor).", metavar="<servername>")
+    group_connect.add_argument("-f", "--fastest", help="Connect to the fastest ProtonVPN server.", action="store_true")
+    group_connect.add_argument("-r", "--random", help="Connect to a random ProtonVPN server.", action="store_true")
+    group_connect.add_argument("-cc", "--country-code", help="Connect to the specified country code (SE, PT, BR, AR).", metavar="")
+    group_connect.add_argument("-sc", "--secure-core", help="Connect to the fastest Secure-Core server.", action="store_true")
+    group_connect.add_argument("-p2p", "--peer2peer", help="Connect to the fastest torrent server.", action="store_true")
+    group_connect.add_argument("-t", "--tor", help="Connect to the fastest Tor server.", action="store_true")
+    parser_connect.add_argument("-p", "--protocol", help="Connect via specified protocol (UDP or TCP).", choices=["udp", "tcp"], metavar="")
+
+    parser_reconnect = subparsers.add_parser("r", aliases=["reconnect"], help="Reconnect to the last server.")
+
+    parser_disconnect = subparsers.add_parser("d", aliases=["disconnect"], help="Disconnect the current session.")
+
+    parser_status = subparsers.add_parser("s", aliases=["status"], help="Show connection status.")
+
+    parser_configure = subparsers.add_parser("cf", aliases=["configure"], help="Change ProtonVPN-CLI configuration.")
+
+    parser_refresh = subparsers.add_parser("rf", aliases=["refresh"], help="Refresh OpenVPN configuration and server data.")
+
+    parser_exmaples = subparsers.add_parser("ex", aliases=["examples"], help="Print some example commands.")
+
+    command = sys.argv[1:2]
+    args = parser.parse_args()
+
+    return command[0], args
 
 def init_cli():
     """Initialize the CLI."""
