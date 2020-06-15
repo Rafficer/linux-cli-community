@@ -208,7 +208,9 @@ class ProtonVPNCLI():
         parser.add_argument("-h", "--help", required=False, action="store_true")
         
         args = parser.parse_args(sys.argv[1:2])
-        
+
+        logger.debug("Main argument\n{0}".format(args))
+
         if args.version:
             print("\nProtonVPN CLI v.{}".format(VERSION))
             parser.exit(1)
@@ -223,7 +225,10 @@ class ProtonVPNCLI():
         """Intialiazes ProtonVPN profile. To intialize profile inline, provide the "-i" option."""
         parser = argparse.ArgumentParser(description="Initialize ProtonVPN profile", prog="protonvpn init")
         parser.add_argument("-i", nargs=3, required=False, help="Inline intialize profile. (username password protocol)", metavar="")
+
         args = parser.parse_args(sys.argv[2:])
+        logger.debug("Sub-arguments\n{0}".format(args))
+
         if args.i:
             print("Inline method invoked")
         
@@ -250,7 +255,7 @@ class ProtonVPNCLI():
         parser.add_argument("-p", "--protocol", help="Connect via specified protocol (UDP or TCP).", choices=["udp", "tcp"], metavar="")
 
         args = parser.parse_args(sys.argv[2:])
-        # print(args)
+        logger.debug("Sub-arguments\n{0}".format(args))
 
         protocol = args.protocol
         if protocol is not None and protocol.lower().strip() in ["tcp", "udp"]:
@@ -322,7 +327,6 @@ class ProtonVPNCLI():
         self.examples()
     def examples(self):
         print_examples()
-        
 
 def init_cli():
     """Initialize the CLI."""
