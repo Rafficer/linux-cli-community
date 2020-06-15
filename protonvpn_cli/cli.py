@@ -1,5 +1,5 @@
 usage = """
-A CLI for ProtonVPN.
+Official ProtonVPN CLI
 
 Usage:
     protonvpn init
@@ -13,19 +13,19 @@ Usage:
     protonvpn (r | reconnect)
     protonvpn (d | disconnect)
     protonvpn (s | status)
-    protonvpn configure
-    protonvpn refresh
-    protonvpn examples
+    protonvpn (cf | configure)
+    protonvpn (rf | refresh)
+    protonvpn (ex | examples)
     protonvpn (-h | --help)
     protonvpn (-v | --version)
 
 Options:
     -f, --fastest       Select the fastest ProtonVPN server.
     -r, --random        Select a random ProtonVPN server.
-    --cc CODE           Determine the country for fastest connect.
-    --sc                Connect to the fastest Secure-Core server.
-    --p2p               Connect to the fastest torrent server.
-    --tor               Connect to the fastest Tor server.
+    -cc CODE            Determine the country for fastest connect.
+    -sc, secure-core    Connect to the fastest Secure-Core server.
+    -p2p, --peer2peer   Connect to the fastest torrent server.
+    -t, --tor           Connect to the fastest Tor server.
     -p PROTOCOL         Determine the protocol (UDP or TCP).
     -h, --help          Show this help message.
     -v, --version       Display version.
@@ -36,9 +36,9 @@ Commands:
     r, reconnect        Reconnect to the last server.
     d, disconnect       Disconnect the current session.
     s, status           Show connection status.
-    configure           Change ProtonVPN-CLI configuration.
-    refresh             Refresh OpenVPN configuration and server data.
-    examples            Print some example commands.
+    cf, configure           Change ProtonVPN-CLI configuration.
+    rf, refresh             Refresh OpenVPN configuration and server data.
+    ex, examples            Print some example commands.
 
 Arguments:
     <servername>        Servername (CH#4, CH-US-1, HK5-Tor).
@@ -199,22 +199,22 @@ def functional_cli():
 class ProtonVPNCLI():
     def __init__(self):
         parser = argparse.ArgumentParser(
-            description="Official ProtonVPN CLI",
             prog="protonvpn",
-            usage=usage
+            add_help=False
         )
-
-        parser.add_argument("command",  nargs="?", help="Command to be run")
-        parser.add_argument("-v", "--version", required=False, help="Command to be run", action="store_true")
+        
+        parser.add_argument("command",  nargs="?")
+        parser.add_argument("-v", "--version", required=False, action="store_true")
+        parser.add_argument("-h", "--help", required=False, action="store_true")
         
         args = parser.parse_args(sys.argv[1:2])
         
         if args.version:
-            print("ProtonVPN CLI v.{}".format(VERSION))
-            sys.exit(1)
-        elif args.command is None or not hasattr(self, args.command):
-            parser.print_usage()
-            sys.exit(1)
+            print("\nProtonVPN CLI v.{}".format(VERSION))
+            parser.exit(1)
+        elif args.command is None or not hasattr(self, args.command) or args.help:
+            print(usage)
+            parser.exit()
         
         getattr(self, args.command)()
 
@@ -319,7 +319,7 @@ class ProtonVPNCLI():
     # Show usage examples
     def ex(self):
         """Short for examples"""
-        self.refresh()
+        self.examples()
     def examples(self):
         print_examples()
         
