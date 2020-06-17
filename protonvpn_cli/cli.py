@@ -22,10 +22,10 @@ Usage:
 Options:
     -f, --fastest       Select the fastest ProtonVPN server.
     -r, --random        Select a random ProtonVPN server.
-    -cc CODE            Determine the country for fastest connect.
-    -sc, secure-core    Connect to the fastest Secure-Core server.
-    -p2p, --peer2peer   Connect to the fastest torrent server.
-    -t, --tor           Connect to the fastest Tor server.
+    --cc CODE           Determine the country for fastest connect.
+    --sc                Connect to the fastest Secure-Core server.
+    --p2p               Connect to the fastest torrent server.
+    --tor               Connect to the fastest Tor server.
     -p PROTOCOL         Determine the protocol (UDP or TCP).
     -h, --help          Show this help message.
     -v, --version       Display version.
@@ -89,112 +89,7 @@ def cli():
     logger.debug("USER: {0}".format(USER))
     logger.debug("CONFIG_DIR: {0}".format(CONFIG_DIR))
     
-    # OO based CLI
     ProtonVPNCLI()
-
-    # Functional based CLI
-    # args = docopt(__doc__, version="ProtonVPN-CLI v{0}".format(VERSION))
-    # command, args = functional_cli()
-    # logger.debug("Arguments\n{0}".format(args))
-
-    # # print("Command: {}\nArgs: {}".format(command, args))
-    
-    # if command in ["init"]:
-    #     init_cli()
-    # elif command in ["c", "connect"]:
-    #     check_root()
-    #     check_init()
-
-    #     # Wait until a connection to the ProtonVPN API can be made
-    #     # As this is mainly for automatically connecting on boot, it only
-    #     # activates when the environment variable PVPN_WAIT is 1
-    #     # Otherwise it wouldn't connect when a VPN process without
-    #     # internet access exists or the Kill Switch is active
-    #     if int(os.environ.get("PVPN_WAIT", 0)) > 0:
-    #         wait_for_network(int(os.environ["PVPN_WAIT"]))
-
-    #     protocol = args.protocol
-    #     if protocol is not None and protocol.lower().strip() in ["tcp", "udp"]:
-    #         protocol = protocol.lower().strip()
-
-    #     if args.random:
-    #         connection.random_c(protocol)
-    #     elif args.fastest:
-    #         connection.fastest(protocol)
-    #     elif args.servername is not None:
-    #         connection.direct(args.servername, protocol)
-    #     elif args.country_code is not None:
-    #         connection.country_f(args.country_code, protocol)
-    #     # Features: 1: Secure-Core, 2: Tor, 4: P2P
-    #     elif args.peer2peer:
-    #         connection.feature_f(4, protocol)
-    #     elif args.secure_core:
-    #         connection.feature_f(1, protocol)
-    #     elif args.tor:
-    #         connection.feature_f(2, protocol)
-    #     else:
-    #         connection.dialog()
-
-    # elif command in ["r", "reconnect"]:
-    #     check_root()
-    #     check_init()
-    #     connection.reconnect()
-
-    # elif command in ["d", "disconnect"]:
-    #     check_root()
-    #     check_init()
-    #     connection.disconnect()
-
-    # elif command in ["s", "status"]:
-    #     connection.status()
-
-    # elif command in ["cf", "configure"]:
-    #     check_root()
-    #     check_init()
-    #     configure_cli()
-
-    # elif command in ["rf", "refresh"]:
-    #     check_init()
-    #     pull_server_data(force=True)
-
-    # elif command in ["ex", "examples"]:
-    #     print_examples()
-
-def functional_cli():
-    parser = argparse.ArgumentParser(description="Official ProtonVPN CLI", prog="protonvpn") 
-    parser.add_argument("-v", "--version", help="Select the fastest ProtonVPN server.", action="store_true")
-
-    subparsers = parser.add_subparsers(metavar="")
-
-    parser_init = subparsers.add_parser(name="init", help="Initialize a ProtonVPN profile.")
-
-    parser_connect = subparsers.add_parser(name="c", aliases=["connect"], help="Connect to a ProtonVPN server.")
-    group_connect = parser_connect.add_mutually_exclusive_group()
-    group_connect.add_argument("servername", nargs="?",  help="Servername (CH#4, CH-US-1, HK5-Tor).", metavar="<servername>")
-    group_connect.add_argument("-f", "--fastest", help="Connect to the fastest ProtonVPN server.", action="store_true")
-    group_connect.add_argument("-r", "--random", help="Connect to a random ProtonVPN server.", action="store_true")
-    group_connect.add_argument("-cc", "--country-code", help="Connect to the specified country code (SE, PT, BR, AR).", metavar="")
-    group_connect.add_argument("-sc", "--secure-core", help="Connect to the fastest Secure-Core server.", action="store_true")
-    group_connect.add_argument("-p2p", "--peer2peer", help="Connect to the fastest torrent server.", action="store_true")
-    group_connect.add_argument("-t", "--tor", help="Connect to the fastest Tor server.", action="store_true")
-    parser_connect.add_argument("-p", "--protocol", help="Connect via specified protocol (UDP or TCP).", choices=["udp", "tcp"], metavar="")
-
-    parser_reconnect = subparsers.add_parser("r", aliases=["reconnect"], help="Reconnect to the last server.")
-
-    parser_disconnect = subparsers.add_parser("d", aliases=["disconnect"], help="Disconnect the current session.")
-
-    parser_status = subparsers.add_parser("s", aliases=["status"], help="Show connection status.")
-
-    parser_configure = subparsers.add_parser("cf", aliases=["configure"], help="Change ProtonVPN-CLI configuration.")
-
-    parser_refresh = subparsers.add_parser("rf", aliases=["refresh"], help="Refresh OpenVPN configuration and server data.")
-
-    parser_exmaples = subparsers.add_parser("ex", aliases=["examples"], help="Print some example commands.")
-
-    command = sys.argv[1:2]
-    args = parser.parse_args()
-
-    return command[0], args
 
 class ProtonVPNCLI():
     def __init__(self):
@@ -224,7 +119,7 @@ class ProtonVPNCLI():
     def init(self):
         """Intialiazes ProtonVPN profile. To intialize profile inline, provide the "-i" option."""
         parser = argparse.ArgumentParser(description="Initialize ProtonVPN profile", prog="protonvpn init")
-        parser.add_argument("-i", nargs=3, required=False, help="Inline intialize profile. (username password protocol)", metavar="")
+        parser.add_argument("-i", "--inline", nargs=3, required=False, help="Inline intialize profile. (username password protocol)", metavar="")
 
         args = parser.parse_args(sys.argv[2:])
         logger.debug("Sub-arguments\n{0}".format(args))
@@ -248,14 +143,14 @@ class ProtonVPNCLI():
         group.add_argument("servername", nargs="?", help="Servername (CH#4, CH-US-1, HK5-Tor).", metavar="")
         group.add_argument("-f", "--fastest", help="Connect to the fastest ProtonVPN server.", action="store_true")
         group.add_argument("-r", "--random",  help="Connect to a random ProtonVPN server.", action="store_true")
-        group.add_argument("-cc", "--country-code", help="Connect to the specified country code (SE, PT, BR, AR).", metavar="")
-        group.add_argument("-sc", "--secure-core", help="Connect to the fastest Secure-Core server.", action="store_true")
-        group.add_argument("-p2p", "--peer2peer", help="Connect to the fastest torrent server.", action="store_true")
-        group.add_argument("-t", "--tor", help="Connect to the fastest Tor server.", action="store_true")
+        group.add_argument("--cc", help="Connect to the specified country code (SE, PT, BR, AR).", metavar="")
+        group.add_argument("--sc", help="Connect to the fastest Secure-Core server.", action="store_true")
+        group.add_argument("--p2p", help="Connect to the fastest torrent server.", action="store_true")
+        group.add_argument("--tor", help="Connect to the fastest Tor server.", action="store_true")
         parser.add_argument("-p", "--protocol", help="Connect via specified protocol (UDP or TCP).", choices=["udp", "tcp"], metavar="")
 
         args = parser.parse_args(sys.argv[2:])
-        logger.debug("Sub-arguments\n{0}".format(args))
+        logger.debug("Sub-arguments:\n{0}".format(args))
 
         protocol = args.protocol
         if protocol is not None and protocol.lower().strip() in ["tcp", "udp"]:
@@ -267,12 +162,12 @@ class ProtonVPNCLI():
             connection.fastest(protocol)
         elif args.servername:
             connection.direct(args.servername, protocol)
-        elif args.country_code is not None:
-            connection.country_f(args.country_code, protocol)
+        elif args.cc is not None:
+            connection.country_f(args.cc, protocol)
         # Features: 1: Secure-Core, 2: Tor, 4: P2P
-        elif args.peer2peer:
+        elif args.p2p:
             connection.feature_f(4, protocol)
-        elif args.secure_core:
+        elif args.sc:
             connection.feature_f(1, protocol)
         elif args.tor:
             connection.feature_f(2, protocol)
