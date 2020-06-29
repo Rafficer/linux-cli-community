@@ -1,48 +1,3 @@
-usage = """
-Official ProtonVPN CLI
-
-Usage:
-    protonvpn init
-    protonvpn (c | connect) [<servername>] [-p <protocol>]
-    protonvpn (c | connect) [-f | --fastest] [-p <protocol>]
-    protonvpn (c | connect) [--cc <code>] [-p <protocol>]
-    protonvpn (c | connect) [--sc] [-p <protocol>]
-    protonvpn (c | connect) [--p2p] [-p <protocol>]
-    protonvpn (c | connect) [--tor] [-p <protocol>]
-    protonvpn (c | connect) [-r | --random] [-p <protocol>]
-    protonvpn (r | reconnect)
-    protonvpn (d | disconnect)
-    protonvpn (s | status)
-    protonvpn (cf | configure)
-    protonvpn (rf | refresh)
-    protonvpn (ex | examples)
-    protonvpn (-h | --help)
-    protonvpn (-v | --version)
-
-Options:
-    -f, --fastest       Select the fastest ProtonVPN server.
-    -r, --random        Select a random ProtonVPN server.
-    --cc CODE           Determine the country for fastest connect.
-    --sc                Connect to the fastest Secure-Core server.
-    --p2p               Connect to the fastest torrent server.
-    --tor               Connect to the fastest Tor server.
-    -p PROTOCOL         Determine the protocol (UDP or TCP).
-    -h, --help          Show this help message.
-    -v, --version       Display version.
-
-Commands:
-    init                Initialize a ProtonVPN profile.
-    c, connect          Connect to a ProtonVPN server.
-    r, reconnect        Reconnect to the last server.
-    d, disconnect       Disconnect the current session.
-    s, status           Show connection status.
-    cf, configure           Change ProtonVPN-CLI configuration.
-    rf, refresh             Refresh OpenVPN configuration and server data.
-    ex, examples            Print some example commands.
-
-Arguments:
-    <servername>        Servername (CH#4, CH-US-1, HK5-Tor).
-"""
 # Standard Libraries
 import sys
 import os
@@ -63,7 +18,7 @@ from .utils import (
 )
 # Constants
 from .constants import (
-    CONFIG_DIR, CONFIG_FILE, PASSFILE, USER, VERSION, SPLIT_TUNNEL_FILE
+    CONFIG_DIR, CONFIG_FILE, PASSFILE, USER, VERSION, SPLIT_TUNNEL_FILE, USAGE
 )
 
 def main():
@@ -107,7 +62,7 @@ class ProtonVPNCLI():
             print("\nProtonVPN CLI v.{}".format(VERSION))
             parser.exit(1)
         elif args.command is None or not hasattr(self, args.command) or args.help:
-            print(usage)
+            print(USAGE)
             parser.exit()
         
         getattr(self, args.command)()
@@ -134,7 +89,7 @@ class ProtonVPNCLI():
     def connect(self):
         check_root()
         check_init()
-        
+
         parser = argparse.ArgumentParser(description="Connect to ProtonVPN", prog="protonvpn c")
         group = parser.add_mutually_exclusive_group()
         group.add_argument("servername", nargs="?", help="Servername (CH#4, CH-US-1, HK5-Tor).", metavar="")
