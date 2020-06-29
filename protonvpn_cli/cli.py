@@ -142,7 +142,7 @@ class ProtonVPNCLI():
     def r(self):
         """Short for reconnect"""
         self.reconnect()
-        
+
     def reconnect(self):
         check_root()
         check_init()
@@ -157,7 +157,7 @@ class ProtonVPNCLI():
         check_root()
         check_init()
         connection.disconnect()
-        
+
     # Display VPN status information
     def s(self):
         """Short for status"""
@@ -165,7 +165,7 @@ class ProtonVPNCLI():
 
     def status(self):
         connection.status()
-        
+
     # Open configurations menu
     def cf(self):
         """Short for configure"""
@@ -183,8 +183,8 @@ class ProtonVPNCLI():
 
     def refresh(self):
         check_init()
-        pull_server_data(force=True)    
-    
+        pull_server_data(force=True)
+        
     # Show usage examples
     def ex(self):
         """Short for examples"""
