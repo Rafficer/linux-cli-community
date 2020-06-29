@@ -90,6 +90,14 @@ class ProtonVPNCLI():
         check_root()
         check_init()
 
+        # Wait until a connection to the ProtonVPN API can be made
+        # As this is mainly for automatically connecting on boot, it only
+        # activates when the environment variable PVPN_WAIT is 1
+        # Otherwise it wouldn't connect when a VPN process without
+        # internet access exists or the Kill Switch is active
+        if int(os.environ.get("PVPN_WAIT", 0)) > 0:
+            wait_for_network(int(os.environ["PVPN_WAIT"]))
+
         parser = argparse.ArgumentParser(description="Connect to ProtonVPN", prog="protonvpn c")
         group = parser.add_mutually_exclusive_group()
         group.add_argument("servername", nargs="?", help="Servername (CH#4, CH-US-1, HK5-Tor).", metavar="")
