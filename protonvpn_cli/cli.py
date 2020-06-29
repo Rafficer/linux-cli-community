@@ -21,6 +21,7 @@ from .constants import (
     CONFIG_DIR, CONFIG_FILE, PASSFILE, USER, VERSION, SPLIT_TUNNEL_FILE, USAGE
 )
 
+
 def main():
     """Main function"""
     try:
@@ -28,6 +29,7 @@ def main():
     except KeyboardInterrupt:
         print("\nQuitting...")
         sys.exit(1)
+
 
 def cli():
     """Run user's input command."""
@@ -43,14 +45,15 @@ def cli():
     
     ProtonVPNCLI()
 
+
 class ProtonVPNCLI():
     def __init__(self):
         parser = argparse.ArgumentParser(
             prog="protonvpn",
             add_help=False
         )
-        
-        parser.add_argument("command",  nargs="?")
+
+        parser.add_argument("command", nargs="?")
         parser.add_argument("-v", "--version", required=False, action="store_true")
         parser.add_argument("-h", "--help", required=False, action="store_true")
         
@@ -102,12 +105,12 @@ class ProtonVPNCLI():
         group = parser.add_mutually_exclusive_group()
         group.add_argument("servername", nargs="?", help="Servername (CH#4, CH-US-1, HK5-Tor).", metavar="")
         group.add_argument("-f", "--fastest", help="Connect to the fastest ProtonVPN server.", action="store_true")
-        group.add_argument("-r", "--random",  help="Connect to a random ProtonVPN server.", action="store_true")
+        group.add_argument("-r", "--random", help="Connect to a random ProtonVPN server.", action="store_true")
         group.add_argument("--cc", help="Connect to the specified country code (SE, PT, BR, AR).", metavar="")
         group.add_argument("--sc", help="Connect to the fastest Secure-Core server.", action="store_true")
         group.add_argument("--p2p", help="Connect to the fastest torrent server.", action="store_true")
         group.add_argument("--tor", help="Connect to the fastest Tor server.", action="store_true")
-        parser.add_argument("-p", "--protocol", help="Connect via specified protocol (UDP or TCP).", choices=["udp", "tcp"], metavar="")
+        parser.add_argument("-p", "--protocol", help="Connect via specified protocol.", choices=["udp", "tcp"], metavar="")
 
         args = parser.parse_args(sys.argv[2:])
         logger.debug("Sub-arguments:\n{0}".format(args))
@@ -138,6 +141,7 @@ class ProtonVPNCLI():
     def r(self):
         """Short for reconnect"""
         self.reconnect()
+        
     def reconnect(self):
         check_root()
         check_init()
@@ -147,6 +151,7 @@ class ProtonVPNCLI():
     def d(self):
         """Short for disconnect"""
         self.disconnect()
+
     def disconnect(self):
         check_root()
         check_init()
@@ -156,6 +161,7 @@ class ProtonVPNCLI():
     def s(self):
         """Short for status"""
         self.status()
+
     def status(self):
         connection.status()
         
@@ -163,6 +169,7 @@ class ProtonVPNCLI():
     def cf(self):
         """Short for configure"""
         self.configure()
+
     def configure(self):
         check_root()
         check_init()
@@ -172,6 +179,7 @@ class ProtonVPNCLI():
     def rf(self):
         """Short for refresh"""
         self.refresh()
+
     def refresh(self):
         check_init()
         pull_server_data(force=True)    
@@ -180,8 +188,10 @@ class ProtonVPNCLI():
     def ex(self):
         """Short for examples"""
         self.examples()
+
     def examples(self):
         print_examples()
+
 
 def init_cli():
     """Initialize the CLI."""
