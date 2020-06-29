@@ -42,7 +42,7 @@ def cli():
     logger.debug(sys.argv)
     logger.debug("USER: {0}".format(USER))
     logger.debug("CONFIG_DIR: {0}".format(CONFIG_DIR))
-    
+
     ProtonVPNCLI()
 
 
@@ -56,7 +56,7 @@ class ProtonVPNCLI():
         parser.add_argument("command", nargs="?")
         parser.add_argument("-v", "--version", required=False, action="store_true")
         parser.add_argument("-h", "--help", required=False, action="store_true")
-        
+
         args = parser.parse_args(sys.argv[1:2])
 
         logger.debug("Main argument\n{0}".format(args))
@@ -67,7 +67,7 @@ class ProtonVPNCLI():
         elif args.command is None or not hasattr(self, args.command) or args.help:
             print(USAGE)
             parser.exit()
-        
+
         getattr(self, args.command)()
 
     # Intialize ProtonVPN profile
@@ -81,7 +81,7 @@ class ProtonVPNCLI():
 
         if args.i:
             print("Inline method invoked")
-        
+
         init_cli()
         # print(args)
 
@@ -89,6 +89,7 @@ class ProtonVPNCLI():
     def c(self):
         """Short for connect"""
         self.connect()
+
     def connect(self):
         check_root()
         check_init()
