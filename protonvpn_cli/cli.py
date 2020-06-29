@@ -53,7 +53,6 @@ import shutil
 import time
 import argparse
 # External Libraries
-# from docopt import docopt
 # protonvpn-cli Functions
 from . import connection
 from .logger import logger
@@ -67,7 +66,6 @@ from .constants import (
     CONFIG_DIR, CONFIG_FILE, PASSFILE, USER, VERSION, SPLIT_TUNNEL_FILE
 )
 
-
 def main():
     """Main function"""
     try:
@@ -75,7 +73,6 @@ def main():
     except KeyboardInterrupt:
         print("\nQuitting...")
         sys.exit(1)
-
 
 def cli():
     """Run user's input command."""
