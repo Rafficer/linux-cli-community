@@ -20,7 +20,7 @@ PASSFILE = os.path.join(CONFIG_DIR, "pvpnpass")
 VERSION = "2.2.4"
 
 USAGE = """
-Official ProtonVPN CLI
+ProtonVPN CLI
 
 Usage:
     protonvpn init
