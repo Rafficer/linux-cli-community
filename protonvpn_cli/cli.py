@@ -46,6 +46,12 @@ def cli():
 
 
 class ProtonVPNCLI():
+    server_features_dict = dict(
+        p2p=4,
+        sc=1,
+        tor=2
+    )
+
     def __init__(self):
         parser = argparse.ArgumentParser(
             prog="protonvpn",
@@ -63,15 +69,14 @@ class ProtonVPNCLI():
         if args.version:
             print("\nProtonVPN CLI v.{}".format(VERSION))
             parser.exit(1)
-        elif args.command is None or not hasattr(self, args.command) or args.help:
+        elif not args.command or not hasattr(self, args.command) or args.help:
             print(USAGE)
-            parser.exit()
+            parser.exit(1)
 
         getattr(self, args.command)()
 
-    # Intialize ProtonVPN profile
     def init(self):
-        """Intialiazes ProtonVPN profile. To intialize profile inline, provide the "-i" option."""
+        """CLI command that intialiazes ProtonVPN profile"""
         parser = argparse.ArgumentParser(description="Initialize ProtonVPN profile", prog="protonvpn init")
         parser.add_argument(
             "-i", "--inline", nargs=3, required=False,
@@ -85,14 +90,13 @@ class ProtonVPNCLI():
             print("Inline method invoked")
 
         init_cli()
-        # print(args)
 
-    # Connect to VPN
     def c(self):
-        """Short for connect"""
+        """Short CLI command for connecting to the VPN"""
         self.connect()
 
     def connect(self):
+        """Full CLI command for connecting to the VPN"""
         check_root()
         check_init()
 
@@ -122,7 +126,7 @@ class ProtonVPNCLI():
         logger.debug("Sub-arguments:\n{0}".format(args))
 
         protocol = args.protocol
-        if protocol is not None and protocol.lower().strip() in ["tcp", "udp"]:
+        if protocol and protocol.lower().strip() in ["tcp", "udp"]:
             protocol = protocol.lower().strip()
 
         if args.random:
@@ -131,71 +135,70 @@ class ProtonVPNCLI():
             connection.fastest(protocol)
         elif args.servername:
             connection.direct(args.servername, protocol)
-        elif args.cc is not None:
+        elif args.cc:
             connection.country_f(args.cc, protocol)
-        # Features: 1: Secure-Core, 2: Tor, 4: P2P
         elif args.p2p:
-            connection.feature_f(4, protocol)
+            connection.feature_f(self.server_features_dict.get("p2p", None), protocol)
         elif args.sc:
-            connection.feature_f(1, protocol)
+            connection.feature_f(self.server_features_dict.get("sc", None), protocol)
         elif args.tor:
-            connection.feature_f(2, protocol)
+            connection.feature_f(self.server_features_dict.get("tor", None), protocol)
         else:
             connection.dialog()
 
-    # Reconnect to last connected VPN server
     def r(self):
-        """Short for reconnect"""
+        """Short CLI command to reconnect to the last connected VPN Server"""
         self.reconnect()
 
     def reconnect(self):
+        """Full CLI command to reconnect to the last connected VPN Server"""
         check_root()
         check_init()
         connection.reconnect()
 
-    # Disconnect from VPN
     def d(self):
-        """Short for disconnect"""
+        """Short CLI command to disconnect the VPN if a connection is present"""
         self.disconnect()
 
     def disconnect(self):
+        """Full CLI command to disconnect the VPN if a connection is present"""
         check_root()
         check_init()
         connection.disconnect()
 
-    # Display VPN status information
     def s(self):
-        """Short for status"""
+        """Short CLI command to display the current VPN status"""
         self.status()
 
     def status(self):
+        """Full CLI command to display the current VPN status"""
         connection.status()
 
-    # Open configurations menu
     def cf(self):
-        """Short for configure"""
+        """Short CLI command to change single configuration values"""
         self.configure()
 
     def configure(self):
+        """Full CLI command to change single configuration values"""
         check_root()
         check_init()
         configure_cli()
 
-    # Refresh servers
     def rf(self):
-        """Short for refresh"""
+        """Short CLI command to refresh server list"""
         self.refresh()
 
     def refresh(self):
+        """Full CLI command to refresh server list"""
         check_init()
         pull_server_data(force=True)
 
-    # Show usage examples
     def ex(self):
-        """Short for examples"""
+        """Short CLI command to display usage examples"""
         self.examples()
 
     def examples(self):
+        """Full CLI command to display usage examples"""
         print_examples()
 
 
