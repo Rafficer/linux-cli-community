@@ -74,7 +74,10 @@ class ProtonVPNCLI():
     def init(self):
         """Intialiazes ProtonVPN profile. To intialize profile inline, provide the "-i" option."""
         parser = argparse.ArgumentParser(description="Initialize ProtonVPN profile", prog="protonvpn init")
-        parser.add_argument("-i", "--inline", nargs=3, required=False, help="Inline intialize profile. (username password protocol)", metavar="")
+        parser.add_argument(
+            "-i", "--inline", nargs=3, required=False, 
+            help="Inline intialize profile. (username password protocol)", metavar=""
+        )
 
         args = parser.parse_args(sys.argv[2:])
         logger.debug("Sub-arguments\n{0}".format(args))
@@ -111,7 +114,10 @@ class ProtonVPNCLI():
         group.add_argument("--sc", help="Connect to the fastest Secure-Core server.", action="store_true")
         group.add_argument("--p2p", help="Connect to the fastest torrent server.", action="store_true")
         group.add_argument("--tor", help="Connect to the fastest Tor server.", action="store_true")
-        parser.add_argument("-p", "--protocol", help="Connect via specified protocol.", choices=["udp", "tcp"], metavar="")
+        parser.add_argument(
+            "-p", "--protocol", help="Connect via specified protocol.", 
+            choices=["udp", "tcp"], metavar=""
+        )
 
         args = parser.parse_args(sys.argv[2:])
         logger.debug("Sub-arguments:\n{0}".format(args))
@@ -184,7 +190,7 @@ class ProtonVPNCLI():
     def refresh(self):
         check_init()
         pull_server_data(force=True)
-        
+                
     # Show usage examples
     def ex(self):
         """Short for examples"""
