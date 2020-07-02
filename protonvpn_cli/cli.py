@@ -7,7 +7,6 @@ import getpass
 import shutil
 import time
 import argparse
-# External Libraries
 # protonvpn-cli Functions
 from . import connection
 from .logger import logger
