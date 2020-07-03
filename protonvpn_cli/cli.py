@@ -120,7 +120,7 @@ class ProtonVPNCLI():
         group.add_argument("--tor", help="Connect to the fastest Tor server.", action="store_true")
         parser.add_argument(
             "-p", "--protocol", help="Connect via specified protocol.",
-            choices=["udp", "tcp"], metavar=""
+            choices=["udp", "tcp"], metavar="", type=str.lower
         )
 
         args = parser.parse_args(sys.argv[2:])
