@@ -86,8 +86,9 @@ class ProtonVPNCLI():
         args = parser.parse_args(sys.argv[2:])
         logger.debug("Sub-arguments\n{0}".format(args))
 
-        if args.i:
-            print("Inline method invoked")
+        if args.inline:
+            print("Please intialize without '-i/--inline' as it is not fully supported yet.")
+            sys.exit(1)
 
         init_cli()
 
