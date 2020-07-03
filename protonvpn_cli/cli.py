@@ -341,7 +341,7 @@ def print_examples():
         "protonvpn connect --cc AU\n"
         "               Connect to the fastest Australian server\n"
         "               with the default protocol.\n\n"
-        "protonvpn c --p2p tcp\n"
+        "protonvpn c --p2p -p tcp\n"
         "               Connect to the fastest torrent server with TCP.\n\n"
         "protonvpn c --sc\n"
         "               Connect to the fastest Secure-Core server with\n"
