@@ -57,9 +57,9 @@ Commands:
     r, reconnect        Reconnect to the last server.
     d, disconnect       Disconnect the current session.
     s, status           Show connection status.
-    cf, configure           Change ProtonVPN-CLI configuration.
-    rf, refresh             Refresh OpenVPN configuration and server data.
-    ex, examples            Print some example commands.
+    cf, configure       Change ProtonVPN-CLI configuration.
+    rf, refresh         Refresh OpenVPN configuration and server data.
+    ex, examples        Print some example commands.
 
 Arguments:
     <servername>        Servername (CH#4, CH-US-1, HK5-Tor).
