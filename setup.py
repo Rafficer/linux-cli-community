@@ -39,7 +39,6 @@ setup(
     },
     install_requires=[
         "requests",
-        "docopt",
         "pythondialog",
         "jinja2",
     ],
