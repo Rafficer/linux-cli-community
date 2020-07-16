@@ -351,6 +351,11 @@ def check_root():
 def check_update():
     """Return the download URL if an Update is available, False if otherwise"""
 
+    if not sys.stdout.isatty():
+        # There is no console to which our message may be printed. Skip update
+        # check for non-interactive usage.
+        return
+
     def get_latest_version():
         """Return the latest version from pypi"""
         logger.debug("Calling pypi API")
