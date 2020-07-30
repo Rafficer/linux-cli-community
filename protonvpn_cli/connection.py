@@ -165,7 +165,7 @@ def fastest(protocol=None):
     openvpn_connect(fastest_server, protocol)
 
 
-def country_f(country_code, protocol=None):
+def country_f(country_code, protocol=None, excluded=False):
     """Connect to the fastest server in a specific country."""
     logger.debug("Starting fastest country connect")
 
@@ -185,15 +185,25 @@ def country_f(country_code, protocol=None):
     # Filter out excluded features and countries
     server_pool = []
     for server in servers:
-        if server["Features"] not in excluded_features and server["ExitCountry"] == country_code:
-            server_pool.append(server)
+        if server["Features"] not in excluded_features:
+            if (excluded and server["ExitCountry"] != country_code) or (
+                not excluded and server["ExitCountry"] == country_code
+            ):
+                server_pool.append(server)
 
     if len(server_pool) == 0:
-        print(
-            "[!] No Server in country {0} found\n".format(country_code)
-            + "[!] Please choose a valid country"
-        )
-        logger.debug("No server in country {0}".format(country_code))
+        if not excluded:
+            print(
+                "[!] No Server in country {0} found\n".format(country_code)
+                + "[!] Please choose a valid country"
+            )
+            logger.debug("No server in country {0}".format(country_code))
+        else:
+            print(
+                "[!] No Server found outside country {0}\n".format(country_code)
+                + "[!] Please choose a valid country"
+            )
+            logger.debug("No server outside country {0}".format(country_code))
         sys.exit(1)
 
     fastest_server = get_fastest_server(server_pool)
@@ -201,7 +211,7 @@ def country_f(country_code, protocol=None):
 
 
 def feature_f(feature, protocol=None):
-    """Connect to the fastest server in a specific country."""
+    """Connect to the fastest server with have a specific feature"""
     logger.debug(
         "Starting fastest feature connect with feature {0}".format(feature)
     )
@@ -724,7 +734,7 @@ def manage_ipv6(mode):
             ipv6_addr = lines[1].strip()
 
         ipv6_info = subprocess.run(
-            "ip addr show dev {0} | grep '\<inet6.*global\>'".format(default_nic), # noqa
+            "ip addr show dev {0} | grep '\<inet6.*global\>'".format(default_nic),  # noqa
             shell=True, stderr=subprocess.PIPE, stdout=subprocess.PIPE
         )
 
@@ -842,10 +852,10 @@ def manage_killswitch(mode, proto=None, port=None):
             "iptables -A INPUT -i lo -j ACCEPT",
             "iptables -A OUTPUT -o {0} -j ACCEPT".format(device),
             "iptables -A INPUT -i {0} -j ACCEPT".format(device),
-            "iptables -A OUTPUT -o {0} -m state --state ESTABLISHED,RELATED -j ACCEPT".format(device), # noqa
-            "iptables -A INPUT -i {0} -m state --state ESTABLISHED,RELATED -j ACCEPT".format(device), # noqa
-            "iptables -A OUTPUT -p {0} -m {1} --dport {2} -j ACCEPT".format(proto.lower(), proto.lower(), port), # noqa
-            "iptables -A INPUT -p {0} -m {1} --sport {2} -j ACCEPT".format(proto.lower(), proto.lower(), port), # noqa
+            "iptables -A OUTPUT -o {0} -m state --state ESTABLISHED,RELATED -j ACCEPT".format(device),  # noqa
+            "iptables -A INPUT -i {0} -m state --state ESTABLISHED,RELATED -j ACCEPT".format(device),  # noqa
+            "iptables -A OUTPUT -p {0} -m {1} --dport {2} -j ACCEPT".format(proto.lower(), proto.lower(), port),  # noqa
+            "iptables -A INPUT -p {0} -m {1} --sport {2} -j ACCEPT".format(proto.lower(), proto.lower(), port),  # noqa
         ]
 
         if int(get_config_value("USER", "killswitch")) == 2:
@@ -858,8 +868,8 @@ def manage_killswitch(mode, proto=None, port=None):
             local_network = local_network.stdout.decode().strip().split()[1]
 
             exclude_lan_commands = [
-                "iptables -A OUTPUT -o {0} -d {1} -j ACCEPT".format(default_nic, local_network), # noqa
-                "iptables -A INPUT -i {0} -s {1} -j ACCEPT".format(default_nic, local_network), # noqa
+                "iptables -A OUTPUT -o {0} -d {1} -j ACCEPT".format(default_nic, local_network),  # noqa
+                "iptables -A INPUT -i {0} -s {1} -j ACCEPT".format(default_nic, local_network),  # noqa
             ]
 
             for lan_command in exclude_lan_commands:
