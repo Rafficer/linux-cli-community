@@ -75,6 +75,7 @@ Depending on your distribution, run the appropriate following command to install
 |OpenSUSE/SLES                            | `sudo zypper in -y openvpn dialog python3-pip python3-setuptools`  |
 |Arch Linux/Manjaro                       | `sudo pacman -S openvpn dialog python-pip python-setuptools`       |
 |Guix                                     | `guix environment protonvpn-cli`                                   |
+|Void Linux                               | `sudo xbps-install -S protonvpn-cli`                               |
 
 #### Installing ProtonVPN-CLI
 
