@@ -1,0 +1,13 @@
+version: '3'
+
+services:
+  linux-cli:
+    build:
+      context: ./
+      dockerfile: Dockerfile
+    volumes:
+      - .:/linux-cli
+      - ~/.pvpn-cli:/root/.pvpn-cli
+      - /dev/net/tun:/dev/net/tun
+    cap_add:
+      - NET_ADMIN
