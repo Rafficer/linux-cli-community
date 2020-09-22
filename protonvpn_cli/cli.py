@@ -218,6 +218,8 @@ def init_cli():
             "custom_dns": "None",
             "check_update_interval": "3",
             "api_domain": "https://api.protonvpn.ch",
+            "metadata_proxy": "0",
+            "metadata_proxy_addr": "None"
         }
         config["metadata"] = {
             "last_api_pull": "0",
@@ -371,7 +373,8 @@ def configure_cli():
             "4) DNS Management\n"
             "5) Kill Switch\n"
             "6) Split Tunneling\n"
-            "7) Purge Configuration\n"
+            "7) Proxy for Metadata Servers\n"
+            "8) Purge Configuration\n"
         )
 
         user_choice = input(
@@ -397,8 +400,10 @@ def configure_cli():
         elif user_choice == "6":
             set_split_tunnel()
             break
-        # Make sure this is always the last option
         elif user_choice == "7":
+            set_metadata_proxy()
+        # Make sure this is always the last option
+        elif user_choice == "8":
             purge_configuration()
             break
         elif user_choice == "":
@@ -710,3 +715,84 @@ def set_split_tunnel():
 
     print()
     print("Split tunneling configuration updated.")
+
+
+def set_metadata_proxy():
+    """Set proxy for fetching metadata from ProtonVPN API servers. This is only
+    used to get the necessary metadata from ProtonVPN API servers when they are
+    blocked or behind a firewall. This is not used to establish the VPN
+    connection through the proxy."""
+
+    def set_metadata_proxy_addr():
+        current_proxy_addr = get_config_value("USER", "metadata_proxy_addr")
+        if not current_proxy_addr == "" or current_proxy_addr == "None":
+            print("")
+            print("Current proxy:", current_proxy_addr)
+
+        print("Enter a new proxy address or leave it empty to skip.\n")
+
+        while True:
+            proxy_ip = input("Proxy IP address: ")
+
+            if proxy_ip == "":
+                return
+
+            if not is_valid_ip(proxy_ip):
+                print("[!] Invalid IP")
+                print()
+                continue
+
+            break
+
+        while True:
+            try:
+                proxy_port = int(input("Proxy port number: "))
+                break
+            except (KeyError, ValueError):
+                print("[!] Invalid port nubmer")
+                print()
+
+        metadata_proxy_addr = f"http://{proxy_ip}:{proxy_port}"
+        set_config_value("USER", "metadata_proxy_addr", metadata_proxy_addr)
+        print("")
+        print("Metadata proxy address configured.\n")
+
+    while True:
+        print()
+        print(
+            "This is only used to get the necessary metadata from ProtonVPN\n"
+            "API servers when they are blocked or behind a firewall. This is\n"
+            "not used to establish the VPN connection through the proxy.\n"
+        )
+        print(
+            ""
+            "1) Enable Metadata Proxy\n"
+            "2) Configure Metadata Proxy Address\n"
+            "3) Disable Metadata Proxy\n"
+        )
+        user_choice = input(
+            "Please enter your choice or leave empty to quit: "
+        )
+        user_choice = user_choice.lower().strip()
+        if user_choice == "1":
+            set_config_value("USER", "metadata_proxy", 1)
+            print("")
+            print("Metadata proxy enabled.")
+            print("You need to configure proxy address as well.\n")
+            break
+        elif user_choice == "2":
+            set_metadata_proxy_addr()
+            break
+        elif user_choice == "3":
+            set_config_value("USER", "metadata_proxy", 0)
+            print("")
+            print("Metadata proxy disabled.\n")
+
+            break
+        elif user_choice == "":
+            print("Quitting configuration.")
+            sys.exit(0)
+        else:
+            print(
+                "[!] Invalid choice. Please enter the number of your choice.\n"
+            )
