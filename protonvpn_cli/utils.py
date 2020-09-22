@@ -21,7 +21,7 @@ from .constants import (
 )
 
 
-def call_api(endpoint, json_format=True, handle_errors=True):
+def call_api(endpoint, proxy=True, json_format=True, handle_errors=True):
     """Call to the ProtonVPN API."""
 
     api_domain = get_config_value("USER", "api_domain").rstrip("/")
@@ -33,15 +33,32 @@ def call_api(endpoint, json_format=True, handle_errors=True):
         "Accept": "application/vnd.protonmail.v1+json"
     }
 
+    proxies = None
+    # Only use proxy when it's enabled by user
+    if check_proxy():
+        # Only use proxy when proxy=False is not explicitly set and
+        # VPN is not connected
+        if proxy and not is_connected():
+            proxy_addr = get_config_value("USER", 'metadata_proxy_addr')
+            proxies = {
+                'http': proxy_addr,
+                'https': proxy_addr
+            }
+            logger.debug("Calling API servers using proxy at {0}".format(proxy_addr)) # noqa
+        else:
+            logger.debug("Proxy is skipped!")
+    else:
+        logger.debug("Proxy is disabled or not configured, skipping proxy!")
+
     logger.debug("Initiating API Call: {0}".format(url))
 
     # For manual error handling, such as in wait_for_network()
     if not handle_errors:
-        response = requests.get(url, headers=headers)
+        response = requests.get(url, headers=headers, proxies=proxies)
         return response
 
     try:
-        response = requests.get(url, headers=headers)
+        response = requests.get(url, headers=headers, proxies=proxies)
     except (requests.exceptions.ConnectionError,
             requests.exceptions.ConnectTimeout):
         print(
@@ -69,7 +86,7 @@ def call_api(endpoint, json_format=True, handle_errors=True):
         return response
 
 
-def pull_server_data(force=False):
+def pull_server_data(force=False, proxy=True):
     """Pull current server data from the ProtonVPN API."""
     config = configparser.ConfigParser()
     config.read(CONFIG_FILE)
@@ -80,7 +97,7 @@ def pull_server_data(force=False):
             logger.debug("Last server pull within 15mins")
             return
 
-    data = call_api("/vpn/logicals")
+    data = call_api("/vpn/logicals", proxy=proxy)
 
     with open(SERVER_INFO_FILE, "w") as f:
         json.dump(data, f)
@@ -138,10 +155,10 @@ def set_config_value(group, key, value):
         config.write(f)
 
 
-def get_ip_info():
+def get_ip_info(proxy=True):
     """Return the current public IP Address"""
     logger.debug("Getting IP Information")
-    ip_info = call_api("/vpn/location")
+    ip_info = call_api("/vpn/location", proxy=proxy)
 
     ip = ip_info["IP"]
     isp = ip_info["ISP"]
@@ -210,7 +227,7 @@ def is_ipv6_disabled():
         return False
 
 
-def wait_for_network(wait_time):
+def wait_for_network(wait_time, proxy=True):
     """Check if internet access is working"""
 
     print("Waiting for connection...")
@@ -223,7 +240,7 @@ def wait_for_network(wait_time):
             sys.exit(1)
         logger.debug("Waiting for {0}s for connection...".format(wait_time))
         try:
-            call_api("/test/ping", handle_errors=False)
+            call_api("/test/ping", handle_errors=False, proxy=proxy)
             time.sleep(2)
             print("Connection working!")
             logger.debug("Connection working!")
@@ -450,6 +467,8 @@ def check_init():
                     "killswitch": "0",
                     "split_tunnel": "0",
                     "api_domain": "https://api.protonvpn.ch",
+                    "metadata_proxy": "0",
+                    "metadata_proxy_addr": "None",
                 },
             }
 
@@ -470,6 +489,15 @@ def check_init():
         )
         logger.debug("Initialized Profile not found")
         sys.exit(1)
+
+
+def check_proxy():
+    """Checks if metadata proxy is enabled and configured."""
+    if (int(get_config_value("USER", "metadata_proxy"))
+            and get_config_value("USER", "metadata_proxy_addr") != "None"):
+        return True
+    else:
+        return False
 
 
 def is_valid_ip(ipaddr):
