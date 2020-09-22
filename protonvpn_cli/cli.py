@@ -752,7 +752,7 @@ def set_metadata_proxy():
                 print("[!] Invalid port nubmer")
                 print()
 
-        metadata_proxy_addr = f"http://{proxy_ip}:{proxy_port}"
+        metadata_proxy_addr = "http://{0}:{1}".format(proxy_ip, proxy_port)
         set_config_value("USER", "metadata_proxy_addr", metadata_proxy_addr)
         print("")
         print("Metadata proxy address configured.\n")
