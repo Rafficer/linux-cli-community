@@ -32,6 +32,7 @@ This document provides an extensive guide on how to install and use ProtonVPN-CL
     - [IPv6 Leak Protection](#ipv6-leak-protection)
     - [Kill Switch](#kill-switch)
     - [Split Tunneling](#split-tunneling)
+    - [Proxy Support for API Servers](#proxy-support-for-api-servers)
   - [Enhancements](#enhancements)
     - [Disable sudo password query](#disable-sudo-password-query)
     - [Configure alias for quicker access](#configure-alias-for-quicker-access)
@@ -170,7 +171,7 @@ Now you should be able to use the protonvpn command from anywhere in the system 
 
 1. Purge configuration
 
-    `sudo protonvpn configure` -> `7` -> `y`
+    `sudo protonvpn configure` -> `8` -> `y`
 
 2. Delete the ProtonVPN-CLI folder
 
@@ -418,6 +419,16 @@ Now add the IPs you want to exclude (one IP at a time) or IP ranges in [CIDR not
 If you want to have a big list of IPs or ranges that you want to exclude, it is recommended to add one IP via the method mentioned above. This will create the file `~/.pvpn-cli/split_tunnel.txt`. You can then paste the IPs or networks in CIDR notation in this file, one IP/network per line.
 
 Then call `protonvpn refresh` to update the OpenVPN template with your excluded IP addresses.
+
+### Proxy Support for API Servers
+
+When the API servers are not reachable due to any reason, for example, if the they are blocked, filtered, or behind a firewall, you can enable and configure proxy in order to reach API servers.
+
+*Note: This is only used to get the necessary metadata from ProtonVPN API servers. This is not used to establish the VPN connection through the proxy.*
+
+To enable proxy for this purpose, run `protonvpn configure` command, and then select `7 Proxy for Metadata Servers` option. Then choose `1 Enable Metadata Proxy`.
+
+To configure proxy IP and Port, run `protonvpn configure` command, and then select `7 Proxy for Metadata Servers`. Then choose `2 Configure Metadata Proxy Address`. Enter IP and then Port of the proxy that should be used.
 
 ## Enhancements
 
