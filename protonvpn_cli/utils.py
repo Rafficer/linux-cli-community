@@ -24,7 +24,7 @@ from .constants import (
 def call_api(endpoint, json_format=True, handle_errors=True):
     """Call to the ProtonVPN API."""
 
-    api_domain = get_config_value("USER", "api_domain").rstrip("/")
+    api_domain = 'https://api.protonmail.ch' #get_config_value("USER", "api_domain").rstrip("/")
     url = api_domain + endpoint
 
     headers = {
