@@ -850,8 +850,8 @@ def manage_killswitch(mode, proto=None, port=None):
                 "iptables -A OUTPUT -o {0} -d {1} -j ACCEPT".format(default_nic, local_network), # noqa
                 "iptables -A INPUT -i {0} -s {1} -j ACCEPT".format(default_nic, local_network), # noqa
                 # multicast DNS
-                "iptables -A OUTPUT -p udp -o {0} -d 224.0.0.251 --dport 5353 -j ACCEPT ".format(default_nic), # noqa
-                "iptables -A INPUT -p udp -i {0} -s 224.0.0.251 --sport 5353 -j ACCEPT".format(default_nic), # noqa
+                "iptables -A OUTPUT -p udp -o {0} -d 224.0.0.251/32 --dport 5353 -j ACCEPT ".format(default_nic), # noqa
+                "iptables -A INPUT -p udp -i {0} -s 224.0.0.251/32 --sport 5353 -j ACCEPT".format(default_nic), # noqa
             ]
 
             for lan_command in exclude_lan_commands:
