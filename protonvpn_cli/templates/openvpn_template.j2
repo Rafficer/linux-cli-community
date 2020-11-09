@@ -69,6 +69,15 @@ route {{ ip_nm_pair.ip }} {{ ip_nm_pair.nm }} net_gateway
 {%- endfor %}
 {%- endif %}
 
+{%- if custom_ovpn_conf %}
+
+# USER CUSTOM CONFIG
+{%- for custom_ovpn_conf_line in custom_ovpn_conf_lines %}
+{{ custom_ovpn_conf_line }}
+{%- endfor %}
+# END OF CUSTOM CONFIG
+{%- endif %}
+
 <ca>
 -----BEGIN CERTIFICATE-----
 MIIFozCCA4ugAwIBAgIBATANBgkqhkiG9w0BAQ0FADBAMQswCQYDVQQGEwJDSDEV

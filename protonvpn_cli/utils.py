@@ -17,7 +17,7 @@ from .logger import logger
 # Constants
 from .constants import (
     USER, CONFIG_FILE, SERVER_INFO_FILE, SPLIT_TUNNEL_FILE,
-    VERSION, OVPN_FILE
+    OVPN_CUSTOM_CONF_FILE, VERSION, OVPN_FILE
 )
 
 
@@ -293,6 +293,21 @@ def create_openvpn_config(serverlist, protocol, ports):
 
             ip_nm_pairs.append({"ip": ip, "nm": netmask})
 
+    # Custom config
+    try:
+        if get_config_value("USER", "custom_openvpn_conf") == "1":
+            custom_ovpn_conf = True
+        else:
+            custom_ovpn_conf = False
+    except KeyError:
+        custom_ovpn_conf = False
+    
+    custom_ovpn_conf_lines = []
+
+    if custom_ovpn_conf:
+        with open(OVPN_CUSTOM_CONF_FILE, 'r') as f:
+            custom_ovpn_conf_lines = f.readlines()
+
     # IPv6
     ipv6_disabled = is_ipv6_disabled()
 
@@ -302,6 +317,8 @@ def create_openvpn_config(serverlist, protocol, ports):
         "openvpn_ports": ports,
         "split": split,
         "ip_nm_pairs": ip_nm_pairs,
+        "custom_ovpn_conf": custom_ovpn_conf,
+        "custom_ovpn_conf_lines": custom_ovpn_conf_lines,
         "ipv6_disabled": ipv6_disabled
     }
 

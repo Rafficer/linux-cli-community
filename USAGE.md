@@ -459,15 +459,22 @@ This lets you use ProtonVPN-CLI by simply typing `protonvpn` without sudo or jus
 
 Systemd is the current init system of most major Linux distributions. This guide shows you how to use systemd to automatically connect to a ProtonVPN Server when you boot up your system.
 
-1. Find the location of the executable with `sudo which protonvpn`
+1. Update the OpenVPN configuration `protonvpn configure` and add the following:
+   ```
+   writepid /var/run/proton.pid
+   ```
+
+   Adjust the path to your liking / system specs.
+
+2. Find the location of the executable with `sudo which protonvpn`
 
    ![which-protonvpn](resources/images/usage-which-protonvpn.png)
 
-2. Create the unit file in `/etc/systemd/system`
+3. Create the unit file in `/etc/systemd/system`
 
    `sudo nano /etc/systemd/system/protonvpn-autoconnect.service`
 
-3. Add the following contents to this file
+4. Add the following contents to this file
 
    ```
    [Unit]
@@ -477,9 +484,12 @@ Systemd is the current init system of most major Linux distributions. This guide
    [Service]
    Type=forking
    ExecStart=/usr/local/bin/protonvpn connect -f
+   ExecStop=/usr/local/bin/protonvpn d
    Environment=PVPN_WAIT=300
    Environment=PVPN_DEBUG=1
    Environment=SUDO_USER=user
+   PIDFile=/var/run/proton.pid
+   Restart=always
 
    [Install]
    WantedBy=multi-user.target
@@ -489,9 +499,11 @@ Systemd is the current init system of most major Linux distributions. This guide
 
    `PVPN_WAIT=300` means that ProtonVPN-CLI will check for 300 Seconds if the internet connection is working before timing out. Adjust this value as you prefer.
 
-   Also replace the path to the `protonvpn` executable in the `ExecStart=` line with the output of Step 1.
+   Also replace the path to the `protonvpn` executable in the `ExecStart=` line with the output of Step 2.
 
    If you want another connect command than fastest as used in this example, just replace `-f` with what you personally prefer.
+
+   Make sure that PIDFile path is same as from step 1.
 
 4. Reload the systemd configuration
 
