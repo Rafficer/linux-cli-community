@@ -145,7 +145,7 @@ class ProtonVPNCLI():
         elif args.tor:
             connection.feature_f(self.server_features_dict.get("tor", None), protocol)
         else:
-            connection.dialog()
+            connection.connection_dialog()
 
     def r(self):
         """Short CLI command to reconnect to the last connected VPN Server"""

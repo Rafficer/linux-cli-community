@@ -27,7 +27,7 @@ from .constants import (
 )
 
 
-def dialog():
+def connection_dialog():
     """Connect to a server with a dialog menu."""
     def show_dialog(headline, choices, stop=False):
         """Show the dialog and process response."""
@@ -70,7 +70,7 @@ def dialog():
         countries[country].append(server["Name"])
 
     # Fist dialog
-    choices = []
+    country_choices = []
 
     for country in sorted(countries.keys()):
         country_features = []
@@ -78,50 +78,64 @@ def dialog():
             feat = int(get_server_value(server, "Features", servers))
             if not features[feat] in country_features:
                 country_features.append(features[feat])
-        choices.append((country, " | ".join(sorted(country_features))))
+        country_choices.append((
+            country,
+            " | ".join(sorted(country_features))
+        ))
 
-    country = show_dialog("Choose a country:", choices)
-    logger.debug("Country Choice: {0}".format(country))
+    def countries_dialog():
+        country = show_dialog("Choose a country:", country_choices)
+        logger.debug("Country Choice: {0}".format(country))
+        return country
 
-    # Second dialog
-    # lambda sorts servers by Load instead of name
-    choices = []
-    country_servers = sorted(countries[country],
-                             key=lambda s: get_server_value(
-                                 s, "Load", servers))
+    def servers_dialog(country):
+        # lambda sorts servers by Load instead of name
+        choices = []
+        country_servers = sorted(countries[country],
+                                 key=lambda s: get_server_value(
+                                     s, "Load", servers))
 
-    for servername in country_servers:
+        for servername in country_servers:
 
-        load = str(
-            get_server_value(servername, "Load", servers)
-        ).rjust(3, " ")
+            load = str(
+                get_server_value(servername, "Load", servers)
+            ).rjust(3, " ")
 
-        feature = features[
-            get_server_value(servername, 'Features', servers)
-        ]
+            feature = features[
+                get_server_value(servername, 'Features', servers)
+            ]
 
-        tier = server_tiers[
-            get_server_value(servername, "Tier", servers)
-        ]
+            tier = server_tiers[
+                get_server_value(servername, "Tier", servers)
+            ]
 
-        choices.append((servername, "Load: {0}% | {1} | {2}".format(
-            load, tier, feature
-        )))
+            choices.append((servername, "Load: {0}% | {1} | {2}".format(
+                load, tier, feature
+            )))
 
-    server_result = show_dialog("Choose the server to connect:", choices)
+        choices.append(("Back", "Back"))
 
-    logger.debug("Server Choice: {0}".format(server_result))
+        server_result = show_dialog("Choose the server to connect:", choices)
 
-    protocol_result = show_dialog(
-        "Choose a protocol:", [
-            ("UDP", "Better Speed"), ("TCP", "Better Reliability")
-        ]
-    )
+        if server_result == "Back":
+            country = countries_dialog()
+            servers_dialog(country)
+        else:
+            logger.debug("Server Choice: {0}".format(server_result))
 
-    logger.debug("Protocol Choice: {0}".format(protocol_result))
+            protocol_result = show_dialog(
+                "Choose a protocol:", [
+                    ("UDP", "Better Speed"), ("TCP", "Better Reliability")
+                ]
+            )
 
-    os.system("clear")
-    openvpn_connect(server_result, protocol_result)
+            logger.debug("Protocol Choice: {0}".format(protocol_result))
+
+            os.system("clear")
+            openvpn_connect(server_result, protocol_result)
+
+    country = countries_dialog()
+    servers_dialog(country)
 
 
 def random_c(protocol=None):
