@@ -301,7 +301,7 @@ def create_openvpn_config(serverlist, protocol, ports):
             custom_ovpn_conf = False
     except KeyError:
         custom_ovpn_conf = False
-    
+
     custom_ovpn_conf_lines = []
 
     if custom_ovpn_conf:

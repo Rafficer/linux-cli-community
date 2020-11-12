@@ -715,6 +715,7 @@ def set_split_tunnel():
     print()
     print("Split tunneling configuration updated.")
 
+
 def set_ovpn_custom_config():
     """Add custom OpenVPN config"""
 
@@ -733,7 +734,7 @@ def set_ovpn_custom_config():
 
         with open(OVPN_CUSTOM_CONF_FILE, 'r') as f:
             print(f.read())
-    
+
     user_choice = input("Enable custom OpenVPN configuration? [y/N]: ")
 
     if user_choice.strip().lower() == "y":
@@ -755,7 +756,7 @@ def set_ovpn_custom_config():
                 config_lines.append(line)
             else:
                 break
-        
+
         config_text = '\n'.join(config_lines)
 
         with open(OVPN_CUSTOM_CONF_FILE, "a") as f:
