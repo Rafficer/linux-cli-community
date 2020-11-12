@@ -17,7 +17,7 @@ from .utils import (
 )
 # Constants
 from .constants import (
-    CONFIG_DIR, CONFIG_FILE, PASSFILE, USER, VERSION, SPLIT_TUNNEL_FILE, USAGE
+    CONFIG_DIR, CONFIG_FILE, PASSFILE, USER, VERSION, SPLIT_TUNNEL_FILE, OVPN_CUSTOM_CONF_FILE, USAGE
 )
 
 
@@ -216,6 +216,7 @@ def init_cli():
             "initialized": "0",
             "dns_leak_protection": "1",
             "custom_dns": "None",
+            "custom_openvpn_conf": "0",
             "check_update_interval": "3",
             "api_domain": "https://api.protonvpn.ch",
         }
@@ -223,7 +224,6 @@ def init_cli():
             "last_api_pull": "0",
             "last_update_check": str(int(time.time())),
         }
-
         with open(CONFIG_FILE, "w") as f:
             config.write(f)
         change_file_owner(CONFIG_FILE)
@@ -371,7 +371,8 @@ def configure_cli():
             "4) DNS Management\n"
             "5) Kill Switch\n"
             "6) Split Tunneling\n"
-            "7) Purge Configuration\n"
+            "7) Advanced OpenVPN config\n"
+            "8) Purge Configuration\n"
         )
 
         user_choice = input(
@@ -397,8 +398,11 @@ def configure_cli():
         elif user_choice == "6":
             set_split_tunnel()
             break
-        # Make sure this is always the last option
         elif user_choice == "7":
+            set_ovpn_custom_config()
+            break
+        # Make sure this is always the last option
+        elif user_choice == "8":
             purge_configuration()
             break
         elif user_choice == "":
@@ -710,3 +714,68 @@ def set_split_tunnel():
 
     print()
     print("Split tunneling configuration updated.")
+
+
+def set_ovpn_custom_config():
+    """Add custom OpenVPN config"""
+
+    print()
+    print(
+        "For advanced users only.\n"
+        "This option enables you to ADD additional OpenVPN config options.\n"
+    )
+    print()
+
+    if os.path.isfile(OVPN_CUSTOM_CONF_FILE) and os.stat(OVPN_CUSTOM_CONF_FILE) != 0:
+        print(
+            "By editing the current config will be overwritten!\n"
+            "Current custom OpenVPN configuration:\n"
+        )
+
+        with open(OVPN_CUSTOM_CONF_FILE, 'r') as f:
+            print(f.read())
+
+    user_choice = input("Enable custom OpenVPN configuration? [y/N]: ")
+
+    if user_choice.strip().lower() == "y":
+        print()
+        print(
+            "Enter custom config below.\n"
+            "Enter each option on a new line.\n"
+            "All lines will be added 'as-is' without validation.\n"
+            "To finish the configuration hit enter.\n"
+        )
+        set_config_value("USER", "custom_openvpn_conf", 1)
+        print()
+
+        config_lines = []
+
+        while True:
+            line = input()
+            if line:
+                config_lines.append(line)
+            else:
+                break
+
+        config_text = '\n'.join(config_lines)
+
+        with open(OVPN_CUSTOM_CONF_FILE, "a") as f:
+            f.write(config_text)
+
+        if os.path.isfile(OVPN_CUSTOM_CONF_FILE):
+            change_file_owner(OVPN_CUSTOM_CONF_FILE)
+        else:
+            logger.debug("No ovpn custom config file existing.")
+            set_config_value("USER", "custom_openvpn_conf", 0)
+
+    else:
+        set_config_value("USER", "custom_openvpn_conf", 0)
+
+        if os.path.isfile(OVPN_CUSTOM_CONF_FILE):
+            clear_config = input("Remove custom OpenVPN configuration? [y/N]: ")
+
+            if clear_config.strip().lower() == "y":
+                os.remove(OVPN_CUSTOM_CONF_FILE)
+
+    print()
+    print("Custom OpenVPN configuration updated.")
