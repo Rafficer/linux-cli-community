@@ -63,7 +63,7 @@ from .utils import (
 )
 # Constants
 from .constants import (
-    CONFIG_DIR, CONFIG_FILE, PASSFILE, USER, VERSION, SPLIT_TUNNEL_FILE
+    CONFIG_DIR, CONFIG_FILE, PASSFILE, USER, VERSION, SPLIT_TUNNEL_FILE, CLIENT_SUFFIX
 )
 
 
@@ -256,7 +256,7 @@ def init_cli():
         set_config_value("USER", "killswitch", 0)
 
         with open(PASSFILE, "w") as f:
-            f.write("{0}\n{1}".format(ovpn_username, ovpn_password))
+            f.write("{0}+{1}\n{2}".format(ovpn_username, CLIENT_SUFFIX, ovpn_password))
             logger.debug("Passfile created")
             os.chmod(PASSFILE, 0o600)
 

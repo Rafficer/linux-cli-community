@@ -17,7 +17,7 @@ from .logger import logger
 # Constants
 from .constants import (
     USER, CONFIG_FILE, SERVER_INFO_FILE, SPLIT_TUNNEL_FILE,
-    VERSION, OVPN_FILE
+    VERSION, OVPN_FILE, CLIENT_SUFFIX
 )
 
 
@@ -521,3 +521,14 @@ def get_transferred_data():
         rx_bytes = int(f.read())
 
     return convert_size(tx_bytes), convert_size(rx_bytes)
+
+
+def patch_passfile(passfile):
+    with open(passfile, "r") as f:
+        ovpn_username = f.readline()
+        ovpn_password = f.readline()
+    if CLIENT_SUFFIX not in ovpn_username.strip().split('+')[1:]:
+        # Let's append the CLIENT_SUFFIX
+        with open(passfile, "w") as f:
+            f.write("{0}+{1}\n{2}".format(ovpn_username.strip(), CLIENT_SUFFIX, ovpn_password))
+        os.chmod(passfile, 0o600)

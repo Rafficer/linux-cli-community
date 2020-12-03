@@ -17,4 +17,5 @@ SERVER_INFO_FILE = os.path.join(CONFIG_DIR, "serverinfo.json")
 SPLIT_TUNNEL_FILE = os.path.join(CONFIG_DIR, "split_tunnel.txt")
 OVPN_FILE = os.path.join(CONFIG_DIR, "connect.ovpn")
 PASSFILE = os.path.join(CONFIG_DIR, "pvpnpass")
-VERSION = "2.2.4"
+CLIENT_SUFFIX = "plc" # ProtonVPN Linux Community
+VERSION = "2.2.5"

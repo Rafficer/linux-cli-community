@@ -19,11 +19,11 @@ from .utils import (
     set_config_value, get_ip_info, get_country_name,
     get_fastest_server, check_update, get_default_nic,
     get_transferred_data, create_openvpn_config,
-    is_ipv6_disabled
+    is_ipv6_disabled, patch_passfile
 )
 # Constants
 from .constants import (
-    CONFIG_DIR, OVPN_FILE, PASSFILE, CONFIG_FILE
+    CONFIG_DIR, OVPN_FILE, PASSFILE, CONFIG_FILE, CLIENT_SUFFIX
 )
 
 
@@ -458,6 +458,8 @@ def openvpn_connect(servername, protocol):
     old_ip, _ = get_ip_info()
 
     print("Connecting to {0} via {1}...".format(servername, protocol.upper()))
+
+    patch_passfile(PASSFILE)
 
     with open(os.path.join(CONFIG_DIR, "ovpn.log"), "w+") as f:
         subprocess.Popen(
