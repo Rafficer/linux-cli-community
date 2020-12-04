@@ -28,7 +28,7 @@ def call_api(endpoint, json_format=True, handle_errors=True):
     url = api_domain + endpoint
 
     headers = {
-        "x-pm-appversion": "Other",
+        "x-pm-appversion": "LinuxVPN_{0}".format(VERSION),
         "x-pm-apiversion": "3",
         "Accept": "application/vnd.protonmail.v1+json"
     }

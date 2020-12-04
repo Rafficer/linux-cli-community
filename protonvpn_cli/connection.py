@@ -23,7 +23,7 @@ from .utils import (
 )
 # Constants
 from .constants import (
-    CONFIG_DIR, OVPN_FILE, PASSFILE, CONFIG_FILE, CLIENT_SUFFIX
+    CONFIG_DIR, OVPN_FILE, PASSFILE, CONFIG_FILE
 )
 
 
