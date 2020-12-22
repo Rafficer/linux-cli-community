@@ -2,6 +2,8 @@
 
 ## Table of Contents
 
+- [v2.2.6](#v226)
+- [v2.2.5](#v225)
 - [v2.2.4](#v224)
 - [v2.2.3](#v223)
 - [v2.2.2](#v222)
@@ -12,6 +14,14 @@
 - [v2.1.0](#v210)
 - [v2.0.0](#v200)
 - [v0.1.0](#v010)
+
+## v2.2.6
+
+- Enhancement: Properly specifies versioning when contacting Proton API
+
+## v2.2.5
+
+- Enhancement: Introduces support for the client to declare itself
 
 ## v2.2.4
 
