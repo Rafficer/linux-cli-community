@@ -639,12 +639,14 @@ def manage_ipv6(mode):
 
     if mode == "disable":
         logger.debug("Disabling IPv6")
-        subprocess.run(["sysctl", "net.ipv6.conf.all.disable_ipv6=1"])
+        subprocess.run(["sysctl", "net.ipv6.conf.all.disable_ipv6=1"],
+                        stdout=subprocess.PIPE)
         logger.debug("IPv6 disabled successfully")
 
     elif mode == "restore":
         logger.debug("Restoring IPv6")
-        subprocess.run(["sysctl", "net.ipv6.conf.all.disable_ipv6=0"])
+        subprocess.run(["sysctl", "net.ipv6.conf.all.disable_ipv6=0"],
+                       stdout=subprocess.PIPE)
         logger.debug("IPv6 restored successfully")
 
     else:
