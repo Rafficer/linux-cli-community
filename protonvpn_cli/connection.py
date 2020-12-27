@@ -18,8 +18,7 @@ from .utils import (
     get_servers, get_server_value, get_config_value,
     set_config_value, get_ip_info, get_country_name,
     get_fastest_server, check_update, get_default_nic,
-    get_transferred_data, create_openvpn_config,
-    is_ipv6_disabled, patch_passfile
+    get_transferred_data, create_openvpn_config, patch_passfile
 )
 # Constants
 from .constants import (
@@ -640,7 +639,7 @@ def manage_ipv6(mode):
     if mode == "disable":
         logger.debug("Disabling IPv6")
         subprocess.run(["sysctl", "net.ipv6.conf.all.disable_ipv6=1"],
-                        stdout=subprocess.PIPE)
+                       stdout=subprocess.PIPE)
         logger.debug("IPv6 disabled successfully")
 
     elif mode == "restore":
