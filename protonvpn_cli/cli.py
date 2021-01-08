@@ -59,7 +59,7 @@ from .logger import logger
 from .utils import (
     check_root, change_file_owner, pull_server_data,
     check_init, set_config_value, get_config_value,
-    is_valid_ip, wait_for_network
+    is_valid_ip, wait_for_network, create_dev_tun
 )
 # Constants
 from .constants import (
