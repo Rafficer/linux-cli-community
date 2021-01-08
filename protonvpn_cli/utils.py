@@ -9,6 +9,7 @@ import re
 import random
 import ipaddress
 import math
+import stat
 # External Libraries
 import requests
 from jinja2 import Environment, FileSystemLoader
@@ -471,6 +472,14 @@ def check_init():
         logger.debug("Initialized Profile not found")
         sys.exit(1)
 
+
+def create_dev_tun():
+    if os.path.exists('/dev/net/tun'):
+        return
+    os.mkdir("/dev/net/")
+    os.mknod("/dev/net/tun",
+             mode=0o0755 | stat.S_IFCHR,
+             device=os.makedev(10, 200))
 
 def is_valid_ip(ipaddr):
     valid_ip_re = re.compile(
