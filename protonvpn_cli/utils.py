@@ -310,17 +310,14 @@ def create_openvpn_config(serverlist, protocol, ports):
 
 def change_file_owner(path):
     """Change the owner of specific files to the sudo user."""
-    uid = int(subprocess.run(["id", "-u", USER],
-                             stdout=subprocess.PIPE).stdout)
-    gid = int(subprocess.run(["id", "-u", USER],
-                             stdout=subprocess.PIPE).stdout)
+    sudo_user = pwd.getpwnam(USER)
+    uid = sudo_user.pw_uid
+    gid = sudo_user.pw_gid
 
-    current_owner = subprocess.run(["id", "-nu", str(os.stat(path).st_uid)],
-                                   stdout=subprocess.PIPE).stdout
-    current_owner = current_owner.decode().rstrip("\n")
+    current_owner = os.stat(path).st_uid
 
     # Only change file owner if it wasn't owned by current running user.
-    if current_owner != USER:
+    if current_owner != uid:
         os.chown(path, uid, gid)
         logger.debug("Changed owner of {0} to {1}".format(path, USER))
 
