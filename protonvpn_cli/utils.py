@@ -419,7 +419,7 @@ def check_update():
 
               To see what's new, check out the changelog:
               https://github.com/ProtonVPN/linux-cli/blob/master/CHANGELOG.md""".format(
-                  '.'.join([str(x) for x in latest_version]))))
+              '.'.join([str(x) for x in latest_version]))))
 
 
 def check_init():
