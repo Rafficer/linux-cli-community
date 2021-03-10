@@ -16,6 +16,12 @@
 
 ProtonVPN-CLI is a full rewrite of the [bash protonvpn-cli](https://github.com/ProtonVPN/protonvpn-cli/blob/master/protonvpn-cli.sh) in Python, which adds more features and functionality with the purpose of improving readability, speed and reliability.
 
+
+## Important information
+The [official ProtonVPN Linux beta](https://protonvpn.com/blog/linux-vpn-cli-beta) app is available for most Linux Debian-based distros and Fedora 33 
+(support for more distros to follow). Where possible, we recommend that you [upgrade to the official app](https://protonvpn.com/support/official-linux-client/).
+The community Linux client described below remains available for those who need it.
+
 ## Installation & Updating
 
 For more detailed information on installing, updating and uninstalling, please view the extensive [usage guide](https://github.com/ProtonVPN/linux-cli/blob/master/USAGE.md#installation--updating).
