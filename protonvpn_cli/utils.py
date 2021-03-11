@@ -9,6 +9,7 @@ import re
 import random
 import ipaddress
 import math
+from textwrap import dedent
 # External Libraries
 import requests
 from jinja2 import Environment, FileSystemLoader
@@ -410,18 +411,15 @@ def check_update():
     set_config_value("metadata", "last_update_check", int(time.time()))
 
     if update_available:
-        print()
-        print(
-            "A new Update for ProtonVPN-CLI (v{0}) ".format('.'.join(
-                [str(x) for x in latest_version])
-            )
-            + "is available.\n"
-            + "Follow the Update instructions on\n"
-            + "https://github.com/ProtonVPN/linux-cli/blob/master/USAGE.md#updating-protonvpn-cli\n"
-            + "\n"
-            + "To see what's new, check out the changelog:\n"
-            + "https://github.com/ProtonVPN/linux-cli/blob/master/CHANGELOG.md"
-        )
+        print(dedent("""
+              A new Update for ProtonVPN-CLI (v{0})
+              is available.
+              Follow the Update instructions on
+              https://github.com/ProtonVPN/linux-cli/blob/master/USAGE.md#updating-protonvpn-cli
+
+              To see what's new, check out the changelog:
+              https://github.com/ProtonVPN/linux-cli/blob/master/CHANGELOG.md""".format(
+              '.'.join([str(x) for x in latest_version]))))
 
 
 def check_init():
