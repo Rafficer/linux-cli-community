@@ -1,7 +1,9 @@
 import os
 import getpass
 import pwd
-
+from xdg import (
+        xdg_config_home
+)
 # This implementation is mostly for GUI support. See #168
 try:
     USER = pwd.getpwuid(int(os.environ["PKEXEC_UID"])).pw_name
@@ -11,7 +13,11 @@ except KeyError:
     except KeyError:
         USER = getpass.getuser()
 
-CONFIG_DIR = os.path.join(os.path.expanduser("~{0}".format(USER)), ".pvpn-cli")
+try:
+    CONFIG_DIR = os.path.join(xdg_config_home(), "pvpn-cli")
+except KeyError:
+    CONFIG_DIR = os.path.join(os.path.expanduser("~{0}".format(USER)), ".pvpn-cli")
+
 CONFIG_FILE = os.path.join(CONFIG_DIR, "pvpn-cli.cfg")
 SERVER_INFO_FILE = os.path.join(CONFIG_DIR, "serverinfo.json")
 SPLIT_TUNNEL_FILE = os.path.join(CONFIG_DIR, "split_tunnel.txt")
