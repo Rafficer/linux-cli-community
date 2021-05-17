@@ -43,28 +43,27 @@ Commands:
 Arguments:
     <servername>        Servername (CH#4, CH-US-1, HK5-Tor).
 """
-# Standard Libraries
-import sys
-import os
-import textwrap
 import configparser
 import getpass
+import os
 import shutil
+# Standard Libraries
+import sys
+import textwrap
 import time
+
 # External Libraries
 from docopt import docopt
+
 # protonvpn-cli Functions
 from . import connection
-from .logger import logger
-from .utils import (
-    check_root, change_file_owner, pull_server_data,
-    check_init, set_config_value, get_config_value,
-    is_valid_ip, wait_for_network
-)
 # Constants
-from .constants import (
-    CONFIG_DIR, CONFIG_FILE, PASSFILE, USER, VERSION, SPLIT_TUNNEL_FILE, CLIENT_SUFFIX
-)
+from .constants import (CLIENT_SUFFIX, CONFIG_DIR, CONFIG_FILE, PASSFILE,
+                        SPLIT_TUNNEL_FILE, USER, VERSION)
+from .logger import logger
+from .utils import (change_file_owner, check_init, check_root,
+                    get_config_value, is_valid_ip, pull_server_data,
+                    set_config_value, wait_for_network)
 
 
 def main():
@@ -78,6 +77,12 @@ def main():
 
 def cli():
     """Run user's input command."""
+
+    if shutil.which("NetworkManager") or shutil.which("nmcli"):
+        print(
+            "\nProtonVPN now offers an official Linux app with graphical user interface.\n"
+            "Visit https://protonvpn.com/support/official-linux-client to upgrade."
+        )
 
     # Initial log values
     change_file_owner(os.path.join(CONFIG_DIR, "pvpn-cli.log"))
