@@ -80,7 +80,7 @@ def cli():
 
     if shutil.which("NetworkManager") or shutil.which("nmcli"):
         print(
-            "\nProtonVPN now offers an official Linux app with graphical user interface.\n"
+            "\nProtonVPN now offers an official Linux app which includes a graphical user interface.\n"
             "Visit https://protonvpn.com/support/official-linux-client to upgrade."
         )
 
