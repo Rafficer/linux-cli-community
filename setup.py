@@ -42,6 +42,7 @@ setup(
         "docopt",
         "pythondialog",
         "jinja2",
+        "distro",
     ],
     python_requires=">=3.5",
     classifiers=[
