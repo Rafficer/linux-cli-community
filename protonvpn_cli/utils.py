@@ -19,6 +19,7 @@ from .constants import (
     USER, CONFIG_FILE, SERVER_INFO_FILE, SPLIT_TUNNEL_FILE,
     VERSION, OVPN_FILE, CLIENT_SUFFIX
 )
+import distro
 
 
 def call_api(endpoint, json_format=True, handle_errors=True):
@@ -26,11 +27,12 @@ def call_api(endpoint, json_format=True, handle_errors=True):
 
     api_domain = get_config_value("USER", "api_domain").rstrip("/")
     url = api_domain + endpoint
-
+    distribution, version, _ = distro.linux_distribution()
     headers = {
         "x-pm-appversion": "LinuxVPN_{0}".format(VERSION),
         "x-pm-apiversion": "3",
-        "Accept": "application/vnd.protonmail.v1+json"
+        "Accept": "application/vnd.protonmail.v1+json",
+        "User-Agent": "ProtonVPN (Linux; {}/{})".format(distribution, version),
     }
 
     logger.debug("Initiating API Call: {0}".format(url))
@@ -417,10 +419,10 @@ def check_update():
             )
             + "is available.\n"
             + "Follow the Update instructions on\n"
-            + "https://github.com/ProtonVPN/linux-cli/blob/master/USAGE.md#updating-protonvpn-cli\n"
+            + "https://github.com/ProtonVPN/linux-cli-community/blob/master/USAGE.md#updating-protonvpn-cli\n"
             + "\n"
             + "To see what's new, check out the changelog:\n"
-            + "https://github.com/ProtonVPN/linux-cli/blob/master/CHANGELOG.md"
+            + "https://github.com/ProtonVPN/linux-cli-community/blob/master/CHANGELOG.md"
         )
 
 
