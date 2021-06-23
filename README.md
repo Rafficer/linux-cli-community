@@ -16,15 +16,13 @@
 
 ProtonVPN-CLI is a full rewrite of the [bash protonvpn-cli](https://github.com/ProtonVPN/protonvpn-cli/blob/master/protonvpn-cli.sh) in Python, which adds more features and functionality with the purpose of improving readability, speed and reliability.
 
-
 ## Important information
-The [official ProtonVPN Linux beta](https://protonvpn.com/blog/linux-vpn-cli-beta) app is available for most Linux Debian-based distros and Fedora 33 
-(support for more distros to follow). Where possible, we recommend that you [upgrade to the official app](https://protonvpn.com/support/official-linux-client/).
+The [official ProtonVPN Linux](https://protonvpn.com/blog/protonvpn-linux-app/) app is available for Debian 10, Ubuntu 20+, Mint 19+, MX Linux 19+, Fedora 31+ and Archlinux / Manjaro. Where possible, we recommend that you [upgrade to the official app](https://protonvpn.com/support/linux-vpn-setup/).
 The community Linux client described below remains available for those who need it.
 
 ## Installation & Updating
 
-For more detailed information on installing, updating and uninstalling, please view the extensive [usage guide](https://github.com/ProtonVPN/linux-cli/blob/master/USAGE.md#installation--updating).
+For more detailed information on installing, updating and uninstalling, please view the extensive [usage guide](https://github.com/ProtonVPN/linux-cli-community/blob/master/USAGE.md#installation--updating).
 
 ### Installing from distribution repositories
 
@@ -89,13 +87,13 @@ Installation happens via Python's package manager PIP.
 
 ### Manual Installation from source
 
-*Disclaimer: If you are unsure about what you're doing, please follow the [normal installation guide](https://github.com/ProtonVPN/linux-cli/blob/master/USAGE.md#installation--updating).*
+*Disclaimer: If you are unsure about what you're doing, please follow the [normal installation guide](https://github.com/ProtonVPN/linux-cli-community/blob/master/USAGE.md#installation--updating).*
 
 It is recommended to do the manual installation in a virtual environment. Especially if it serves the purpose of developing.
 
 1. Clone this repository
 
-    `git clone https://github.com/protonvpn/linux-cli`
+    `git clone https://github.com/ProtonVPN/linux-cli-community`
 
 2. Step into the directory
 
@@ -109,7 +107,7 @@ For updating, you just need to pull the latest version of the repository with gi
 
 ### How to use
 
-#### For more detailed information, see the extensive [usage guide](https://github.com/ProtonVPN/linux-cli/blob/master/USAGE.md).
+#### For more detailed information, see the extensive [usage guide](https://github.com/ProtonVPN/linux-cli-community/blob/master/USAGE.md).
 
 | **Command**                       | **Description**                                       |
 |:----------------------------------|:------------------------------------------------------|
@@ -134,4 +132,4 @@ All connect options can be used with the `-p` flag to explicitly specify which t
 
 ## Contributing
 
-If you want to contribute to this project, please read the [contribution guide](https://github.com/ProtonVPN/linux-cli/blob/master/CONTRIBUTING.md).
+If you want to contribute to this project, please read the [contribution guide](https://github.com/ProtonVPN/linux-cli-community/blob/master/CONTRIBUTING.md).
