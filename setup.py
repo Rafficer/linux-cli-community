@@ -1,7 +1,8 @@
 """setup.py: setuptools control."""
 
 
-import re, os
+import re
+import os
 from setuptools import setup
 
 try:
@@ -17,7 +18,7 @@ except FileNotFoundError:
     """
 
 version = re.search(
-    r'(VERSION = "(\d.\d.\d)")',
+    r'(VERSION = "(\d.\d.\d+)")',
     open("protonvpn_cli/constants.py").read(),
     re.M
 ).group(2)

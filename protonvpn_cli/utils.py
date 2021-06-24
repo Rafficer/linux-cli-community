@@ -32,7 +32,7 @@ def call_api(endpoint, json_format=True, handle_errors=True):
         "x-pm-appversion": "LinuxVPN_{0}".format(VERSION),
         "x-pm-apiversion": "3",
         "Accept": "application/vnd.protonmail.v1+json",
-        "User-Agent": "ProtonVPN (Linux; {}/{})".format(distribution, version),
+        "User-Agent": "ProtonVPN/{} (Linux; {}/{})".format(VERSION, distribution, version),
     }
 
     logger.debug("Initiating API Call: {0}".format(url))
