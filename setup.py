@@ -29,9 +29,11 @@ setup(
     entry_points={
         "console_scripts": ["protonvpn = protonvpn_cli.cli:main"]
     },
+    include_package_data=True,
     version=version,
     description="Linux command-line client for ProtonVPN",
     long_description=long_descr,
+    long_description_content_type="text/markdown",
     author="Proton Technologies AG",
     author_email="contact@protonvpn.com",
     license="GPLv3",
