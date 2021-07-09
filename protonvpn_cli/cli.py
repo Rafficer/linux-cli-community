@@ -432,6 +432,9 @@ def set_protonvpn_tier(write=False):
         try:
             user_tier = int(user_tier)
             # Check if the choice exists in the dictionary
+            
+            # Lower tier by one to match API allocation
+            user_tier -= 1
             protonvpn_plans[user_tier]
             break
         except (KeyError, ValueError):
