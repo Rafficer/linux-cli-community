@@ -554,75 +554,84 @@ def manage_dns(mode, dns_server=False):
 
     if mode == "leak_protection":
         logger.debug("Leak Protection initiated")
-        # Restore original resolv.conf if it exists
-        if os.path.isfile(backupfile):
-            logger.debug("resolv.conf.backup exists")
-            manage_dns("restore")
-        # Check for custom DNS Server
-        if not int(get_config_value("USER", "dns_leak_protection")):
-            if get_config_value("USER", "custom_dns") == "None":
-                logger.debug("DNS Leak Protection is disabled")
-                return
-            else:
-                dns_server = get_config_value("USER", "custom_dns")
-                logger.debug("Using custom DNS")
+        if shutil.which("resolvectl") and os.path.islink("/etc/resolv.conf"):
+            logger.debug("Running resolvectl command for leak_protection")
+            cmd_args = ["resolvectl", "dns", "proton0", dns_server]
+            pipes = subprocess.Popen(cmd_args, stderr=subprocess.PIPE)
+            _, std_err = pipes.communicate()
+            if pipes.returncode != 0:
+                raise Exception(f"{' '.join(cmd_args)} failed with code {pipes.returncode} -> {std_err.strip()}")
         else:
-            logger.debug("DNS Leak Protection is enabled")
-        # Make sure DNS Server has been provided
-        if not dns_server:
-            raise Exception("No DNS Server has been provided.")
+            # Restore original resolv.conf if it exists
+            if os.path.isfile(backupfile):
+                logger.debug("resolv.conf.backup exists")
+                manage_dns("restore")
+            # Check for custom DNS Server
+            if not int(get_config_value("USER", "dns_leak_protection")):
+                if get_config_value("USER", "custom_dns") == "None":
+                    logger.debug("DNS Leak Protection is disabled")
+                    return
+                else:
+                    dns_server = get_config_value("USER", "custom_dns")
+                    logger.debug("Using custom DNS")
+            else:
+                logger.debug("DNS Leak Protection is enabled")
+            # Make sure DNS Server has been provided
+            if not dns_server:
+                raise Exception("No DNS Server has been provided.")
 
-        shutil.copy2(resolvconf_path, backupfile)
-        logger.debug("{0} (resolv.conf) backed up".format(resolvconf_path))
+            shutil.copy2(resolvconf_path, backupfile)
+            logger.debug("{0} (resolv.conf) backed up".format(resolvconf_path))
 
-        # Remove previous nameservers
-        dns_regex = re.compile(r"^nameserver .*$")
+            # Remove previous nameservers
+            dns_regex = re.compile(r"^nameserver .*$")
 
-        with open(backupfile, 'r') as backup_handle:
-            with open(resolvconf_path, 'w') as resolvconf_handle:
-                for line in backup_handle:
-                    if not dns_regex.search(line):
-                        resolvconf_handle.write(line)
+            with open(backupfile, 'r') as backup_handle:
+                with open(resolvconf_path, 'w') as resolvconf_handle:
+                    for line in backup_handle:
+                        if not dns_regex.search(line):
+                            resolvconf_handle.write(line)
 
-        logger.debug("Removed existing DNS Servers")
+            logger.debug("Removed existing DNS Servers")
 
-        # Add ProtonVPN managed DNS Server to resolv.conf
-        dns_server = dns_server.split()
-        with open(resolvconf_path, "a") as f:
-            f.write("# ProtonVPN DNS Servers. Managed by ProtonVPN-CLI.\n")
-            for dns in dns_server[:3]:
-                f.write("nameserver {0}\n".format(dns))
-            logger.debug("Added ProtonVPN or custom DNS")
+            # Add ProtonVPN managed DNS Server to resolv.conf
+            dns_server = dns_server.split()
+            with open(resolvconf_path, "a") as f:
+                f.write("# ProtonVPN DNS Servers. Managed by ProtonVPN-CLI.\n")
+                for dns in dns_server[:3]:
+                    f.write("nameserver {0}\n".format(dns))
+                logger.debug("Added ProtonVPN or custom DNS")
 
-        # Write the hash of the edited file in the configuration
-        #
-        # This is so it doesn't restore an old DNS configuration
-        # if the configuration changes during a VPN session
-        # (e.g. by switching networks)
+            # Write the hash of the edited file in the configuration
+            #
+            # This is so it doesn't restore an old DNS configuration
+            # if the configuration changes during a VPN session
+            # (e.g. by switching networks)
 
-        with open(resolvconf_path, "rb") as f:
-            filehash = zlib.crc32(f.read())
-        set_config_value("metadata", "resolvconf_hash", filehash)
+            with open(resolvconf_path, "rb") as f:
+                filehash = zlib.crc32(f.read())
+            set_config_value("metadata", "resolvconf_hash", filehash)
 
     elif mode == "restore":
         logger.debug("Restoring DNS")
-        if os.path.isfile(backupfile):
+        if not (shutil.which("resolvectl") and os.path.islink("/etc/resolv.conf")):
+            if os.path.isfile(backupfile):
 
-            # Check if the file changed since connection
-            oldhash = get_config_value("metadata", "resolvconf_hash")
-            with open(resolvconf_path, "rb") as f:
-                filehash = zlib.crc32(f.read())
+                # Check if the file changed since connection
+                oldhash = get_config_value("metadata", "resolvconf_hash")
+                with open(resolvconf_path, "rb") as f:
+                    filehash = zlib.crc32(f.read())
 
-            if filehash == int(oldhash):
-                shutil.copy2(backupfile, resolvconf_path)
-                logger.debug("resolv.conf restored from backup")
+                if filehash == int(oldhash):
+                    shutil.copy2(backupfile, resolvconf_path)
+                    logger.debug("resolv.conf restored from backup")
+                else:
+                    logger.debug("resolv.conf changed. Not restoring.")
+
+                os.remove(backupfile)
+                logger.debug("resolv.conf.backup removed")
             else:
-                logger.debug("resolv.conf changed. Not restoring.")
-
-            os.remove(backupfile)
-            logger.debug("resolv.conf.backup removed")
-        else:
-            logger.debug("No Backupfile found")
+                logger.debug("No Backupfile found")
     else:
         raise Exception("Invalid argument provided. "
                         "Mode must be 'restore' or 'leak_protection'")
