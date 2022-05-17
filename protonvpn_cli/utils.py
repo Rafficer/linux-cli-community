@@ -55,10 +55,15 @@ def call_api(endpoint, json_format=True, handle_errors=True):
     try:
         response.raise_for_status()
     except requests.exceptions.HTTPError:
+        try:
+            error_message = response.json()['Error']
+        except:
+            error_message = "Unknown error"
         print(
             "[!] There was an error with accessing the ProtonVPN API.\n"
             "[!] Please make sure your connection is working properly!\n"
-            "[!] HTTP Error Code: {0}".format(response.status_code)
+            "[!] HTTP Error Code: {0}\n"
+            "[!] {1}".format(response.status_code, error_message)
         )
         logger.debug("Bad Return Code: {0}".format(response.status_code))
         sys.exit(1)
