@@ -57,7 +57,12 @@ def dialog():
 
     pull_server_data()
 
-    features = {0: "Normal", 1: "Secure-Core", 2: "Tor", 4: "P2P"}
+    features = {
+        1: "Secure-Core",
+        2: "Tor",
+        4: "P2P",
+        8: "Streaming",
+    }
     server_tiers = {0: "F", 1: "B", 2: "P"}
 
     servers = get_servers()
@@ -76,8 +81,14 @@ def dialog():
         country_features = []
         for server in countries[country]:
             feat = int(get_server_value(server, "Features", servers))
-            if not features[feat] in country_features:
-                country_features.append(features[feat])
+            for bit_flag in features:
+                if (feat & bit_flag) != 0:
+                    if not features[bit_flag] in country_features:
+                        country_features.append(features[bit_flag])
+
+        if len(country_features) == 0:
+            country_features.append("Normal")
+
         choices.append((country, " | ".join(sorted(country_features))))
 
     country = show_dialog("Choose a country:", choices)
@@ -96,16 +107,21 @@ def dialog():
             get_server_value(servername, "Load", servers)
         ).rjust(3, " ")
 
-        feature = features[
-            get_server_value(servername, 'Features', servers)
-        ]
+        servers_features = []
+        feat = int(get_server_value(servername, 'Features', servers))
+        for bit_flag in features:
+            if (feat & bit_flag) != 0:
+                servers_features.append(features[bit_flag])
+
+        if len(servers_features) == 0:
+            servers_features.append("Normal")
 
         tier = server_tiers[
             get_server_value(servername, "Tier", servers)
         ]
 
         choices.append((servername, "Load: {0}% | {1} | {2}".format(
-            load, tier, feature
+            load, tier, ", ".join(servers_features)
         )))
 
     server_result = show_dialog("Choose the server to connect:", choices)
