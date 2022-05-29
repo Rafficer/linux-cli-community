@@ -57,7 +57,7 @@ def call_api(endpoint, json_format=True, handle_errors=True):
     except requests.exceptions.HTTPError:
         try:
             error_message = response.json()['Error']
-        except:
+        except: # noqa
             error_message = "Unknown error"
         print(
             "[!] There was an error with accessing the ProtonVPN API.\n"
