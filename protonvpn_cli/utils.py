@@ -450,6 +450,7 @@ def check_init():
 
             default_conf = {
                 "USER": {
+                    "uid": "uid",
                     "username": "username",
                     "tier": "0",
                     "default_protocol": "udp",
