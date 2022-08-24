@@ -384,6 +384,7 @@ def set_username_password(write=False):
     """Set the ProtonVPN Username and Password."""
 
     print()
+    ovpn_uid = input("Enter your ProtonVPN uid: ")
     ovpn_username = input("Enter your ProtonVPN OpenVPN username: ")
 
     # Ask for the password and confirmation until both are the same
@@ -402,6 +403,7 @@ def set_username_password(write=False):
             break
 
     if write:
+        set_config_value("USER", "uid", ovpn_uid)
         set_config_value("USER", "username", ovpn_username)
 
         with open(PASSFILE, "w") as f:
