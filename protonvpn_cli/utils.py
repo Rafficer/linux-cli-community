@@ -28,9 +28,11 @@ def call_api(endpoint, json_format=True, handle_errors=True):
     api_domain = get_config_value("USER", "api_domain").rstrip("/")
     url = api_domain + endpoint
     distribution, version, _ = distro.linux_distribution()
+    uid = get_config_value("USER", "uid")
     headers = {
         "x-pm-appversion": "LinuxVPN_{0}".format(VERSION),
         "x-pm-apiversion": "3",
+        "x-pm-uid": uid,
         "Accept": "application/vnd.protonmail.v1+json",
         "User-Agent": "ProtonVPN/{} (Linux; {}/{})".format(VERSION, distribution, version),
     }
