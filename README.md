@@ -97,7 +97,7 @@ It is recommended to do the manual installation in a virtual environment. Especi
 
 2. Step into the directory
 
-   `cd linux-cli`
+   `cd linux-cli-community`
 
 3. Install
 
