@@ -28,6 +28,12 @@ For more detailed information on installing, updating and uninstalling, please v
 
 For the following Linux distribution(s), install the official `protonvpn-cli` package:
 
+#### Guix
+
+```sh
+guix install protonvpn-cli
+```
+
 #### Fedora
 
 ```sh
@@ -72,6 +78,7 @@ Depending on your distribution, run the appropriate following command to install
 |Ubuntu/Linux Mint/Debian and derivatives | `sudo apt install -y openvpn dialog python3-pip python3-setuptools`|
 |OpenSUSE/SLES                            | `sudo zypper in -y openvpn dialog python3-pip python3-setuptools`  |
 |Arch Linux/Manjaro                       | `sudo pacman -S openvpn dialog python-pip python-setuptools`       |
+|Guix                                     | `guix environment protonvpn-cli`                                   |
 
 #### Installing ProtonVPN-CLI
 
