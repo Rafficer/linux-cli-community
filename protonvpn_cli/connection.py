@@ -181,7 +181,7 @@ def fastest(protocol=None):
     openvpn_connect(fastest_server, protocol)
 
 
-def country_f(country_code, protocol=None):
+def country_f(country_code, protocol=None, excluded=False):
     """Connect to the fastest server in a specific country."""
     logger.debug("Starting fastest country connect")
 
@@ -201,15 +201,25 @@ def country_f(country_code, protocol=None):
     # Filter out excluded features and countries
     server_pool = []
     for server in servers:
-        if server["Features"] not in excluded_features and server["ExitCountry"] == country_code:
-            server_pool.append(server)
+        if server["Features"] not in excluded_features:
+            if (excluded and server["ExitCountry"] != country_code) or (
+                not excluded and server["ExitCountry"] == country_code
+            ):
+                server_pool.append(server)
 
     if len(server_pool) == 0:
-        print(
-            "[!] No Server in country {0} found\n".format(country_code)
-            + "[!] Please choose a valid country"
-        )
-        logger.debug("No server in country {0}".format(country_code))
+        if not excluded:
+            print(
+                "[!] No Server in country {0} found\n".format(country_code)
+                + "[!] Please choose a valid country"
+            )
+            logger.debug("No server in country {0}".format(country_code))
+        else:
+            print(
+                "[!] No Server found outside country {0}\n".format(country_code)
+                + "[!] Please choose a valid country"
+            )
+            logger.debug("No server outside country {0}".format(country_code))
         sys.exit(1)
 
     fastest_server = get_fastest_server(server_pool)
@@ -217,7 +227,7 @@ def country_f(country_code, protocol=None):
 
 
 def feature_f(feature, protocol=None):
-    """Connect to the fastest server in a specific country."""
+    """Connect to the fastest server with have a specific feature"""
     logger.debug(
         "Starting fastest feature connect with feature {0}".format(feature)
     )
@@ -570,75 +580,84 @@ def manage_dns(mode, dns_server=False):
 
     if mode == "leak_protection":
         logger.debug("Leak Protection initiated")
-        # Restore original resolv.conf if it exists
-        if os.path.isfile(backupfile):
-            logger.debug("resolv.conf.backup exists")
-            manage_dns("restore")
-        # Check for custom DNS Server
-        if not int(get_config_value("USER", "dns_leak_protection")):
-            if get_config_value("USER", "custom_dns") == "None":
-                logger.debug("DNS Leak Protection is disabled")
-                return
-            else:
-                dns_server = get_config_value("USER", "custom_dns")
-                logger.debug("Using custom DNS")
+        if shutil.which("resolvectl") and os.path.islink("/etc/resolv.conf"):
+            logger.debug("Running resolvectl command for leak_protection")
+            cmd_args = ["resolvectl", "dns", "proton0", dns_server]
+            pipes = subprocess.Popen(cmd_args, stderr=subprocess.PIPE)
+            _, std_err = pipes.communicate()
+            if pipes.returncode != 0:
+                raise Exception(f"{' '.join(cmd_args)} failed with code {pipes.returncode} -> {std_err.strip()}")
         else:
-            logger.debug("DNS Leak Protection is enabled")
-        # Make sure DNS Server has been provided
-        if not dns_server:
-            raise Exception("No DNS Server has been provided.")
+            # Restore original resolv.conf if it exists
+            if os.path.isfile(backupfile):
+                logger.debug("resolv.conf.backup exists")
+                manage_dns("restore")
+            # Check for custom DNS Server
+            if not int(get_config_value("USER", "dns_leak_protection")):
+                if get_config_value("USER", "custom_dns") == "None":
+                    logger.debug("DNS Leak Protection is disabled")
+                    return
+                else:
+                    dns_server = get_config_value("USER", "custom_dns")
+                    logger.debug("Using custom DNS")
+            else:
+                logger.debug("DNS Leak Protection is enabled")
+            # Make sure DNS Server has been provided
+            if not dns_server:
+                raise Exception("No DNS Server has been provided.")
 
-        shutil.copy2(resolvconf_path, backupfile)
-        logger.debug("{0} (resolv.conf) backed up".format(resolvconf_path))
+            shutil.copy2(resolvconf_path, backupfile)
+            logger.debug("{0} (resolv.conf) backed up".format(resolvconf_path))
 
-        # Remove previous nameservers
-        dns_regex = re.compile(r"^nameserver .*$")
+            # Remove previous nameservers
+            dns_regex = re.compile(r"^nameserver .*$")
 
-        with open(backupfile, 'r') as backup_handle:
-            with open(resolvconf_path, 'w') as resolvconf_handle:
-                for line in backup_handle:
-                    if not dns_regex.search(line):
-                        resolvconf_handle.write(line)
+            with open(backupfile, 'r') as backup_handle:
+                with open(resolvconf_path, 'w') as resolvconf_handle:
+                    for line in backup_handle:
+                        if not dns_regex.search(line):
+                            resolvconf_handle.write(line)
 
-        logger.debug("Removed existing DNS Servers")
+            logger.debug("Removed existing DNS Servers")
 
-        # Add ProtonVPN managed DNS Server to resolv.conf
-        dns_server = dns_server.split()
-        with open(resolvconf_path, "a") as f:
-            f.write("# ProtonVPN DNS Servers. Managed by ProtonVPN-CLI.\n")
-            for dns in dns_server[:3]:
-                f.write("nameserver {0}\n".format(dns))
-            logger.debug("Added ProtonVPN or custom DNS")
+            # Add ProtonVPN managed DNS Server to resolv.conf
+            dns_server = dns_server.split()
+            with open(resolvconf_path, "a") as f:
+                f.write("# ProtonVPN DNS Servers. Managed by ProtonVPN-CLI.\n")
+                for dns in dns_server[:3]:
+                    f.write("nameserver {0}\n".format(dns))
+                logger.debug("Added ProtonVPN or custom DNS")
 
-        # Write the hash of the edited file in the configuration
-        #
-        # This is so it doesn't restore an old DNS configuration
-        # if the configuration changes during a VPN session
-        # (e.g. by switching networks)
+            # Write the hash of the edited file in the configuration
+            #
+            # This is so it doesn't restore an old DNS configuration
+            # if the configuration changes during a VPN session
+            # (e.g. by switching networks)
 
-        with open(resolvconf_path, "rb") as f:
-            filehash = zlib.crc32(f.read())
-        set_config_value("metadata", "resolvconf_hash", filehash)
+            with open(resolvconf_path, "rb") as f:
+                filehash = zlib.crc32(f.read())
+            set_config_value("metadata", "resolvconf_hash", filehash)
 
     elif mode == "restore":
         logger.debug("Restoring DNS")
-        if os.path.isfile(backupfile):
+        if not (shutil.which("resolvectl") and os.path.islink("/etc/resolv.conf")):
+            if os.path.isfile(backupfile):
 
-            # Check if the file changed since connection
-            oldhash = get_config_value("metadata", "resolvconf_hash")
-            with open(resolvconf_path, "rb") as f:
-                filehash = zlib.crc32(f.read())
+                # Check if the file changed since connection
+                oldhash = get_config_value("metadata", "resolvconf_hash")
+                with open(resolvconf_path, "rb") as f:
+                    filehash = zlib.crc32(f.read())
 
-            if filehash == int(oldhash):
-                shutil.copy2(backupfile, resolvconf_path)
-                logger.debug("resolv.conf restored from backup")
+                if filehash == int(oldhash):
+                    shutil.copy2(backupfile, resolvconf_path)
+                    logger.debug("resolv.conf restored from backup")
+                else:
+                    logger.debug("resolv.conf changed. Not restoring.")
+
+                os.remove(backupfile)
+                logger.debug("resolv.conf.backup removed")
             else:
-                logger.debug("resolv.conf changed. Not restoring.")
-
-            os.remove(backupfile)
-            logger.debug("resolv.conf.backup removed")
-        else:
-            logger.debug("No Backupfile found")
+                logger.debug("No Backupfile found")
     else:
         raise Exception("Invalid argument provided. "
                         "Mode must be 'restore' or 'leak_protection'")
@@ -731,7 +750,7 @@ def manage_ipv6(mode):
             ipv6_addr = lines[1].strip()
 
         ipv6_info = subprocess.run(
-            "ip addr show dev {0} | grep '\<inet6.*global\>'".format(default_nic), # noqa
+            "ip addr show dev {0} | grep '\<inet6.*global\>'".format(default_nic),  # noqa
             shell=True, stderr=subprocess.PIPE, stdout=subprocess.PIPE
         )
 
@@ -849,10 +868,10 @@ def manage_killswitch(mode, proto=None, port=None):
             "iptables -A INPUT -i lo -j ACCEPT",
             "iptables -A OUTPUT -o {0} -j ACCEPT".format(device),
             "iptables -A INPUT -i {0} -j ACCEPT".format(device),
-            "iptables -A OUTPUT -o {0} -m state --state ESTABLISHED,RELATED -j ACCEPT".format(device), # noqa
-            "iptables -A INPUT -i {0} -m state --state ESTABLISHED,RELATED -j ACCEPT".format(device), # noqa
-            "iptables -A OUTPUT -p {0} -m {1} --dport {2} -j ACCEPT".format(proto.lower(), proto.lower(), port), # noqa
-            "iptables -A INPUT -p {0} -m {1} --sport {2} -j ACCEPT".format(proto.lower(), proto.lower(), port), # noqa
+            "iptables -A OUTPUT -o {0} -m state --state ESTABLISHED,RELATED -j ACCEPT".format(device),  # noqa
+            "iptables -A INPUT -i {0} -m state --state ESTABLISHED,RELATED -j ACCEPT".format(device),  # noqa
+            "iptables -A OUTPUT -p {0} -m {1} --dport {2} -j ACCEPT".format(proto.lower(), proto.lower(), port),  # noqa
+            "iptables -A INPUT -p {0} -m {1} --sport {2} -j ACCEPT".format(proto.lower(), proto.lower(), port),  # noqa
         ]
 
         if int(get_config_value("USER", "killswitch")) == 2:
@@ -865,8 +884,8 @@ def manage_killswitch(mode, proto=None, port=None):
             local_network = local_network.stdout.decode().strip().split()[1]
 
             exclude_lan_commands = [
-                "iptables -A OUTPUT -o {0} -d {1} -j ACCEPT".format(default_nic, local_network), # noqa
-                "iptables -A INPUT -i {0} -s {1} -j ACCEPT".format(default_nic, local_network), # noqa
+                "iptables -A OUTPUT -o {0} -d {1} -j ACCEPT".format(default_nic, local_network),  # noqa
+                "iptables -A INPUT -i {0} -s {1} -j ACCEPT".format(default_nic, local_network),  # noqa
             ]
 
             for lan_command in exclude_lan_commands:

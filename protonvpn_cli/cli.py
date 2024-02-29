@@ -6,6 +6,7 @@ Usage:
     protonvpn (c | connect) [<servername>] [-p <protocol>]
     protonvpn (c | connect) [-f | --fastest] [-p <protocol>]
     protonvpn (c | connect) [--cc <code>] [-p <protocol>]
+    protonvpn (c | connect) [--not-cc <code>] [-p <protocol>]
     protonvpn (c | connect) [--sc] [-p <protocol>]
     protonvpn (c | connect) [--p2p] [-p <protocol>]
     protonvpn (c | connect) [--tor] [-p <protocol>]
@@ -23,6 +24,7 @@ Options:
     -f, --fastest       Select the fastest ProtonVPN server.
     -r, --random        Select a random ProtonVPN server.
     --cc CODE           Determine the country for fastest connect.
+    --not-cc CODE       Determine the country to exclude for fastest connect.
     --sc                Connect to the fastest Secure-Core server.
     --p2p               Connect to the fastest torrent server.
     --tor               Connect to the fastest Tor server.
@@ -123,6 +125,8 @@ def cli():
             connection.direct(args.get("<servername>"), protocol)
         elif args.get("--cc") is not None:
             connection.country_f(args.get("--cc"), protocol)
+        elif args.get("--not-cc") is not None:
+            connection.country_f(args.get("--not-cc"), protocol, True)
         # Features: 1: Secure-Core, 2: Tor, 4: P2P
         elif args.get("--p2p"):
             connection.feature_f(4, protocol)
@@ -290,6 +294,9 @@ def print_examples():
         "               Connect to the fastest VPN Server.\n\n"
         "protonvpn connect --cc AU\n"
         "               Connect to the fastest Australian server\n"
+        "               with the default protocol.\n\n"
+        "protonvpn connect --not-cc AU\n"
+        "               Connect to the fastest server outside Australia\n"
         "               with the default protocol.\n\n"
         "protonvpn c --p2p -p tcp\n"
         "               Connect to the fastest torrent server with TCP.\n\n"
@@ -563,7 +570,7 @@ def set_killswitch():
             "The Kill Switch will block all network traffic\n"
             "if the VPN connection drops unexpectedly.\n"
             "\n"
-            "Please note that the Kill Switch assumes only one network interface being active.\n" # noqa
+            "Please note that the Kill Switch assumes only one network interface being active.\n"  # noqa
             "\n"
             "1) Enable Kill Switch (Block access to/from LAN)\n"
             "2) Enable Kill Switch (Allow access to/from LAN)\n"
