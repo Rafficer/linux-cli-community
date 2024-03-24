@@ -80,11 +80,10 @@ def dialog():
     for country in sorted(countries.keys()):
         country_features = []
         for server in countries[country]:
-            feat = int(get_server_value(server, "Features", servers))
-            for bit_flag in features:
-                if (feat & bit_flag) != 0:
-                    if not features[bit_flag] in country_features:
-                        country_features.append(features[bit_flag])
+            server_features = get_server_features(server, servers)
+            for feat in server_features:
+                if not feat in country_features:
+                    country_features.append(feat)
 
         if len(country_features) == 0:
             country_features.append("Normal")
