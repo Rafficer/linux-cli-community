@@ -14,7 +14,7 @@ from dialog import Dialog
 # protonvpn-cli Functions
 from .logger import logger
 from .utils import (
-    check_init, pull_server_data, is_connected,
+    check_init, get_server_features, pull_server_data, is_connected,
     get_servers, get_server_value, get_config_value,
     set_config_value, get_ip_info, get_country_name,
     get_fastest_server, check_update, get_default_nic,
@@ -57,12 +57,6 @@ def dialog():
 
     pull_server_data()
 
-    features = {
-        1: "Secure-Core",
-        2: "Tor",
-        4: "P2P",
-        8: "Streaming",
-    }
     server_tiers = {0: "F", 1: "B", 2: "P"}
 
     servers = get_servers()
@@ -80,11 +74,10 @@ def dialog():
     for country in sorted(countries.keys()):
         country_features = []
         for server in countries[country]:
-            feat = int(get_server_value(server, "Features", servers))
-            for bit_flag in features:
-                if (feat & bit_flag) != 0:
-                    if not features[bit_flag] in country_features:
-                        country_features.append(features[bit_flag])
+            server_features = get_server_features(server, servers)
+            for feat in server_features:
+                if not feat in country_features:
+                    country_features.append(feat)
 
         if len(country_features) == 0:
             country_features.append("Normal")
@@ -107,21 +100,17 @@ def dialog():
             get_server_value(servername, "Load", servers)
         ).rjust(3, " ")
 
-        servers_features = []
-        feat = int(get_server_value(servername, 'Features', servers))
-        for bit_flag in features:
-            if (feat & bit_flag) != 0:
-                servers_features.append(features[bit_flag])
+        server_features = get_server_features(servername, servers)
 
-        if len(servers_features) == 0:
-            servers_features.append("Normal")
+        if len(server_features) == 0:
+            server_features.append("Normal")
 
         tier = server_tiers[
             get_server_value(servername, "Tier", servers)
         ]
 
         choices.append((servername, "Load: {0}% | {1} | {2}".format(
-            load, tier, ", ".join(servers_features)
+            load, tier, ", ".join(server_features)
         )))
 
     server_result = show_dialog("Choose the server to connect:", choices)
@@ -412,14 +401,12 @@ def status():
     ip, isp = get_ip_info()
 
     # Collect Information
-    all_features = {0: "Normal", 1: "Secure-Core", 2: "Tor", 4: "P2P"}
-
     logger.debug("Collecting status information")
     country_code = get_server_value(connected_server, "ExitCountry", servers)
     country = get_country_name(country_code)
     city = get_server_value(connected_server, "City", servers)
     load = get_server_value(connected_server, "Load", servers)
-    feature = get_server_value(connected_server, "Features", servers)
+    features = get_server_features(connected_server, servers)
     last_connection = get_config_value("metadata", "connected_time")
     connection_time = time.time() - int(last_connection)
 
@@ -441,7 +428,7 @@ def status():
         + "Time:         {0}\n".format(connection_time)
         + "IP:           {0}\n".format(ip)
         + "Server:       {0}\n".format(connected_server)
-        + "Features:     {0}\n".format(all_features[feature])
+        + "Features:     {0}\n".format(', '.join(features))
         + "Protocol:     {0}\n".format(connected_protocol.upper())
         + "Kill Switch:  {0}\n".format(killswitch_status)
         + "Country:      {0}\n".format(country)
