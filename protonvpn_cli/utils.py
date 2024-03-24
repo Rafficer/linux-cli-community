@@ -115,10 +115,12 @@ def get_servers():
     # Sort server IDs by Tier
     return [server for server in servers if server["Tier"] <= user_tier and server["Status"] == 1] # noqa
 
+
 def get_server_value(servername, key, servers):
     """Return the value of a key for a given server."""
     value = [server[key] for server in servers if server['Name'] == servername]
     return value[0]
+
 
 def get_server_features(servername, servers):
     """Decode server feature bit flags and return feature strings in list"""
@@ -128,6 +130,7 @@ def get_server_features(servername, servers):
         if (feat & bit_flag):
             server_features.append(SERVER_FEATURES[bit_flag])
     return server_features
+
 
 def get_config_value(group, key):
     """Return specific value from CONFIG_FILE as string"""

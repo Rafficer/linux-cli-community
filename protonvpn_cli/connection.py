@@ -57,12 +57,6 @@ def dialog():
 
     pull_server_data()
 
-    features = {
-        1: "Secure-Core",
-        2: "Tor",
-        4: "P2P",
-        8: "Streaming",
-    }
     server_tiers = {0: "F", 1: "B", 2: "P"}
 
     servers = get_servers()
@@ -106,21 +100,17 @@ def dialog():
             get_server_value(servername, "Load", servers)
         ).rjust(3, " ")
 
-        servers_features = []
-        feat = int(get_server_value(servername, 'Features', servers))
-        for bit_flag in features:
-            if (feat & bit_flag) != 0:
-                servers_features.append(features[bit_flag])
+        server_features = get_server_features(servername, servers)
 
-        if len(servers_features) == 0:
-            servers_features.append("Normal")
+        if len(server_features) == 0:
+            server_features.append("Normal")
 
         tier = server_tiers[
             get_server_value(servername, "Tier", servers)
         ]
 
         choices.append((servername, "Load: {0}% | {1} | {2}".format(
-            load, tier, ", ".join(servers_features)
+            load, tier, ", ".join(server_features)
         )))
 
     server_result = show_dialog("Choose the server to connect:", choices)
