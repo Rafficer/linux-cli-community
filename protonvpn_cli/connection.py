@@ -14,7 +14,7 @@ from dialog import Dialog
 # protonvpn-cli Functions
 from .logger import logger
 from .utils import (
-    check_init, pull_server_data, is_connected,
+    check_init, get_server_features, pull_server_data, is_connected,
     get_servers, get_server_value, get_config_value,
     set_config_value, get_ip_info, get_country_name,
     get_fastest_server, check_update, get_default_nic,
@@ -412,14 +412,12 @@ def status():
     ip, isp = get_ip_info()
 
     # Collect Information
-    all_features = {0: "Normal", 1: "Secure-Core", 2: "Tor", 4: "P2P"}
-
     logger.debug("Collecting status information")
     country_code = get_server_value(connected_server, "ExitCountry", servers)
     country = get_country_name(country_code)
     city = get_server_value(connected_server, "City", servers)
     load = get_server_value(connected_server, "Load", servers)
-    feature = get_server_value(connected_server, "Features", servers)
+    features = get_server_features(connected_server, servers)
     last_connection = get_config_value("metadata", "connected_time")
     connection_time = time.time() - int(last_connection)
 
@@ -441,7 +439,7 @@ def status():
         + "Time:         {0}\n".format(connection_time)
         + "IP:           {0}\n".format(ip)
         + "Server:       {0}\n".format(connected_server)
-        + "Features:     {0}\n".format(all_features[feature])
+        + "Features:     {0}\n".format(', '.join(features))
         + "Protocol:     {0}\n".format(connected_protocol.upper())
         + "Kill Switch:  {0}\n".format(killswitch_status)
         + "Country:      {0}\n".format(country)
