@@ -8,6 +8,7 @@ This document provides an extensive guide on how to install and use ProtonVPN-CL
   - [Table of Contents](#table-of-contents)
   - [Installation & Updating](#installation--updating)
     - [Installing from distribution repositories](#installing-from-distribution-repositories)
+      - [Guix](#guix)
       - [Fedora](#fedora)
       - [CentOS & RHEL](#centos--rhel)
     - [Installing from PyPI](#installing-from-pypi)
@@ -42,6 +43,12 @@ This document provides an extensive guide on how to install and use ProtonVPN-CL
 ### Installing from distribution repositories
 
 For the following Linux distribution(s), install the official `protonvpn-cli` package:
+
+#### Guix
+
+```sh
+guix install protonvpn-cli
+```
 
 #### Fedora
 
@@ -85,6 +92,7 @@ Depending on your distribution, run the appropriate following command to install
 |Ubuntu/Linux Mint/Debian and derivatives | `sudo apt install -y openvpn dialog python3-pip python3-setuptools`|
 |OpenSUSE/SLES                            | `sudo zypper in -y openvpn dialog python3-pip python3-setuptools`  |
 |Arch Linux/Manjaro                       | `sudo pacman -S openvpn dialog python-pip python-setuptools`       |
+|Guix                                     | `guix environment protonvpn-cli`                                   |
 
 #### Installing ProtonVPN-CLI
 
@@ -494,3 +502,18 @@ Systemd is the current init system of most major Linux distributions. This guide
    `sudo systemctl enable protonvpn-autoconnect`
 
 Now ProtonVPN-CLI should connect automatically when you boot up your system.
+
+#### Additional steps for systems with encrypted home directory
+
+Because ProtonVPN-CLI can not access encrypted home directories before the user is logged in, setting up auto-connect on systems with encrypted home directories requires a few more steps.
+
+6. Initialize your ProtonVPN profile as root by running:
+   ```sh
+   su
+   protonvpn init
+   ```
+   If you have not set a root password (it is not set by default on most Ubuntu-based distributions) you may run `sudo passwd root` and set the password before running `su`.
+
+7. Open the `/etc/systemd/system/protonvpn-autoconnect.service` file created above and remove the `Environment=SUDO_USER=user` line.
+
+*Note: if the VPN connection drops, you will need to run `su` then `protonvpn r` to reconnect as just `sudo protonvpn r` will not take into account the connection started by root which will cause the reconnection to fail.*
