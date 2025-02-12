@@ -65,6 +65,21 @@ from .utils import (change_file_owner, check_init, check_root,
                     get_config_value, is_valid_ip, pull_server_data,
                     set_config_value, wait_for_network)
 
+DEPRECATION_NOTICE = """
+/******************************************DEPRECATION NOTICE********************************************/
+/*                                                                                                      */
+/*          Proton VPN is upgrading its OpenVPN infrastructure.                                         */
+/*          This means the legacy OpenVPN configuration will stop working on 31 March 2025.             */
+/*          After this date, you’ll need to switch to the official Proton VPN for Linux app,            */
+/*          or reconfigure OpenVPN or WireGuard manually.                                               */
+/*          See:                                                                                        */
+/*          - Official app: https://protonvpn.com/support/linux-vpn-setup/                              */
+/*          - WireGuard: https://protonvpn.com/support/wireguard-configurations/                        */
+/*          - OpenVPN: https://protonvpn.com/support/vpn-config-download/                               */
+/*                                                                                                      */
+/********************************************************************************************************/
+"""
+
 
 def main():
     """Main function"""
@@ -78,11 +93,7 @@ def main():
 def cli():
     """Run user's input command."""
 
-    if shutil.which("NetworkManager") or shutil.which("nmcli"):
-        print(
-            "\nProtonVPN now offers an official Linux app which includes a graphical user interface.\n"
-            "Visit https://protonvpn.com/support/official-linux-client to upgrade."
-        )
+    print(DEPRECATION_NOTICE)
 
     # Initial log values
     change_file_owner(os.path.join(CONFIG_DIR, "pvpn-cli.log"))

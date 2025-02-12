@@ -16,9 +16,8 @@
 
 ProtonVPN-CLI is a full rewrite of the [bash protonvpn-cli](https://github.com/ProtonVPN/protonvpn-cli/blob/master/protonvpn-cli.sh) in Python, which adds more features and functionality with the purpose of improving readability, speed and reliability.
 
-## Important information
-The [official ProtonVPN Linux](https://protonvpn.com/blog/protonvpn-linux-app/) app is available for Debian 10, Ubuntu 20+, Mint 19+, MX Linux 19+, Fedora 31+ and Archlinux / Manjaro. Where possible, we recommend that you [upgrade to the official app](https://protonvpn.com/support/linux-vpn-setup/).
-The community Linux client described below remains available for those who need it.
+## Deprecation notice
+Proton VPN is upgrading its OpenVPN infrastructure. This means the legacy OpenVPN configuration will stop working on 31 March 2025. After this date, you’ll need to switch to the [official Proton VPN for Linux app](https://protonvpn.com/support/linux-vpn-setup/), or reconfigure [OpenVPN](https://protonvpn.com/support/vpn-config-download/) or [WireGuard](https://protonvpn.com/support/wireguard-configurations/) manually.
 
 ## Installation & Updating
 
