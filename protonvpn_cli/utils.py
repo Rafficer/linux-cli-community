@@ -16,7 +16,7 @@ from jinja2 import Environment, FileSystemLoader
 from .logger import logger
 # Constants
 from .constants import (
-    USER, CONFIG_FILE, SERVER_INFO_FILE, SPLIT_TUNNEL_FILE,
+    USER, CONFIG_FILE, SERVER_INFO_FILE, SERVER_FEATURES, SPLIT_TUNNEL_FILE,
     VERSION, OVPN_FILE, CLIENT_SUFFIX
 )
 import distro
@@ -120,6 +120,16 @@ def get_server_value(servername, key, servers):
     """Return the value of a key for a given server."""
     value = [server[key] for server in servers if server['Name'] == servername]
     return value[0]
+
+
+def get_server_features(servername, servers):
+    """Decode server feature bit flags and return feature strings in list"""
+    feat = int(get_server_value(servername, "Features", servers))
+    server_features = []
+    for bit_flag in SERVER_FEATURES:
+        if (feat & bit_flag):
+            server_features.append(SERVER_FEATURES[bit_flag])
+    return server_features
 
 
 def get_config_value(group, key):
