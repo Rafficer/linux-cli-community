@@ -281,11 +281,15 @@ You can use the `--random` or `-r` flag to connect to a random server:
 
 `protonvpn c -r`
 
-There are several other variables to keep in mind when you want to connect to the “fastest” server. You can connect to the fastest server in a country, the fastest Secure Core server, the fastest P2P-enabled server, or the fastest Tor server.
+There are several other variables to keep in mind when you want to connect to the “fastest” server. You can connect to the fastest server in a country, the fastest server outside a country, the fastest Secure Core server, the fastest P2P-enabled server, or the fastest Tor server.
 
 Fastest server in a country (replace UK with the code of the desired country, e.g. `US` for USA, `JP` for Japan, `AU` for Australia, etc.):
 
 `protonvpn c --cc UK`
+
+Fastest server outside a country (replace UK with the code of the desired country, e.g. `US` for USA, `JP` for Japan, `AU` for Australia, etc.):
+
+`protonvpn c --not-cc UK`
 
 Fastest Secure Core server:
 
